@@ -33,7 +33,7 @@ class Mysql extends \Flake\Core\Database {
     protected $sUsername = "";
     protected $sPassword = "";
 
-    function __construct($sHost, $sDbName, $sUsername, $sPassword) {
+    public function __construct($sHost, $sDbName, $sUsername, $sPassword) {
         $this->sHost = $sHost;
         $this->sDbName = $sDbName;
         $this->sUsername = $sUsername;
@@ -47,7 +47,7 @@ class Mysql extends \Flake\Core\Database {
         $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
-    function tables() {
+    public function tables() {
         $aTables = [];
 
         $sSql = "SHOW TABLES FROM `" . $this->sDbName . "`";

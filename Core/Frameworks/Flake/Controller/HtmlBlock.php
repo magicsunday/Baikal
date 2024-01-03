@@ -33,14 +33,14 @@ class HtmlBlock extends \Flake\Core\Controller {
      */
     private $sHtml;
 
-    function __construct($sHtml) {
+    public function __construct($sHtml) {
         $this->sHtml = $sHtml;
     }
 
-    function execute() {
+    public function execute() {
     }
 
-    function render() {
+    public function render() {
         return $this->sHtml;
     }
 }

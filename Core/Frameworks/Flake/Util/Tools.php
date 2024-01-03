@@ -31,7 +31,7 @@ class Tools extends \Flake\Core\FLObject {
     private function __construct() {    # private constructor to force static class
     }
 
-    static function getCurrentUrl() {
+    public static function getCurrentUrl() {
         if (MONGOOSE_SERVER) {
             $sUrl = $GLOBALS["_SERVER"]["REQUEST_URI"];
             if (array_key_exists("QUERY_STRING", $GLOBALS["_SERVER"]) && trim($GLOBALS["_SERVER"]["QUERY_STRING"]) !== "") {
@@ -44,7 +44,7 @@ class Tools extends \Flake\Core\FLObject {
         return $sUrl;
     }
 
-    static function getCurrentProtocol() {
+    public static function getCurrentProtocol() {
         if (isset($GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO']) && !empty($GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO'])) {
             return $GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO'];
         }
@@ -56,7 +56,7 @@ class Tools extends \Flake\Core\FLObject {
         return "http";
     }
 
-    static function deCamelCase($sString, $sGlue = " ") {
+    public static function deCamelCase($sString, $sGlue = " ") {
         $sSep = md5(rand());
         $sRes = preg_replace('/(?!^)[[:upper:]][[:lower:]]/', '$0', preg_replace('/(?!^)[[:upper:]]+/', $sSep . '$0', $sString));
         if ($sGlue !== "" && preg_match('/^[[:upper:]].*/', $sRes)) {
@@ -66,11 +66,11 @@ class Tools extends \Flake\Core\FLObject {
         return str_replace($sSep, $sGlue, $sRes);
     }
 
-    static function serverToRelativeWebPath($sAbsPath) {
+    public static function serverToRelativeWebPath($sAbsPath) {
         return "/" . str_replace(PROJECT_PATH_WWWROOT, "", $sAbsPath);
     }
 
-    static function view_array($array_in) {
+    public static function view_array($array_in) {
         if (is_array($array_in)) {
             $result = '<table border="1" cellpadding="1" cellspacing="0" bgcolor="white">';
             if (!count($array_in)) {
@@ -110,7 +110,7 @@ class Tools extends \Flake\Core\FLObject {
         return $result;
     }
 
-    static function debug($var = "", $brOrHeader = 0) {
+    public static function debug($var = "", $brOrHeader = 0) {
         if ($brOrHeader === 0) {
             try {
                 $trail = debug_backtrace();
@@ -158,7 +158,7 @@ class Tools extends \Flake\Core\FLObject {
         }
     }
 
-    static function debug_trail() {
+    public static function debug_trail() {
         $trail = debug_backtrace();
         $trail = array_reverse($trail);
         array_pop($trail);
@@ -171,7 +171,7 @@ class Tools extends \Flake\Core\FLObject {
         return implode(' // ', $path);
     }
 
-    static function POST($sVar = false) {
+    public static function POST($sVar = false) {
         if ($sVar !== false) {
             $aData = \Flake\Util\Tools::POST();
             if (array_key_exists($sVar, $aData)) {
@@ -184,7 +184,7 @@ class Tools extends \Flake\Core\FLObject {
         return is_array($GLOBALS["_POST"]) ? $GLOBALS["_POST"] : [];
     }
 
-    static function GET($sVar = false) {
+    public static function GET($sVar = false) {
         if ($sVar !== false) {
             $aData = \Flake\Util\Tools::GET();
             if (array_key_exists($sVar, $aData)) {
@@ -197,7 +197,7 @@ class Tools extends \Flake\Core\FLObject {
         return is_array($GLOBALS["_GET"]) ? $GLOBALS["_GET"] : [];
     }
 
-    static function GP($sVar = false) {
+    public static function GP($sVar = false) {
         if ($sVar !== false) {
             $aData = \Flake\Util\Tools::GP();
             if (array_key_exists($sVar, $aData)) {
@@ -213,43 +213,43 @@ class Tools extends \Flake\Core\FLObject {
         );
     }
 
-    static function safelock($sString) {
+    public static function safelock($sString) {
         return substr(md5(PROJECT_SAFEHASH_SALT . ":" . $sString), 0, 5);
     }
 
-    static function redirect($sUrl) {
+    public static function redirect($sUrl) {
         header("Location: " . $sUrl);
         exit(0);
     }
 
-    static function redirectUsingMeta($sUrl) {
+    public static function redirectUsingMeta($sUrl) {
         $sDoc = "<html><head><meta http-equiv='refresh' content='0; url=" . $sUrl . "'></meta></head><body></body></html>";
         echo $sDoc;
         exit(0);
     }
 
-    static function refreshPage() {
+    public static function refreshPage() {
         header("Location: " . \Flake\Util\Tools::getCurrentUrl());
         exit(0);
     }
 
-    static function validEmail($sEmail) {
+    public static function validEmail($sEmail) {
         return (filter_var($sEmail, FILTER_VALIDATE_EMAIL) !== false);
     }
 
-    static function filterFormInput($sInput) {
+    public static function filterFormInput($sInput) {
         return strip_tags($sInput);
     }
 
-    static function getHumanDate($iStamp) {
+    public static function getHumanDate($iStamp) {
         return ucwords(strftime("%A, %d %B %Y", $iStamp));
     }
 
-    static function getHumanTime($iStamp) {
+    public static function getHumanTime($iStamp) {
         return strftime("%Hh%M", $iStamp);
     }
 
-    static function trimExplode($string, $delim = ",", $removeEmptyValues = false, $limit = 0) {
+    public static function trimExplode($string, $delim = ",", $removeEmptyValues = false, $limit = 0) {
         $explodedValues = explode($delim, $string);
 
         $result = array_map('trim', $explodedValues);
@@ -286,7 +286,7 @@ class Tools extends \Flake\Core\FLObject {
      *
      * @return	bool		True if $partStr was found to be equal to the first part of $str
      */
-    static function isFirstPartOfStr($str, $partStr) {
+    public static function isFirstPartOfStr($str, $partStr) {
         // Returns true, if the first part of a $str equals $partStr and $partStr is not ''
         $psLen = strlen($partStr);
         if ($psLen) {
@@ -303,7 +303,7 @@ class Tools extends \Flake\Core\FLObject {
      *
      * @return	string		file contents
      */
-    static function file_readBin($sPath) {
+    public static function file_readBin($sPath) {
         $sData = "";
         $rFile = fopen($sPath, "rb");
         while (!feof($rFile)) {
@@ -323,13 +323,13 @@ class Tools extends \Flake\Core\FLObject {
      *
      * @return	void
      */
-    static function file_writeBin($sPath, $sData) {
+    public static function file_writeBin($sPath, $sData) {
         $rFile = fopen($sPath, "wb");
         fputs($rFile, $sData);
         fclose($rFile);
     }
 
-    static function sendHtmlMail($sToAddress, $sSubject, $sBody, $sFromName, $sFromAddress, $sReplyToName, $sReplyToAddress) {
+    public static function sendHtmlMail($sToAddress, $sSubject, $sBody, $sFromName, $sFromAddress, $sReplyToName, $sReplyToAddress) {
         $sMessage = <<<TEST
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -350,11 +350,11 @@ TEST;
         mail($sToAddress, $sSubject, $sMessage, $sHeaders);
     }
 
-    static function shortMD5($sValue) {
+    public static function shortMD5($sValue) {
         return strtolower(substr(md5($sValue), 0, 5));
     }
 
-    static function overrideFirstWithSecond($sFirst, $sSecond) {
+    public static function overrideFirstWithSecond($sFirst, $sSecond) {
         if (trim($sSecond) !== "") {
             return $sSecond;
         }
@@ -362,7 +362,7 @@ TEST;
         return "" . $sFirst;
     }
 
-    static function parseTemplateCode($sCode, $aMarkers) {
+    public static function parseTemplateCode($sCode, $aMarkers) {
         $tplName = md5($sCode);
         $loader = new \Twig\Loader\ArrayLoader([$tplName => $sCode]);
         $env = new \Twig\Environment($loader);
@@ -371,7 +371,7 @@ TEST;
         return $env->render($tplName, $aMarkers);
     }
 
-    static function is_a($object, $class) {
+    public static function is_a($object, $class) {
         if (is_object($object)) {
             return $object instanceof $class;
         }
@@ -394,13 +394,13 @@ TEST;
         return false;
     }
 
-    static function HTTPStatus($iCode, $sMessage) {
+    public static function HTTPStatus($iCode, $sMessage) {
         header("HTTP/1.1 404 Not Found");
         header("Status: 404 Not Found");
         exit("<h1>HTTP Status " . $iCode . " : " . $sMessage . "</h1>");
     }
 
-    static function number2Rank($a) {
+    public static function number2Rank($a) {
         $a = intval($a);
 
         if ($a === 1) {
@@ -423,7 +423,7 @@ TEST;
         return $sNumber . "ième";
     }
 
-    static function number2Human($a) {
+    public static function number2Human($a) {
         $temp = explode('.', $a);
         if (isset($temp[1]) && $temp[1] != '') {
             return self::number2Human($temp[0]) . ' virgule ' . self::number2Human($temp[1]);
@@ -499,7 +499,7 @@ TEST;
         }
     }
 
-    static function stringToUrlToken($sString) {
+    public static function stringToUrlToken($sString) {
         # Taken from TYPO3 extension realurl
 
         $space = "-";
@@ -519,11 +519,11 @@ TEST;
         return $sString;
     }
 
-    static function isCliPhp() {
+    public static function isCliPhp() {
         return strtolower(php_sapi_name()) === "cli";
     }
 
-    static function getIP() {
+    public static function getIP() {
         $alt_ip = $_SERVER['REMOTE_ADDR'];
 
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
@@ -543,33 +543,33 @@ TEST;
         return $alt_ip;
     }
 
-    static function getUserAgent() {
+    public static function getUserAgent() {
         return $_SERVER['HTTP_USER_AGENT'];
     }
 
     ###########
-    static function appendSlash($sString) {
+    public static function appendSlash($sString) {
         return self::appendString($sString, "/");
     }
 
-    static function prependSlash($sString) {
+    public static function prependSlash($sString) {
         return self::prependString($sString, "/");
     }
 
-    static function stripBeginSlash($sString) {
+    public static function stripBeginSlash($sString) {
         return self::stripBeginString($sString, "/");
     }
 
-    static function stripEndSlash($sString) {
+    public static function stripEndSlash($sString) {
         return self::stripEndString($sString, "/");
     }
 
-    static function trimSlashes($sString) {
+    public static function trimSlashes($sString) {
         return self::stripBeginSlash(self::stripEndSlash($sString));
     }
 
     ###########
-    static function appendString($sString, $sAppend) {
+    public static function appendString($sString, $sAppend) {
         if (substr($sString, -1 * strlen($sAppend)) !== $sAppend) {
             $sString .= $sAppend;
         }
@@ -577,7 +577,7 @@ TEST;
         return $sString;
     }
 
-    static function prependString($sString, $sAppend) {
+    public static function prependString($sString, $sAppend) {
         if (substr($sString, 0, 1 * strlen($sAppend)) !== $sAppend) {
             $sString = $sAppend . $sString;
         }
@@ -585,7 +585,7 @@ TEST;
         return $sString;
     }
 
-    static function stripBeginString($sString, $sAppend) {
+    public static function stripBeginString($sString, $sAppend) {
         if (substr($sString, 0, 1 * strlen($sAppend)) === $sAppend) {
             $sString = substr($sString, strlen($sAppend));
         }
@@ -593,7 +593,7 @@ TEST;
         return $sString;
     }
 
-    static function stripEndString($sString, $sAppend) {
+    public static function stripEndString($sString, $sAppend) {
         if (substr($sString, -1 * strlen($sAppend)) === $sAppend) {
             $sString = substr($sString, 0, -1 * strlen($sAppend));
         }
@@ -601,21 +601,21 @@ TEST;
         return $sString;
     }
 
-    static function trimStrings($sString, $sAppend) {
+    public static function trimStrings($sString, $sAppend) {
         return self::stripBeginString(self::stripEndString($sString, $sAppend), $sAppend);
     }
 
-    static function stringEndsWith($sHaystack, $sNeedle) {
+    public static function stringEndsWith($sHaystack, $sNeedle) {
         return substr($sHaystack, strlen($sNeedle) * -1) === $sNeedle;
     }
 
     ###########
 
-    static function router() {
+    public static function router() {
         return "\Flake\Util\Router\QuestionMarkRewrite";
     }
 
-    static function arrayIsAssoc($aArray) {
+    public static function arrayIsAssoc($aArray) {
         if (!is_array($aArray)) {
             throw new \Exception("\Flake\Util\Tools::arrayIsAssoc(): parameter has to be an array.");
         }
@@ -625,11 +625,11 @@ TEST;
         return (bool) count(array_filter(array_keys($aArray), 'is_string'));
     }
 
-    static function arrayIsSeq($aArray) {
+    public static function arrayIsSeq($aArray) {
         return !self::arrayIsAssoc($aArray);
     }
 
-    static function echoAndCutClient($sMessage = '') {
+    public static function echoAndCutClient($sMessage = '') {
         ignore_user_abort(true);
         #		set_time_limit(0);
 
@@ -640,11 +640,11 @@ TEST;
         flush();
     }
 
-    static function milliseconds() {
+    public static function milliseconds() {
         return intval((microtime(true) * 1000));
     }
 
-    static function stopWatch($sWhat) {
+    public static function stopWatch($sWhat) {
         #		return;
         $iStop = \Flake\Util\Tools::milliseconds();
 
@@ -667,7 +667,7 @@ TEST;
     }
 
     # Taken from http://www.php.net/manual/en/function.gzdecode.php#82930
-    static function gzdecode($data, &$filename = '', &$error = '', $maxlength = null) {
+    public static function gzdecode($data, &$filename = '', &$error = '', $maxlength = null) {
         $len = strlen($data);
         if ($len < 18 || strcmp(substr($data, 0, 2), "\x1f\x8b")) {
             $error = "Not in GZIP format.";

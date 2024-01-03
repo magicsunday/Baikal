@@ -38,12 +38,12 @@ class HtmlBlockTemplated extends \Flake\Core\Controller {
      */
     private $aMarkers;
 
-    function __construct($sTemplatePath, $aMarkers = []) {
+    public function __construct($sTemplatePath, $aMarkers = []) {
         $this->sTemplatePath = $sTemplatePath;
         $this->aMarkers = $aMarkers;
     }
 
-    function render() {
+    public function render() {
         $oTemplate = new \Flake\Core\Template($this->sTemplatePath);
         $sHtml = $oTemplate->parse(
             $this->aMarkers
@@ -52,7 +52,7 @@ class HtmlBlockTemplated extends \Flake\Core\Controller {
         return $sHtml;
     }
 
-    function execute() {
+    public function execute() {
         // TODO: Implement execute() method.
     }
 }

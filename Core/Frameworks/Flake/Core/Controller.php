@@ -30,19 +30,19 @@ namespace Flake\Core;
 abstract class Controller extends \Flake\Core\FLObject {
     protected $aParams = [];
 
-    function __construct($aParams = []) {
+    public function __construct($aParams = []) {
         $this->aParams = $aParams;
     }
 
-    function getParams() {
+    public function getParams() {
         return $this->aParams;
     }
 
-    static function link(/*[$sParam, $sParam2, ...]*/) {
+    public static function link(/*[$sParam, $sParam2, ...]*/) {
         return static::buildRoute();
     }
 
-    static function buildRoute($aParams = []) {
+    public static function buildRoute($aParams = []) {
         # TODO: il faut remplacer le mécanisme basé sur un nombre variable de paramètres en un mécanisme basé sur un seul paramètre "tableau"
         #$aParams = func_get_args();
         $sController = "\\" . get_called_class();
@@ -52,7 +52,7 @@ abstract class Controller extends \Flake\Core\FLObject {
         return $GLOBALS["ROUTER"]::buildRouteForController($sController, $aParams);
     }
 
-    abstract function execute();
+    abstract public function execute();
 
-    abstract function render();
+    abstract public function render();
 }

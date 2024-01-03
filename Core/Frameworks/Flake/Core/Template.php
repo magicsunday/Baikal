@@ -31,7 +31,7 @@ class Template extends \Flake\Core\FLObject {
     private $sAbsPath = "";
     private $sHtml = "";
 
-    function __construct($sAbsPath) {
+    public function __construct($sAbsPath) {
         $this->sAbsPath = $sAbsPath;
         $this->sHtml = $this->getTemplateFile(
             $this->sAbsPath
@@ -42,7 +42,7 @@ class Template extends \Flake\Core\FLObject {
         return file_get_contents($sAbsPath);
     }
 
-    function parse($aMarkers = []) {
+    public function parse($aMarkers = []) {
         return \Flake\Util\Tools::parseTemplateCode(
             $this->sHtml,
             $aMarkers

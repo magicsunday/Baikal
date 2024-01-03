@@ -28,7 +28,7 @@
 namespace Flake\Model;
 
 interface IUser {
-    function isAdmin();
+    public function isAdmin();
 
-    function getDisplayName();
+    public function getDisplayName();
 }

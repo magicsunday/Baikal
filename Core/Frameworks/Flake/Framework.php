@@ -30,7 +30,7 @@ namespace Flake;
 use Symfony\Component\Yaml\Yaml;
 
 class Framework extends \Flake\Core\Framework {
-    static function rmBeginSlash($sString) {
+    public static function rmBeginSlash($sString) {
         if (substr($sString, 0, 1) === "/") {
             $sString = substr($sString, 1);
         }
@@ -38,7 +38,7 @@ class Framework extends \Flake\Core\Framework {
         return $sString;
     }
 
-    static function rmEndSlash($sString) {
+    public static function rmEndSlash($sString) {
         if (substr($sString, -1) === "/") {
             $sString = substr($sString, 0, -1);
         }
@@ -46,7 +46,7 @@ class Framework extends \Flake\Core\Framework {
         return $sString;
     }
 
-    static function appendSlash($sString) {
+    public static function appendSlash($sString) {
         if (substr($sString, -1) !== "/") {
             $sString .= "/";
         }
@@ -54,7 +54,7 @@ class Framework extends \Flake\Core\Framework {
         return $sString;
     }
 
-    static function prependSlash($sString) {
+    public static function prependSlash($sString) {
         if (substr($sString, 0, 1) !== "/") {
             $sString = "/" . $sString;
         }
@@ -62,13 +62,13 @@ class Framework extends \Flake\Core\Framework {
         return $sString;
     }
 
-    static function rmQuery($sString) {
+    public static function rmQuery($sString) {
         $iStart = strpos($sString, "?");
 
         return ($iStart === false) ? $sString : substr($sString, 0, $iStart);
     }
 
-    static function rmScriptName($sString, $sScriptName) {
+    public static function rmScriptName($sString, $sScriptName) {
         $sScriptBaseName = basename($sScriptName);
         if (self::endswith($sString, $sScriptBaseName)) {
             return substr($sString, 0, -strlen($sScriptBaseName));
@@ -77,13 +77,13 @@ class Framework extends \Flake\Core\Framework {
         return $sString;
     }
 
-    static function rmProjectContext($sString) {
+    public static function rmProjectContext($sString) {
         return self::appendSlash(
             substr($sString, 0, -1 * strlen(PROJECT_CONTEXT_BASEURI))
         );
     }
 
-    static function endsWith($sString, $sTest) {
+    public static function endsWith($sString, $sTest) {
         $iTestLen = strlen($sTest);
         if ($iTestLen > strlen($sString)) {
             return false;
@@ -92,7 +92,7 @@ class Framework extends \Flake\Core\Framework {
         return substr_compare($sString, $sTest, -$iTestLen) === 0;
     }
 
-    static function bootstrap() {
+    public static function bootstrap() {
         # Asserting PHP 5.5.0+
         if (version_compare(PHP_VERSION, '5.5.0', '<')) {
             exit('Flake Fatal Error: Flake requires PHP 5.5.0+ to run properly. Your version is: ' . PHP_VERSION . '.');
@@ -339,7 +339,7 @@ class Framework extends \Flake\Core\Framework {
         return true;
     }
 
-    static function isDBInitialized() {
+    public static function isDBInitialized() {
         return isset($GLOBALS["DB"]) && \Flake\Util\Tools::is_a($GLOBALS["DB"], "\Flake\Core\Database");
     }
 }

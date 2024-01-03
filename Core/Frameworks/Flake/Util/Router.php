@@ -28,7 +28,7 @@
 namespace Flake\Util;
 
 abstract class Router extends \Flake\Core\FLObject {
-    static $sURIPath = "";
+    public static $sURIPath = "";
 
     /* ----------------------- COMMON METHODS ------------------------------*/
 
@@ -36,23 +36,23 @@ abstract class Router extends \Flake\Core\FLObject {
         # private constructor for static class
     }
 
-    static function getRoutes() {
+    public static function getRoutes() {
         reset($GLOBALS["ROUTES"]);
 
         return $GLOBALS["ROUTES"];
     }
 
-    static function getControllerForRoute($sRoute) {
+    public static function getControllerForRoute($sRoute) {
         return str_replace("\\Route", "\\Controller", self::getRouteClassForRoute($sRoute));
     }
 
-    static function getRouteClassForRoute($sRoute) {
+    public static function getRouteClassForRoute($sRoute) {
         $aRoutes = $GLOBALS["ROUTER"]::getRoutes();
 
         return $aRoutes[$sRoute];
     }
 
-    static function getRouteForController($sController) {
+    public static function getRouteForController($sController) {
         if ($sController[0] !== "\\") {
             $sController = "\\" . $sController;
         }
@@ -68,7 +68,7 @@ abstract class Router extends \Flake\Core\FLObject {
         return false;
     }
 
-    static function route(\Flake\Core\Render\Container &$oRenderContainer) {
+    public static function route(\Flake\Core\Render\Container &$oRenderContainer) {
         $sRouteClass = $GLOBALS["ROUTER"]::getRouteClassForRoute(
             $GLOBALS["ROUTER"]::getCurrentRoute()
         );
@@ -76,7 +76,7 @@ abstract class Router extends \Flake\Core\FLObject {
         $sRouteClass::layout($oRenderContainer);
     }
 
-    static function buildRouteForController($sController, $aParams = []) {
+    public static function buildRouteForController($sController, $aParams = []) {
         #$aParams = func_get_args();
         #array_shift($aParams);	# stripping $sController
         if (($sRouteForController = $GLOBALS["ROUTER"]::getRouteForController($sController)) === false) {
@@ -107,7 +107,7 @@ abstract class Router extends \Flake\Core\FLObject {
         return $GLOBALS["ROUTER"]::buildRoute($sRouteForController, $aRewrittenParams);
     }
 
-    static function buildCurrentRoute(/*[$sParam, $sParam2, ...]*/) {
+    public static function buildCurrentRoute(/*[$sParam, $sParam2, ...]*/) {
         $aParams = func_get_args();
         $sCurrentRoute = $GLOBALS["ROUTER"]::getCurrentRoute();
 
@@ -116,11 +116,11 @@ abstract class Router extends \Flake\Core\FLObject {
         return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
     }
 
-    static function setURIPath($sURIPath) {
+    public static function setURIPath($sURIPath) {
         static::$sURIPath = $sURIPath;
     }
 
-    static function getUriPath() {
+    public static function getUriPath() {
         return FLAKE_URIPATH . static::$sURIPath;
     }
 
@@ -128,14 +128,14 @@ abstract class Router extends \Flake\Core\FLObject {
 
     # this method is likely to change with every Router implementation
     # should be abstract, but is not, because of PHP's strict standards
-    static function buildRoute($sRoute, $aParams/* [, $sParam, $sParam2, ...] */) {
+    public static function buildRoute($sRoute, $aParams/* [, $sParam, $sParam2, ...] */) {
     }
 
     # should be abstract, but is not, because of PHP's strict standards
-    static function getCurrentRoute() {
+    public static function getCurrentRoute() {
     }
 
     # should be abstract, but is not, because of PHP's strict standards
-    static function getURLParams() {
+    public static function getURLParams() {
     }
 }

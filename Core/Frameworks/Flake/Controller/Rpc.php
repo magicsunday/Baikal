@@ -28,12 +28,12 @@
 namespace Flake\Controller;
 
 class Rpc extends \Flake\Core\Render\Container {
-    function initializeContext() {
+    public function initializeContext() {
         $this->injectHTTPHeaders();
         $GLOBALS["POSTCONNECTIONSERVICES"] = [];
     }
 
-    function injectHTTPHeaders() {
+    public function injectHTTPHeaders() {
         ob_start();
 
         header("Access-Control-Allow-Origin: *");    # To allow cross domain AJAX response
@@ -45,12 +45,12 @@ class Rpc extends \Flake\Core\Render\Container {
         ignore_user_abort(true);
     }
 
-    function P3PAllowCrossDomainCookies() {
+    public function P3PAllowCrossDomainCookies() {
         # This tells IE6+ to accept passing cookies allong when establishing a XHR connection to read.codr.fr
         header('P3P: CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"');
     }
 
-    function sendResponseCutClientAndRunPostConnectionTasks() {
+    public function sendResponseCutClientAndRunPostConnectionTasks() {
         header("Content-Length: " . ob_get_length());
         ob_end_flush();
         flush();

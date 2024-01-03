@@ -30,11 +30,11 @@ namespace Flake\Core\Database;
 class Statement extends \Flake\Core\FLObject {
     protected $stmt;
 
-    function __construct($stmt) {
+    public function __construct($stmt) {
         $this->stmt = $stmt;
     }
 
-    function fetch() {
+    public function fetch() {
         if ($this->stmt !== false) {
             return $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_FIRST);
         }

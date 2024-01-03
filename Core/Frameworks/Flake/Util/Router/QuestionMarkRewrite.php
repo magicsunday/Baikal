@@ -28,7 +28,7 @@
 namespace Flake\Util\Router;
 
 class QuestionMarkRewrite extends \Flake\Util\Router {
-    static function getCurrentRoute() {
+    public static function getCurrentRoute() {
         $aMatches = [];
         $sRouteTokens = implode("/", self::getRouteTokens());
 
@@ -55,7 +55,7 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         return array_shift($aBestMatches);        // first route amongst best matches
     }
 
-    static function buildRoute($sRoute, $aParams = []/* [, $sParam, $sParam2, ...] */) {
+    public static function buildRoute($sRoute, $aParams = []/* [, $sParam, $sParam2, ...] */) {
         #		$aParams = func_get_args();
         #		array_shift($aParams);	# Stripping $sRoute
 
@@ -118,7 +118,7 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         return [];
     }
 
-    static function getURLParams() {
+    public static function getURLParams() {
         $aTokens = self::getRouteTokens();
 
         # stripping route

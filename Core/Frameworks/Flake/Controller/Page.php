@@ -38,53 +38,53 @@ class Page extends \Flake\Core\Render\Container {
      */
     private $sBaseUrl;
 
-    function __construct($sTemplatePath) {
+    public function __construct($sTemplatePath) {
         $this->sTemplatePath = $sTemplatePath;
     }
 
-    function setTitle($sTitle) {
+    public function setTitle($sTitle) {
         $this->sTitle = $sTitle;
     }
 
-    function setMetaKeywords($sKeywords) {
+    public function setMetaKeywords($sKeywords) {
         $this->sMetaKeywords = $sKeywords;
     }
 
-    function setMetaDescription($sDescription) {
+    public function setMetaDescription($sDescription) {
         $this->sMetaDescription = $sDescription;
     }
 
-    function getTitle() {
+    public function getTitle() {
         return $this->sTitle;
     }
 
-    function getMetaKeywords() {
+    public function getMetaKeywords() {
         $sString = str_replace(["le", "la", "les", "de", "des", "un", "une"], " ", $this->sMetaKeywords);
         $sString = \Flake\Util\Tools::stringToUrlToken($sString);
 
         return implode(", ", explode("-", $sString));
     }
 
-    function getMetaDescription() {
+    public function getMetaDescription() {
         return $this->sMetaDescription;
     }
 
-    function setBaseUrl($sBaseUrl) {
+    public function setBaseUrl($sBaseUrl) {
         $this->sBaseUrl = $sBaseUrl;
     }
 
-    function getBaseUrl() {
+    public function getBaseUrl() {
         return $this->sBaseUrl;
     }
 
-    function injectHTTPHeaders() {
+    public function injectHTTPHeaders() {
         header("Content-Type: text/html; charset=UTF-8");
 
         header("X-Frame-Options: DENY");    # Prevent Clickjacking attacks
         header("X-Content-Type-Options: nosniff");    # Prevent code injection via mime type sniffing
     }
 
-    function render() {
+    public function render() {
         $this->execute();
 
         $aRenderedBlocks = $this->renderBlocks();
@@ -101,7 +101,7 @@ class Page extends \Flake\Core\Render\Container {
         return $sHtml;
     }
 
-    function addCss($sCssAbsPath) {
+    public function addCss($sCssAbsPath) {
         if (\Flake\Util\Frameworks::enabled("LessPHP")) {
             $sCompiledPath = PATH_buildcss;
             $sFileName = basename($sCssAbsPath);

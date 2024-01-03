@@ -34,7 +34,7 @@ abstract class Requester extends \Flake\Core\FLObject {
     protected $iLimitStart = false;
     protected $iLimitNumber = false;
 
-    function __construct($sModelClass) {
+    public function __construct($sModelClass) {
         $this->sModelClass = $sModelClass;
     }
 
@@ -44,7 +44,7 @@ abstract class Requester extends \Flake\Core\FLObject {
         return $this;
     }
 
-    function limit($iStart, $iNumber = false) {
+    public function limit($iStart, $iNumber = false) {
         if ($iNumber !== false) {
             return $this->setLimitStart($iStart)->setLimitNumber($iNumber);
         }
@@ -52,28 +52,28 @@ abstract class Requester extends \Flake\Core\FLObject {
         return $this->setLimitStart($iStart);
     }
 
-    function orderBy($sOrderField, $sOrderDirection = "ASC") {
+    public function orderBy($sOrderField, $sOrderDirection = "ASC") {
         $this->sOrderField = $sOrderField;
         $this->sOrderDirection = $sOrderDirection;
 
         return $this;
     }
 
-    function setLimitStart($iLimitStart) {
+    public function setLimitStart($iLimitStart) {
         $this->iLimitStart = $iLimitStart;
 
         return $this;
     }
 
-    function setLimitNumber($iLimitNumber) {
+    public function setLimitNumber($iLimitNumber) {
         $this->iLimitNumber = $iLimitNumber;
 
         return $this;
     }
 
-    abstract function addClauseEquals($sField, $sValue);
+    abstract public function addClauseEquals($sField, $sValue);
 
-    abstract function execute();
+    abstract public function execute();
 
-    abstract function count();
+    abstract public function count();
 }

@@ -36,11 +36,11 @@ abstract class Model extends \Flake\Core\FLObject {
         return $this->aData;
     }
 
-    function __get($sPropName) {
+    public function __get($sPropName) {
         return $this->get($sPropName);
     }
 
-    function __isset($name) {
+    public function __isset($name) {
         if (array_key_exists($name, $this->aData)) {
             return true;
         }
@@ -48,7 +48,7 @@ abstract class Model extends \Flake\Core\FLObject {
         return false;
     }
 
-    function get($sPropName) {
+    public function get($sPropName) {
         if (array_key_exists($sPropName, $this->aData)) {
             return $this->aData[$sPropName];
         }
@@ -56,7 +56,7 @@ abstract class Model extends \Flake\Core\FLObject {
         throw new \Exception("\Flake\Core\Model->get(): property " . htmlspecialchars($sPropName) . " does not exist on " . get_class($this));
     }
 
-    function set($sPropName, $sPropValue) {
+    public function set($sPropName, $sPropValue) {
         if (array_key_exists($sPropName, $this->aData)) {
             $this->aData[$sPropName] = $sPropValue;
 
@@ -66,33 +66,33 @@ abstract class Model extends \Flake\Core\FLObject {
         throw new \Exception("\Flake\Core\Model->set(): property " . htmlspecialchars($sPropName) . " does not exist on " . get_class($this));
     }
 
-    function label() {
+    public function label() {
         return $this->get($this::LABELFIELD);
     }
 
-    static function icon() {
+    public static function icon() {
         return "icon-book";
     }
 
-    static function mediumicon() {
+    public static function mediumicon() {
         return "glyph-book";
     }
 
-    static function bigicon() {
+    public static function bigicon() {
         return "glyph2x-book";
     }
 
-    static function humanName() {
+    public static function humanName() {
         $aRes = explode("\\", get_called_class());
 
         return array_pop($aRes);
     }
 
-    function floating() {
+    public function floating() {
         return true;
     }
 
-    function formForThisModelInstance($options = []) {
+    public function formForThisModelInstance($options = []) {
         $sClass = get_class($this);
         $oForm = new \Formal\Form($sClass, $options);
         $oForm->setModelInstance($this);
@@ -100,11 +100,11 @@ abstract class Model extends \Flake\Core\FLObject {
         return $oForm;
     }
 
-    function formMorphologyForThisModelInstance() {
+    public function formMorphologyForThisModelInstance() {
         throw new \Exception(get_class($this) . ": No form morphology provided for Model.");
     }
 
-    abstract function persist();
+    abstract public function persist();
 
-    abstract function destroy();
+    abstract public function destroy();
 }

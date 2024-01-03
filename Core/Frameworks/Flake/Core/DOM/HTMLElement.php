@@ -28,19 +28,19 @@
 namespace Flake\Core\DOM;
 
 class HTMLElement extends \DOMElement {
-    function getInnerText() {
+    public function getInnerText() {
         return $this->nodeValue;
     }
 
-    function getOuterHTML() {
+    public function getOuterHTML() {
         return $this->ownerDocument->saveHTML($this);
     }
 
-    function getNormalizedInnerText() {
+    public function getNormalizedInnerText() {
         return $this->normalizeWhiteSpace($this->getInnerText());
     }
 
-    function getNormalizedOuterHTML() {
+    public function getNormalizedOuterHTML() {
         return $this->normalizeWhitespace($this->getOuterHTML());
     }
 
@@ -56,7 +56,7 @@ class HTMLElement extends \DOMElement {
         return trim($sText);
     }
 
-    function setInnerHTML($sHtml) {
+    public function setInnerHTML($sHtml) {
         // first, empty the element
         for ($x = $this->childNodes->length - 1; $x >= 0; --$x) {
             $this->removeChild($this->childNodes->item($x));
@@ -94,7 +94,7 @@ class HTMLElement extends \DOMElement {
         }
     }
 
-    function getInnerHTML() {
+    public function getInnerHTML() {
         $sHtml = '';
         $iNodes = $this->childNodes->length;
         for ($i = 0; $i < $iNodes; ++$i) {
@@ -105,11 +105,11 @@ class HTMLElement extends \DOMElement {
         return $sHtml;
     }
 
-    function isDOMText() {
+    public function isDOMText() {
         return $this->nodeType === XML_TEXT_NODE;
     }
 
-    function getSiblingPosition() {
+    public function getSiblingPosition() {
         $iPos = 0;
         $oNode = $this;
 
@@ -121,7 +121,7 @@ class HTMLElement extends \DOMElement {
         return $iPos;
     }
 
-    function getTreePosition() {
+    public function getTreePosition() {
         # Tree position is number 100^level + sibling offset
         $iLevel = substr_count($this->getNodePath(), "/") - 2;    # -1 to align on 0, and -1 to compensate for /document
         if ($iLevel === 0) {

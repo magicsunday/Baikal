@@ -35,13 +35,13 @@ class Profiler extends \Flake\Core\FLObject {
         # Static class
     }
 
-    static function start() {
+    public static function start() {
         $dat = getrusage();
         self::$TUSAGE = microtime(true);
         self::$RUSAGE = $dat["ru_utime.tv_sec"] * 1e6 + $dat["ru_utime.tv_usec"];
     }
 
-    static function cpuUsage() {
+    public static function cpuUsage() {
         $dat = getrusage();
         $tv_usec = (($dat["ru_utime.tv_sec"] * 1e6) + $dat["ru_utime.tv_usec"]) - self::$RUSAGE;
         $time = (microtime(true) - self::$TUSAGE) * 1e6;
@@ -56,7 +56,7 @@ class Profiler extends \Flake\Core\FLObject {
         return $cpu;
     }
 
-    static function cpuTime() {
+    public static function cpuTime() {
         $dat = getrusage();
         $tv_usec = (($dat["ru_utime.tv_sec"] * 1e6) + $dat["ru_utime.tv_usec"]) - self::$RUSAGE;
         $time = (microtime(true) - self::$TUSAGE) * 1e6;

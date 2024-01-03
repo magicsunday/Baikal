@@ -31,7 +31,7 @@ class Frameworks extends \Flake\Core\FLObject {
     private function __construct() {    # private constructor to force static class
     }
 
-    function isAFramework($sName) {
+    public function isAFramework($sName) {
         $sName = trim(\Flake\Util\Tools::trimSlashes($sName));
         if ($sName === "" || $sName === "." || $sName === "..") {
             return false;
@@ -42,12 +42,12 @@ class Frameworks extends \Flake\Core\FLObject {
         return file_exists($sFrameworkPath) && is_dir($sFrameworkPath);
     }
 
-    static function enabled($sFramework) {
+    public static function enabled($sFramework) {
         return false;
     }
 
     # TODO: Create a 'Framework' Model
-    function getPath($sName) {
+    public function getPath($sName) {
         if (self::isAFramework($sName)) {
             throw new \Flake\Core\Exception(htmlspecialchars($$sName) . " is not a framework.", $sName);
         }

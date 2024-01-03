@@ -28,9 +28,9 @@
 namespace Flake\Model\User;
 
 class Customer extends \Flake\Core\Model\Db implements \Flake\Model\IUser {
-    const DATATABLE = "user";
-    const PRIMARYKEY = "uid";
-    const LABELFIELD = "username";
+    public const DATATABLE = "user";
+    public const PRIMARYKEY = "uid";
+    public const LABELFIELD = "username";
 
     protected $aData = [
         "username"  => "",
@@ -43,25 +43,25 @@ class Customer extends \Flake\Core\Model\Db implements \Flake\Model\IUser {
         "enabled"   => 0,
     ];
 
-    function isAdmin() {
+    public function isAdmin() {
         return false;
     }
 
-    function getDisplayName() {
+    public function getDisplayName() {
         return $this->get("firstname") . " " . $this->get("lastname");
     }
 
-    function persist() {
+    public function persist() {
     }
 
-    function destroy() {
+    public function destroy() {
     }
 
-    static function hashPassword($sClearPassword, $sSalt) {
+    public static function hashPassword($sClearPassword, $sSalt) {
         return sha1(APP_ENCRYPTION_KEY . ":" . $sClearPassword . ":" . $sSalt);
     }
 
-    static function fetchByCredentials($sUsername, $sClearPassword) {
+    public static function fetchByCredentials($sUsername, $sClearPassword) {
         # Algorithm:
         #	1- find the user by username
         #	2- hash the given password using the salt for this user

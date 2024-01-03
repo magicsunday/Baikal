@@ -33,7 +33,7 @@ abstract class Container extends \Flake\Core\Controller {
     public $aRendu = [];
     public $aZones = [];
 
-    function addBlock(&$oBlock, $sZone = "_DEFAULT_") {
+    public function addBlock(&$oBlock, $sZone = "_DEFAULT_") {
         $aTemp = [
             "block" => &$oBlock,
             "rendu" => "",
@@ -42,7 +42,7 @@ abstract class Container extends \Flake\Core\Controller {
         $this->aBlocks[$sZone][] = &$aTemp["rendu"];
     }
 
-    function &zone($sZone) {
+    public function &zone($sZone) {
         if (!array_key_exists($sZone, $this->aZones)) {
             $this->aZones[$sZone] = new \Flake\Core\Render\Zone($this, $sZone);
         }
@@ -50,14 +50,14 @@ abstract class Container extends \Flake\Core\Controller {
         return $this->aZones[$sZone];
     }
 
-    function render() {
+    public function render() {
         $this->execute();
         $aRenderedBlocks = $this->renderBlocks();
 
         return implode("", $aRenderedBlocks);
     }
 
-    function execute() {
+    public function execute() {
         foreach ($this->aSequence as $aStep) {
             $aStep["block"]->execute();
         }

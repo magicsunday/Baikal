@@ -31,12 +31,12 @@ abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
     protected $__container;
     protected $__key;
 
-    function chain(Chain $container, $key) {
+    public function chain(Chain $container, $key) {
         $this->__container = $container;
         $this->__key = $key;
     }
 
-    function offsetSet($offset, $value): void {
+    public function offsetSet($offset, $value): void {
         if (is_null($this->__container)) {
             return;
         }
@@ -44,7 +44,7 @@ abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
         $this->__container->offsetSet($offset, $value);
     }
 
-    function offsetExists($offset): bool {
+    public function offsetExists($offset): bool {
         if (is_null($this->__container)) {
             return false;
         }
@@ -52,7 +52,7 @@ abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
         return $this->__container->offsetExists($offset);
     }
 
-    function offsetUnset($offset): void {
+    public function offsetUnset($offset): void {
         if (is_null($this->__container)) {
             return;
         }
@@ -61,7 +61,7 @@ abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
     }
 
     #[\ReturnTypeWillChange]
-    function &offsetGet($offset) {
+    public function &offsetGet($offset) {
         if (is_null($this->__container)) {
             return null;
         }
@@ -71,45 +71,45 @@ abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
         return $oRes;
     }
 
-    function rewind(): void {
+    public function rewind(): void {
         $this->__container->rewind();
     }
 
     #[\ReturnTypeWillChange]
-    function current() {
+    public function current() {
         return $this->__container->current();
     }
 
     #[\ReturnTypeWillChange]
-    function key() {
+    public function key() {
         return $this->__container->key();
     }
 
-    function &next(): void {
+    public function &next(): void {
         $this->__container->next();
     }
 
-    function &prev() {
+    public function &prev() {
         $oPrev = $this->__container->prev();
 
         return $oPrev;
     }
 
-    function valid(): bool {
+    public function valid(): bool {
         return $this->__container->valid();
     }
 
-    function count(): int {
+    public function count(): int {
         return $this->__container->count();
     }
 
-    function &first() {
+    public function &first() {
         $oRes = $this->__container->first();
 
         return $oRes;
     }
 
-    function &last() {
+    public function &last() {
         $oRes = $this->__container->last();
 
         return $oRes;

@@ -33,11 +33,11 @@ abstract class PostConnectionService extends \Flake\Core\FLObject {
      */
     private $aParams;
 
-    function __construct($aParams = []) {
+    public function __construct($aParams = []) {
         $this->aParams = $aParams;
     }
 
-    function execute() {
+    public function execute() {
         sleep(10);
         mail("mail@jeromeschneider.fr", "Hello", "je suis la");
     }

@@ -31,12 +31,12 @@ class Zone extends \Flake\Core\FLObject {
     private $oZonableObject;
     private $sZone;
 
-    function __construct(&$oZonableObject, $sZone) {
+    public function __construct(&$oZonableObject, $sZone) {
         $this->oZonableObject = &$oZonableObject;
         $this->sZone = $sZone;
     }
 
-    function addBlock($oBlock) {
+    public function addBlock($oBlock) {
         $this->oZonableObject->addBlock(
             $oBlock,
             $this->sZone

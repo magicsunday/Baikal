@@ -37,76 +37,76 @@ class Sql extends \Flake\Core\Requester {
     protected $iLimitNumber = false;
     protected $bHasBeenExecuted = false;
 
-    function setDataTable($sDataTable) {
+    public function setDataTable($sDataTable) {
         $this->sDataTable = $sDataTable;
 
         return $this;
     }
 
-    function addClauseEquals($sField, $sValue) {
+    public function addClauseEquals($sField, $sValue) {
         $sWrap = "{field}='{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseNotEquals($sField, $sValue) {
+    public function addClauseNotEquals($sField, $sValue) {
         $sWrap = "{field}!='{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseLike($sField, $sValue) {
+    public function addClauseLike($sField, $sValue) {
         $sWrap = "{field} LIKE '%{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseLikeBeginning($sField, $sValue) {
+    public function addClauseLikeBeginning($sField, $sValue) {
         $sWrap = "{field} LIKE '{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseLikeEnd($sField, $sValue) {
+    public function addClauseLikeEnd($sField, $sValue) {
         $sWrap = "{field} LIKE '%{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseNotLike($sField, $sValue) {
+    public function addClauseNotLike($sField, $sValue) {
         $sWrap = "{field} NOT LIKE '%{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseNotLikeBeginning($sField, $sValue) {
+    public function addClauseNotLikeBeginning($sField, $sValue) {
         $sWrap = "{field} NOT LIKE '{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseNotLikeEnd($sField, $sValue) {
+    public function addClauseNotLikeEnd($sField, $sValue) {
         $sWrap = "{field} NOT LIKE '%{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseIn($sField, $sValue) {
+    public function addClauseIn($sField, $sValue) {
         $sWrap = "{field} IN ({value})";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    function addClauseNotIn($sField, $sValue) {
+    public function addClauseNotIn($sField, $sValue) {
         $sWrap = "{field} NOT IN ({value})";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
@@ -132,7 +132,7 @@ class Sql extends \Flake\Core\Requester {
         return $this;
     }
 
-    function addClauseLiteral($sClause) {
+    public function addClauseLiteral($sClause) {
         $this->aClauses[] = $sClause;
 
         return $this;
@@ -152,11 +152,11 @@ class Sql extends \Flake\Core\Requester {
         return $res;    # To address 'Notice: Only variable references should be returned by reference'
     }
 
-    function hasBeenExecuted() {
+    public function hasBeenExecuted() {
         return $this->bHasBeenExecuted;
     }
 
-    function getQuery($sFields = "*") {
+    public function getQuery($sFields = "*") {
         $sWhere = "1=1";
         $sOrderBy = "";
         $sLimit = "";
@@ -189,11 +189,11 @@ class Sql extends \Flake\Core\Requester {
         );
     }
 
-    function getCountQuery() {
+    public function getCountQuery() {
         return $this->getQuery("count(*) as nbitems");
     }
 
-    function execute() {
+    public function execute() {
         $oCollection = new \Flake\Core\CollectionTyped($this->sModelClass);
         $sSql = $this->getQuery();
 
@@ -209,7 +209,7 @@ class Sql extends \Flake\Core\Requester {
         return $oCollection;
     }
 
-    function count() {
+    public function count() {
         $sSql = $this->getCountQuery();
 
         $rSql = $GLOBALS["DB"]->query($sSql);

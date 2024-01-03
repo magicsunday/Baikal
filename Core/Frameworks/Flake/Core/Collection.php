@@ -32,30 +32,30 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
     protected $aMeta = [];
 
     #[\ReturnTypeWillChange]
-    function current() {
+    public function current() {
         return current($this->aCollection);
     }
 
     #[\ReturnTypeWillChange]
-    function key() {
+    public function key() {
         return key($this->aCollection);
     }
 
-    function next(): void {
+    public function next(): void {
         next($this->aCollection);
     }
 
-    function rewind(): void {
+    public function rewind(): void {
         $this->reset();
     }
 
-    function valid(): bool {
+    public function valid(): bool {
         $key = key($this->aCollection);
 
         return ($key !== null && $key !== false);
     }
 
-    function &getForKey($sKey) {
+    public function &getForKey($sKey) {
         $aKeys = $this->keys();
         if (!in_array($sKey, $aKeys)) {
             throw new \Exception("\Flake\Core\Collection->getForKey(): key '" . $sKey . "' not found in Collection");
@@ -66,44 +66,44 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
         return $oRes;
     }
 
-    function reset() {
+    public function reset() {
         reset($this->aCollection);
     }
 
-    function prev() {
+    public function prev() {
         return prev($this->aCollection);
     }
 
-    function count() {
+    public function count() {
         return count($this->aCollection);
     }
 
-    function keys() {
+    public function keys() {
         return array_keys($this->aCollection);
     }
 
-    function isEmpty() {
+    public function isEmpty() {
         return $this->count() === 0;
     }
 
-    function isAtFirst() {
+    public function isAtFirst() {
         return $this->key() === array_shift($this->keys());
     }
 
-    function isAtLast() {
+    public function isAtLast() {
         return $this->key() === array_pop($this->keys());
     }
 
-    function push(&$mMixed) {
+    public function push(&$mMixed) {
         array_push($this->aCollection, $mMixed);
     }
 
-    function flush() {
+    public function flush() {
         unset($this->aCollection);
         $this->aCollection = [];
     }
 
-    function &first() {
+    public function &first() {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
@@ -115,7 +115,7 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
         return $var;    # as PHP needs a variable to return by ref
     }
 
-    function &last() {
+    public function &last() {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
@@ -127,11 +127,11 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
         return $var;
     }
 
-    function toArray() {
+    public function toArray() {
         return $this->aCollection;
     }
 
-    static function fromArray($aData) {
+    public static function fromArray($aData) {
         $oColl = new \Flake\Core\Collection();
         reset($aData);
         foreach ($aData as $mData) {
@@ -149,21 +149,21 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
         return $oCollection;                            # as PHP needs a variable to return by ref
     }
 
-    function map($sFunc) {
+    public function map($sFunc) {
         $aData = $this->toArray();
         $oNewColl = $this->fromArray(array_map($sFunc, $aData));
 
         return $oNewColl;
     }
 
-    function walk($sFunc, $aParams = []) {
+    public function walk($sFunc, $aParams = []) {
         $aData = $this->toArray();
         $oNewColl = $this->fromArray(array_walk($aData, $sFunc, $aParams));
 
         return $oNewColl;
     }
 
-    function remove($sKey) {
+    public function remove($sKey) {
         $aKeys = $this->keys();
         if (!in_array($sKey, $aKeys)) {
             throw new \Exception("\Flake\Core\Collection->remove(): key '" . $sKey . "' not found in Collection");
@@ -173,7 +173,7 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
         $this->aCollection = array_values($this->aCollection);
     }
 
-    function &__call($sName, $aArguments) {
+    public function &__call($sName, $aArguments) {
         if (
             strlen($sName) > 7
             && $sName[0] === "s"

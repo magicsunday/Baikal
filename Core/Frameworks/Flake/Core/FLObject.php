@@ -28,7 +28,7 @@
 namespace Flake\Core;
 
 class FLObject {
-    function __toString() {
+    public function __toString() {
         ob_start();
         var_dump($this);
         $sDump = ob_get_contents();
@@ -37,7 +37,7 @@ class FLObject {
         return "<pre>" . htmlspecialchars($sDump) . "</pre>";
     }
 
-    function isA($sClassOrProtocolName) {
+    public function isA($sClassOrProtocolName) {
         return \Flake\Util\Tools::is_a($this, $sClassOrProtocolName);
     }
 }

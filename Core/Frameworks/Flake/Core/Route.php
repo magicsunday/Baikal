@@ -31,16 +31,16 @@ use Flake\Core\Render\Container;
 
 abstract class Route extends \Flake\Core\FLObject {
     # should be abstract, but is not, due to PHP strict standard
-    static function layout(Container &$oRenderContainer) {
+    public static function layout(Container &$oRenderContainer) {
     }
 
-    static function parametersMap() {
+    public static function parametersMap() {
         return [];
     }
 
     # converts raw url params "a/b/c/d"=[a, b, c, d] in route params [a=>b, c=>d]
 
-    static function getParams() {
+    public static function getParams() {
         $aRouteParams = [];
 
         $aParametersMap = static::parametersMap();    # static to use method as defined in derived class

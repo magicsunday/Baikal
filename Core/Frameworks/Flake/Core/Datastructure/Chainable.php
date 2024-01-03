@@ -29,11 +29,11 @@ namespace Flake\Core\Datastructure;
 
 interface Chainable extends \ArrayAccess, \Iterator, \Countable {
     #	public function &next();	# This is already specified by interface Iterator
-    function &prev();
+    public function &prev();
 
-    function &first();
+    public function &first();
 
-    function &last();
+    public function &last();
 
-    function chain(Chain $chain, $key);
+    public function chain(Chain $chain, $key);
 }

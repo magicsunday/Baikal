@@ -30,19 +30,19 @@ namespace Flake\Core;
 abstract class View extends \Flake\Core\FLObject {
     protected $aData;
 
-    function __construct() {
+    public function __construct() {
         $this->aData = [];
     }
 
-    function setData($sName, $mData) {
+    public function setData($sName, $mData) {
         $this->aData[$sName] = $mData;
     }
 
-    function getData() {
+    public function getData() {
         return $this->aData;
     }
 
-    function get($sWhat) {
+    public function get($sWhat) {
         if (array_key_exists($sWhat, $this->aData)) {
             return $this->aData[$sWhat];
         }
@@ -50,12 +50,12 @@ abstract class View extends \Flake\Core\FLObject {
         return false;
     }
 
-    function render() {
+    public function render() {
         $sTemplatePath = $this->templatesPath();
         $oTemplate = new \Flake\Core\Template($this->templatesPath());
 
         return $oTemplate->parse($this->getData());
     }
 
-    abstract function templatesPath();
+    abstract public function templatesPath();
 }

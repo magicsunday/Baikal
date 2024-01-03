@@ -33,7 +33,7 @@ class Cli extends \Flake\Core\Render\Container {
      */
     private $aArgs;
 
-    function render() {
+    public function render() {
         $this->sys_init();
         $this->init();
 
@@ -42,7 +42,7 @@ class Cli extends \Flake\Core\Render\Container {
         $this->echoFlush($this->notice("process ended @" . strftime("%d/%m/%Y %H:%M:%S")) . "\n\n");
     }
 
-    function execute() {
+    public function execute() {
         foreach ($this->aSequence as $aStep) {
             $aStep["block"]->execute();
         }
@@ -50,15 +50,15 @@ class Cli extends \Flake\Core\Render\Container {
 
     public $sLog = "";
 
-    function sys_init() {
+    public function sys_init() {
         $this->rawLine("Command line: " . (implode(" ", $_SERVER["argv"])));
         $this->initArgs();
     }
 
-    function init() {
+    public function init() {
     }
 
-    function initArgs() {
+    public function initArgs() {
         $sShortOpts = "";
         $sShortOpts .= "h";        // help; pas de valeur
         $sShortOpts .= "w:";    // author; valeur obligatoire
@@ -71,24 +71,24 @@ class Cli extends \Flake\Core\Render\Container {
         $this->aArgs = getopt($sShortOpts, $aLongOpts);
     }
 
-    function getScriptPath() {
+    public function getScriptPath() {
         return realpath($_SERVER['argv'][0]);
     }
 
-    function getSyntax() {
+    public function getSyntax() {
         return $this->getScriptPath();
     }
 
-    function syntaxError() {
+    public function syntaxError() {
         $sStr = $this->rawLine("Syntax error.\nUsage: " . $this->getSyntax());
         exit("\n\n" . $sStr . "\n\n");
     }
 
-    function log($sStr) {
+    public function log($sStr) {
         $this->sLog .= $sStr;
     }
 
-    function header($sMsg) {
+    public function header($sMsg) {
         $sStr = "\n" . str_repeat("#", 80);
         $sStr .= "\n#" . str_repeat(" ", 78) . "#";
         $sStr .= "\n#" . str_pad(strtoupper($sMsg), 78, " ", STR_PAD_BOTH) . "#";
@@ -101,46 +101,46 @@ class Cli extends \Flake\Core\Render\Container {
         return $sStr;
     }
 
-    function subHeader($sMsg) {
+    public function subHeader($sMsg) {
         $sStr = "\n\n# " . str_pad(strtoupper($sMsg) . " ", 78, "-", STR_PAD_RIGHT) . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    function subHeader2($sMsg) {
+    public function subHeader2($sMsg) {
         $sStr = "\n# # " . str_pad($sMsg . " ", 76, "-", STR_PAD_RIGHT) . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    function textLine($sMsg) {
+    public function textLine($sMsg) {
         $sStr = ". " . $sMsg . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    function rawLine($sMsg) {
+    public function rawLine($sMsg) {
         $sStr = $sMsg . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    function notice($sMsg) {
+    public function notice($sMsg) {
         $sStr = "\n" . str_pad($sMsg, 80, ".", STR_PAD_BOTH) . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    function getLog() {
+    public function getLog() {
         return $this->sLog;
     }
 
-    function file_writeBin($sPath, $sData, $bUTF8 = true) {
+    public function file_writeBin($sPath, $sData, $bUTF8 = true) {
         $rFile = fopen($sPath, "wb");
 
         if ($bUTF8 === true) {
@@ -152,7 +152,7 @@ class Cli extends \Flake\Core\Render\Container {
         fclose($rFile);
     }
 
-    function echoFlush($sString = "") {
+    public function echoFlush($sString = "") {
         echo $sString;
         ob_flush();
         flush();

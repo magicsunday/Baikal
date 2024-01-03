@@ -30,7 +30,7 @@ namespace Flake\Core\Model;
 abstract class Db extends \Flake\Core\Model {
     protected $bFloating = true;
 
-    function __construct($sPrimary = false) {
+    public function __construct($sPrimary = false) {
         if ($sPrimary === false) {
             # Object will be floating
             $this->initFloating();
@@ -41,31 +41,31 @@ abstract class Db extends \Flake\Core\Model {
         }
     }
 
-    static function &getBaseRequester() {
+    public static function &getBaseRequester() {
         $oRequester = new \Flake\Core\Requester\Sql(get_called_class());
         $oRequester->setDataTable(self::getDataTable());
 
         return $oRequester;
     }
 
-    static function &getByRequest(\Flake\Core\Requester\Sql $oRequester) {
+    public static function &getByRequest(\Flake\Core\Requester\Sql $oRequester) {
         // renvoie une collection de la classe du modèle courant (this)
         return $oRequester->execute();
     }
 
-    static function getDataTable() {
+    public static function getDataTable() {
         $sClass = get_called_class();
 
         return $sClass::DATATABLE;
     }
 
-    static function getPrimaryKey() {
+    public static function getPrimaryKey() {
         $sClass = get_called_class();
 
         return $sClass::PRIMARYKEY;
     }
 
-    function getPrimary() {
+    public function getPrimary() {
         return $this->get(self::getPrimaryKey());
     }
 
@@ -84,7 +84,7 @@ abstract class Db extends \Flake\Core\Model {
         $this->aData = $aRs;
     }
 
-    function persist() {
+    public function persist() {
         if ($this->floating()) {
             $GLOBALS["DB"]->exec_INSERTquery(
                 self::getDataTable(),
@@ -103,7 +103,7 @@ abstract class Db extends \Flake\Core\Model {
         }
     }
 
-    function destroy() {
+    public function destroy() {
         $GLOBALS["DB"]->exec_DELETEquery(
             self::getDataTable(),
             self::getPrimaryKey() . "='" . $GLOBALS["DB"]->quote($this->getPrimary()) . "'"
@@ -114,7 +114,7 @@ abstract class Db extends \Flake\Core\Model {
         # nothing; object will be blank
     }
 
-    function floating() {
+    public function floating() {
         return $this->bFloating;
     }
 }

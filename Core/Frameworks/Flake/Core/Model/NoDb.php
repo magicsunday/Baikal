@@ -28,7 +28,7 @@
 namespace Flake\Core\Model;
 
 abstract class NoDb extends \Flake\Core\Model {
-    function __construct($aData = false) {
+    public function __construct($aData = false) {
         if ($aData !== false) {
             $this->aData = $aData;
         }

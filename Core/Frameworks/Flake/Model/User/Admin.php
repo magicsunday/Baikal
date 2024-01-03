@@ -28,17 +28,17 @@
 namespace Flake\Model\User;
 
 class Admin extends \Flake\Core\Model\NoDb {
-    function isAdmin() {
+    public function isAdmin() {
         return true;
     }
 
-    function getDisplayName() {
+    public function getDisplayName() {
         return "Admin";
     }
 
-    function persist() {
+    public function persist() {
     }
 
-    function destroy() {
+    public function destroy() {
     }
 }
