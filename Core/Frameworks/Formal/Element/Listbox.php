@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,45 +29,60 @@
 
 namespace Formal\Element;
 
-class Listbox extends \Formal\Element {
-    function render() {
-        $disabled = "";
-        $inputclass = "";
-        $groupclass = "";
-        $placeholder = "";
-        $onchange = "";
+use Exception;
+use Flake\Util\Tools;
+use Formal\Element;
+use RuntimeException;
+
+use function is_array;
+
+/**
+ *
+ */
+class Listbox extends Element
+{
+    /**
+     * @throws Exception
+     */
+    public function render(): string
+    {
+        $disabled = '';
+        $inputclass = '';
+        $groupclass = '';
+        $placeholder = '';
+        $onchange = '';
 
         $value = $this->value();
-        $label = $this->option("label");
-        $prop = $this->option("prop");
-        $helpblock = "";
-        $popover = "";
+        $label = $this->option('label');
+        $prop = $this->option('prop');
+        $helpblock = '';
+        $popover = '';
 
-        if ($this->option("readonly") === true) {
-            $inputclass .= " disabled";
-            $disabled = " disabled";
+        if ($this->option('readonly') === true) {
+            $inputclass .= ' disabled';
+            $disabled = ' disabled';
         }
 
-        if ($this->option("error") === true) {
-            $groupclass .= " error";
+        if ($this->option('error') === true) {
+            $groupclass .= ' error';
         }
 
-        $aOptions = $this->option("options");
+        $aOptions = $this->option('options');
         if (!is_array($aOptions)) {
-            throw new \Exception("\Formal\Element\Listbox->render(): 'options' has to be an array.");
+            throw new RuntimeException("\Formal\Element\Listbox->render(): 'options' has to be an array.");
         }
 
-        if (($sHelp = trim($this->option("help"))) !== "") {
-            $helpblock = "<p class=\"help-block\">" . $sHelp . "</p>";
+        if (($sHelp = trim($this->option('help'))) !== '') {
+            $helpblock = '<p class="help-block">' . $sHelp . '</p>';
         }
 
-        if (($aPopover = $this->option("popover")) !== "") {
-            $inputclass .= " popover-focus ";
-            $popover = " title=\"" . htmlspecialchars($aPopover["title"]) . "\" ";
-            $popover .= " data-content=\"" . htmlspecialchars($aPopover["content"]) . "\" ";
+        if (($aPopover = $this->option('popover')) !== '') {
+            $inputclass .= ' popover-focus ';
+            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
         }
 
-        if ($this->option("refreshonchange") === true) {
+        if ($this->option('refreshonchange') === true) {
             $onchange = " onchange=\"document.getElementsByTagName('form')[0].elements['refreshed'].value=1;document.getElementsByTagName('form')[0].submit();\" ";
         }
 
@@ -73,23 +90,24 @@ class Listbox extends \Formal\Element {
 
         $aRenderedOptions = [];
 
-        if (\Flake\Util\Tools::arrayIsSeq($aOptions)) {
+        if (Tools::arrayIsSeq($aOptions)) {
             # Array is sequential
             reset($aOptions);
             foreach ($aOptions as $sOptionValue) {
-                $selected = ($sOptionValue === $value) ? " selected=\"selected\"" : "";
-                $aRenderedOptions[] = "<option" . $selected . ">" . htmlspecialchars($sOptionValue) . "</option>";
+                $selected = ($sOptionValue === $value) ? ' selected="selected"' : '';
+                $aRenderedOptions[] = '<option' . $selected . '>' . htmlspecialchars($sOptionValue) . '</option>';
             }
         } else {
             # Array is associative
             reset($aOptions);
             foreach ($aOptions as $sOptionValue => $sOptionCaption) {
-                $selected = ($sOptionValue === $value) ? " selected=\"selected\"" : "";
-                $aRenderedOptions[] = "<option value=\"" . htmlspecialchars($sOptionValue) . "\"" . $selected . ">" . htmlspecialchars($sOptionCaption) . "</option>";
+                $selected = ($sOptionValue === $value) ? ' selected="selected"' : '';
+                $aRenderedOptions[] = '<option value="' . htmlspecialchars(
+                        $sOptionValue
+                    ) . '"' . $selected . '>' . htmlspecialchars($sOptionCaption) . '</option>';
             }
         }
 
-        reset($aRenderedOptions);
         $sRenderedOptions = implode("\n", $aRenderedOptions);
         unset($aRenderedOptions);
 

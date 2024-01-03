@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,34 +29,51 @@
 
 namespace Baikal\Model\Calendar;
 
-class Calendar extends \Flake\Core\Model\Db {
-    const DATATABLE = "calendars";
-    const PRIMARYKEY = "id";
-    const LABELFIELD = "components";
+use Flake\Core\Model\Db;
+use RuntimeException;
 
-    protected $aData = [
-        "components" => "",
+/**
+ *
+ */
+class Calendar extends Db
+{
+    public const DATATABLE = 'calendars';
+    public const PRIMARYKEY = 'id';
+    public const LABELFIELD = 'components';
+
+    protected array $aData = [
+        'components' => '',
     ];
 
-    function hasInstances() {
-        $rSql = $GLOBALS["DB"]->exec_SELECTquery(
-            "count(*)",
-            "calendarinstances",
-            "calendarid='" . $this->aData["id"] . "'"
+    /**
+     * @return bool|null
+     */
+    public function hasInstances(): ?bool
+    {
+        $rSql = $GLOBALS['DB']->exec_SELECTquery(
+            'count(*)',
+            'calendarinstances',
+            'calendarid' . "='" . $this->aData['id'] . "'"
         );
 
         if (($aRs = $rSql->fetch()) === false) {
             return false;
-        } else {
-            reset($aRs);
-
-            return $aRs["count(*)"] > 1;
         }
+
+        reset($aRs);
+
+        return $aRs['count(*)'] > 1;
     }
 
-    function destroy() {
+    /**
+     * @return void
+     *
+     * @throws RuntimeException
+     */
+    public function destroy(): void
+    {
         if ($this->hasInstances()) {
-            throw new \Exception("Trying to destroy a calendar with instances");
+            throw new RuntimeException('Trying to destroy a calendar with instances');
         }
         parent::destroy();
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,27 +29,39 @@
 
 namespace BaikalAdmin\Controller\Settings;
 
-class Standard extends \Flake\Core\Controller {
-    /**
-     * @var \Baikal\Model\Config\Standard
-     */
-    private $oModel;
+use Exception;
+use Flake\Core\Controller;
+use Formal\Form;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+
+/**
+ *
+ */
+class Standard extends Controller
+{
 
     /**
-     * @var \Formal\Form
+     * @var Form
      */
-    private $oForm;
+    private Form $oForm;
 
-    function execute() {
-        $this->oModel = new \Baikal\Model\Config\Standard();
+    /**
+     * @throws Exception
+     */
+    public function execute(): void
+    {
+        $oModel = new \Baikal\Model\Config\Standard();
 
         # Assert that config file is writable
-        if (!$this->oModel->writable()) {
-            throw new \Exception("Config file is not writable;" . __FILE__ . " > " . __LINE__);
+        if (!$oModel->writable()) {
+            throw new RuntimeException('Config file is not writable;' . __FILE__ . ' > ' . __LINE__);
         }
 
-        $this->oForm = $this->oModel->formForThisModelInstance([
-            "close" => false,
+        $this->oForm = $oModel->formForThisModelInstance([
+            'close' => false,
         ]);
 
         if ($this->oForm->submitted()) {
@@ -55,9 +69,16 @@ class Standard extends \Flake\Core\Controller {
         }
     }
 
-    function render() {
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function render(): string
+    {
         $oView = new \BaikalAdmin\View\Settings\Standard();
-        $oView->setData("form", $this->oForm->render());
+        $oView->setData('form', $this->oForm->render());
 
         return $oView->render();
     }

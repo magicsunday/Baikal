@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,23 +29,48 @@
 
 namespace Flake\Core;
 
-class Template extends \Flake\Core\FLObject {
-    private $sAbsPath = "";
-    private $sHtml = "";
+use Flake\Util\Tools;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-    public function __construct($sAbsPath) {
+/**
+ *
+ */
+class Template extends FLObject
+{
+    private string $sAbsPath;
+    private string|false $sHtml;
+
+    /**
+     * @param string $sAbsPath
+     */
+    public function __construct(string $sAbsPath)
+    {
         $this->sAbsPath = $sAbsPath;
         $this->sHtml = $this->getTemplateFile(
             $this->sAbsPath
         );
     }
 
-    private function getTemplateFile($sAbsPath) {
+    /**
+     * @param $sAbsPath
+     *
+     * @return false|string
+     */
+    private function getTemplateFile($sAbsPath): false|string
+    {
         return file_get_contents($sAbsPath);
     }
 
-    public function parse($aMarkers = []) {
-        return \Flake\Util\Tools::parseTemplateCode(
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    public function parse(array $aMarkers = []): string
+    {
+        return Tools::parseTemplateCode(
             $this->sHtml,
             $aMarkers
         );

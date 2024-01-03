@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,8 +29,18 @@
 
 namespace Flake\Model;
 
-interface IUser {
+/**
+ *
+ */
+interface IUser
+{
+    /**
+     * @return mixed
+     */
     public function isAdmin();
 
+    /**
+     * @return mixed
+     */
     public function getDisplayName();
 }

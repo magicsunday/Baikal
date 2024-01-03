@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,8 +29,16 @@
 
 namespace Formal\Element;
 
-class Password extends \Formal\Element\Text {
-    protected function inputtype() {
-        return "password";
+/**
+ *
+ */
+class Password extends Text
+{
+    /**
+     * @return string
+     */
+    protected function inputtype(): string
+    {
+        return 'password';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,25 +29,62 @@
 
 namespace Flake\Core\DOM;
 
-class HTMLElement extends \DOMElement {
-    public function getInnerText() {
+use DOMDocument;
+use DOMElement;
+
+/**
+ *
+ */
+class HTMLElement extends DOMElement
+{
+    /**
+     * @return string|null
+     */
+    public function getInnerText(): ?string
+    {
         return $this->nodeValue;
     }
 
-    public function getOuterHTML() {
+    /**
+     * @return false|string
+     */
+    public function getOuterHTML(): false|string
+    {
         return $this->ownerDocument->saveHTML($this);
     }
 
-    public function getNormalizedInnerText() {
+    /**
+     * @return string
+     */
+    public function getNormalizedInnerText(): string
+    {
         return $this->normalizeWhiteSpace($this->getInnerText());
     }
 
-    public function getNormalizedOuterHTML() {
+    /**
+     * @return string
+     */
+    public function getNormalizedOuterHTML(): string
+    {
         return $this->normalizeWhitespace($this->getOuterHTML());
     }
 
-    protected function normalizeWhitespace($sText) {
-        $sText = str_replace(["\t", "\r\n", "\n"], ' ', $sText);
+    /**
+     * @param $sText
+     *
+     * @return string
+     */
+    protected function normalizeWhitespace($sText): string
+    {
+        $sText = str_replace(
+            [
+                "\t",
+                "\r\n",
+                "\n",
+            ],
+            ' ',
+            $sText
+        );
 
         # using multiple str_replace has proven to be twice as fast that regexp on big strings
         $iCount = 0;
@@ -56,7 +95,13 @@ class HTMLElement extends \DOMElement {
         return trim($sText);
     }
 
-    public function setInnerHTML($sHtml) {
+    /**
+     * @param $sHtml
+     *
+     * @return void
+     */
+    public function setInnerHTML($sHtml): void
+    {
         // first, empty the element
         for ($x = $this->childNodes->length - 1; $x >= 0; --$x) {
             $this->removeChild($this->childNodes->item($x));
@@ -72,7 +117,7 @@ class HTMLElement extends \DOMElement {
                 }
             } else {
                 // $value is probably ill-formed
-                $f = new \DOMDocument();
+                $f = new DOMDocument();
                 $sHtml = mb_convert_encoding($sHtml, 'HTML-ENTITIES', 'UTF-8');
                 // Using <htmlfragment> will generate a warning, but so will bad HTML
                 // (and by this point, bad HTML is what we've got).
@@ -94,7 +139,11 @@ class HTMLElement extends \DOMElement {
         }
     }
 
-    public function getInnerHTML() {
+    /**
+     * @return string
+     */
+    public function getInnerHTML(): string
+    {
         $sHtml = '';
         $iNodes = $this->childNodes->length;
         for ($i = 0; $i < $iNodes; ++$i) {
@@ -105,15 +154,23 @@ class HTMLElement extends \DOMElement {
         return $sHtml;
     }
 
-    public function isDOMText() {
+    /**
+     * @return bool
+     */
+    public function isDOMText(): bool
+    {
         return $this->nodeType === XML_TEXT_NODE;
     }
 
-    public function getSiblingPosition() {
+    /**
+     * @return int
+     */
+    public function getSiblingPosition(): int
+    {
         $iPos = 0;
         $oNode = $this;
 
-        while (!is_null($oNode->previousSibling)) {
+        while ($oNode->previousSibling !== null) {
             $oNode = $oNode->previousSibling;
             ++$iPos;
         }
@@ -121,13 +178,17 @@ class HTMLElement extends \DOMElement {
         return $iPos;
     }
 
-    public function getTreePosition() {
+    /**
+     * @return float|object|int
+     */
+    public function getTreePosition(): float|object|int
+    {
         # Tree position is number 100^level + sibling offset
-        $iLevel = substr_count($this->getNodePath(), "/") - 2;    # -1 to align on 0, and -1 to compensate for /document
+        $iLevel = substr_count($this->getNodePath(), '/') - 2;    # -1 to align on 0, and -1 to compensate for /document
         if ($iLevel === 0) {
             return $this->getSiblingPosition();
-        } else {
-            return pow(10, $iLevel) + $this->getSiblingPosition();
         }
+
+        return (10 ** $iLevel) + $this->getSiblingPosition();
     }
 }

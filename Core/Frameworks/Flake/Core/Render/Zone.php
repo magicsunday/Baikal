@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,16 +29,33 @@
 
 namespace Flake\Core\Render;
 
-class Zone extends \Flake\Core\FLObject {
-    private $oZonableObject;
-    private $sZone;
+use Flake\Core\FLObject;
 
-    public function __construct(&$oZonableObject, $sZone) {
-        $this->oZonableObject = &$oZonableObject;
+/**
+ *
+ */
+class Zone extends FLObject
+{
+    private $oZonableObject;
+    private string $sZone;
+
+    /**
+     * @param        $oZonableObject
+     * @param string $sZone
+     */
+    public function __construct($oZonableObject, string $sZone)
+    {
+        $this->oZonableObject = $oZonableObject;
         $this->sZone = $sZone;
     }
 
-    public function addBlock($oBlock) {
+    /**
+     * @param $oBlock
+     *
+     * @return void
+     */
+    public function addBlock($oBlock): void
+    {
         $this->oZonableObject->addBlock(
             $oBlock,
             $this->sZone

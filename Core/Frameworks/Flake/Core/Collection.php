@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,112 +29,207 @@
 
 namespace Flake\Core;
 
-class Collection extends \Flake\Core\FLObject implements \Iterator {
-    protected $aCollection = [];
-    protected $aMeta = [];
+use Exception;
+use Iterator;
+use ReturnTypeWillChange;
+use RuntimeException;
 
-    #[\ReturnTypeWillChange]
-    public function current() {
+use function array_key_exists;
+use function count;
+use function get_class;
+use function in_array;
+use function strlen;
+
+/**
+ *
+ */
+class Collection extends FLObject implements Iterator
+{
+    protected array $aCollection = [];
+    protected array $aMeta = [];
+
+    /**
+     * @return false|mixed
+     */
+    #[ReturnTypeWillChange]
+    public function current()
+    {
         return current($this->aCollection);
     }
 
-    #[\ReturnTypeWillChange]
-    public function key() {
+    /**
+     * @return int|string|null
+     */
+    #[ReturnTypeWillChange]
+    public function key()
+    {
         return key($this->aCollection);
     }
 
-    public function next(): void {
+    /**
+     * @return void
+     */
+    public function next(): void
+    {
         next($this->aCollection);
     }
 
-    public function rewind(): void {
+    /**
+     * @return void
+     */
+    public function rewind(): void
+    {
         $this->reset();
     }
 
-    public function valid(): bool {
+    /**
+     * @return bool
+     */
+    public function valid(): bool
+    {
         $key = key($this->aCollection);
 
         return ($key !== null && $key !== false);
     }
 
-    public function &getForKey($sKey) {
+    /**
+     * @throws Exception
+     */
+    public function getForKey($sKey)
+    {
         $aKeys = $this->keys();
-        if (!in_array($sKey, $aKeys)) {
-            throw new \Exception("\Flake\Core\Collection->getForKey(): key '" . $sKey . "' not found in Collection");
+        if (!in_array($sKey, $aKeys, true)) {
+            throw new RuntimeException(
+                "\Flake\Core\Collection->getForKey(): key '" . $sKey . "' not found in Collection"
+            );
         }
 
-        $oRes = $this->aCollection[$sKey];
-
-        return $oRes;
+        return $this->aCollection[$sKey];
     }
 
-    public function reset() {
+    /**
+     * @return void
+     */
+    public function reset(): void
+    {
         reset($this->aCollection);
     }
 
-    public function prev() {
+    /**
+     * @return false|mixed
+     */
+    public function prev()
+    {
         return prev($this->aCollection);
     }
 
-    public function count() {
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
         return count($this->aCollection);
     }
 
-    public function keys() {
+    /**
+     * @return array
+     */
+    public function keys(): array
+    {
         return array_keys($this->aCollection);
     }
 
-    public function isEmpty() {
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
         return $this->count() === 0;
     }
 
-    public function isAtFirst() {
-        return $this->key() === array_shift($this->keys());
+    /**
+     * @return bool
+     */
+    public function isAtFirst(): bool
+    {
+        $keys = $this->keys();
+        return $this->key() === array_shift($keys);
     }
 
-    public function isAtLast() {
-        return $this->key() === array_pop($this->keys());
+    /**
+     * @return bool
+     */
+    public function isAtLast(): bool
+    {
+        $keys = $this->keys();
+        return $this->key() === array_pop($keys);
     }
 
-    public function push(&$mMixed) {
-        array_push($this->aCollection, $mMixed);
+    /**
+     * @param $mMixed
+     *
+     * @return void
+     */
+    public function push($mMixed): void
+    {
+        $this->aCollection[] = $mMixed;
     }
 
-    public function flush() {
+    /**
+     * @return void
+     */
+    public function flush(): void
+    {
         unset($this->aCollection);
         $this->aCollection = [];
     }
 
-    public function &first() {
+    /**
+     * @return mixed|null
+     */
+    public function first()
+    {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
             return $this->aCollection[array_shift($aKeys)];
         }
 
-        $var = null;    # two lines instead of one
+        # two lines instead of one
 
-        return $var;    # as PHP needs a variable to return by ref
+        return null;    # as PHP needs a variable to return by ref
     }
 
-    public function &last() {
+    /**
+     * @return mixed|null
+     */
+    public function last()
+    {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
             return $this->aCollection[array_pop($aKeys)];
         }
 
-        $var = null;
-
-        return $var;
+        return null;
     }
 
-    public function toArray() {
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
         return $this->aCollection;
     }
 
-    public static function fromArray($aData) {
-        $oColl = new \Flake\Core\Collection();
+    /**
+     * @param $aData
+     *
+     * @return Collection
+     */
+    public static function fromArray($aData): Collection
+    {
+        $oColl = new self();
         reset($aData);
         foreach ($aData as $mData) {
             $oColl->push($mData);
@@ -143,51 +240,70 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
 
     # Create a new collection like this one
     # This abstraction is useful because of CollectionTyped
-    protected function newCollectionLikeThisOne() {
-        $oCollection = new \Flake\Core\Collection();    # two lines instead of one
+    /**
+     * @return Collection
+     */
+    protected function newCollectionLikeThisOne(): Collection
+    {
+        # two lines instead of one
 
-        return $oCollection;                            # as PHP needs a variable to return by ref
+        return new self();                            # as PHP needs a variable to return by ref
     }
 
-    public function map($sFunc) {
+    /**
+     * @param $sFunc
+     *
+     * @return Collection
+     */
+    public function map($sFunc): Collection
+    {
         $aData = $this->toArray();
-        $oNewColl = $this->fromArray(array_map($sFunc, $aData));
-
-        return $oNewColl;
+        return self::fromArray(array_map($sFunc, $aData));
     }
 
-    public function walk($sFunc, $aParams = []) {
+    /**
+     * @param       $sFunc
+     * @param array $aParams
+     *
+     * @return Collection
+     */
+    public function walk($sFunc, array $aParams = []): Collection
+    {
         $aData = $this->toArray();
-        $oNewColl = $this->fromArray(array_walk($aData, $sFunc, $aParams));
-
-        return $oNewColl;
+        return self::fromArray(array_walk($aData, $sFunc, $aParams));
     }
 
-    public function remove($sKey) {
+    /**
+     * @throws Exception
+     */
+    public function remove($sKey): void
+    {
         $aKeys = $this->keys();
-        if (!in_array($sKey, $aKeys)) {
-            throw new \Exception("\Flake\Core\Collection->remove(): key '" . $sKey . "' not found in Collection");
+        if (!in_array($sKey, $aKeys, true)) {
+            throw new RuntimeException("\Flake\Core\Collection->remove(): key '" . $sKey . "' not found in Collection");
         }
 
         unset($this->aCollection[$sKey]);
         $this->aCollection = array_values($this->aCollection);
     }
 
-    public function &__call($sName, $aArguments) {
-        if (
-            strlen($sName) > 7
-            && $sName[0] === "s"
-            && $sName[1] === "e"
-            && $sName[2] === "t"
-            && $sName[3] === "M"
-            && $sName[4] === "e"
-            && $sName[5] === "t"
-            && $sName[6] === "a"
-        ) {
+    /**
+     * @throws Exception
+     */
+    public function __call($sName, $aArguments)
+    {
+        if (strlen($sName) > 7 &&
+            $sName[0] === 's' &&
+            $sName[1] === 'e' &&
+            $sName[2] === 't' &&
+            $sName[3] === 'M' &&
+            $sName[4] === 'e' &&
+            $sName[5] === 't' &&
+            $sName[6] === 'a') {
             $sKey = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
             $mValue = &$aArguments[0];
 
-            if (is_null($mValue)) {
+            if ($mValue === null) {
                 if (array_key_exists($sKey, $this->aMeta)) {
                     unset($this->aMeta[$sKey]);
                 }
@@ -195,27 +311,23 @@ class Collection extends \Flake\Core\FLObject implements \Iterator {
                 $this->aMeta[$sKey] = &$mValue;
             }
 
-            $res = null;
+            return null;    # To avoid 'Notice: Only variable references should be returned by reference'
+        }
 
-            return $res;    # To avoid 'Notice: Only variable references should be returned by reference'
-        } elseif (
-            strlen($sName) > 7
-            && $sName[0] === "g"
-            && $sName[1] === "e"
-            && $sName[2] === "t"
-            && $sName[3] === "M"
-            && $sName[4] === "e"
-            && $sName[5] === "t"
-            && $sName[6] === "a"
+        if (
+            strlen($sName) > 7 &&
+            $sName[0] === 'g' &&
+            $sName[1] === 'e' &&
+            $sName[2] === 't' &&
+            $sName[3] === 'M' &&
+            $sName[4] === 'e' &&
+            $sName[5] === 't' &&
+            $sName[6] === 'a'
         ) {
             $sKey = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
-            if (array_key_exists($sKey, $this->aMeta)) {
-                return $this->aMeta[$sKey];
-            } else {
-                return null;
-            }
+            return $this->aMeta[$sKey] ?? null;
         } else {
-            throw new \Exception("Method " . $sName . "() not found on " . get_class($this));
+            throw new RuntimeException('Method ' . $sName . '() not found on ' . get_class($this));
         }
     }
 }

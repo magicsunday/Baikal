@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,23 +29,38 @@
 
 namespace Flake\Util;
 
-class Profiler extends \Flake\Core\FLObject {
-    protected static $TUSAGE;
-    protected static $RUSAGE;
+use Flake\Core\FLObject;
 
-    protected function __construct() {
+/**
+ *
+ */
+class Profiler extends FLObject
+{
+    protected static float $TUSAGE;
+    protected static float $RUSAGE;
+
+    protected function __construct()
+    {
         # Static class
     }
 
-    public static function start() {
+    /**
+     * @return void
+     */
+    public static function start(): void
+    {
         $dat = getrusage();
         self::$TUSAGE = microtime(true);
-        self::$RUSAGE = $dat["ru_utime.tv_sec"] * 1e6 + $dat["ru_utime.tv_usec"];
+        self::$RUSAGE = $dat['ru_utime.tv_sec'] * 1e6 + $dat['ru_utime.tv_usec'];
     }
 
-    public static function cpuUsage() {
+    /**
+     * @return string
+     */
+    public static function cpuUsage(): string
+    {
         $dat = getrusage();
-        $tv_usec = (($dat["ru_utime.tv_sec"] * 1e6) + $dat["ru_utime.tv_usec"]) - self::$RUSAGE;
+        $tv_usec = (($dat['ru_utime.tv_sec'] * 1e6) + $dat['ru_utime.tv_usec']) - self::$RUSAGE;
         $time = (microtime(true) - self::$TUSAGE) * 1e6;
 
         // cpu per request
@@ -56,9 +73,13 @@ class Profiler extends \Flake\Core\FLObject {
         return $cpu;
     }
 
-    public static function cpuTime() {
+    /**
+     * @return float
+     */
+    public static function cpuTime(): float
+    {
         $dat = getrusage();
-        $tv_usec = (($dat["ru_utime.tv_sec"] * 1e6) + $dat["ru_utime.tv_usec"]) - self::$RUSAGE;
+        $tv_usec = (($dat['ru_utime.tv_sec'] * 1e6) + $dat['ru_utime.tv_usec']) - self::$RUSAGE;
         $time = (microtime(true) - self::$TUSAGE) * 1e6;
         $cpuusage = ($tv_usec / $time);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,15 +29,31 @@
 
 namespace BaikalAdmin\Controller;
 
-class Logout extends \Flake\Core\Controller {
-    function execute() {
-        \BaikalAdmin\Core\Auth::unAuthenticate();
+use BaikalAdmin\Core\Auth;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
 
-        $sControllerForDefaultRoute = $GLOBALS["ROUTER"]::getControllerForRoute("default");
-        $sLink = $GLOBALS["ROUTER"]::buildRouteForController($sControllerForDefaultRoute, "loggedout");
-        \Flake\Util\Tools::redirect($sLink);
+/**
+ *
+ */
+class Logout extends Controller
+{
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
+        Auth::unAuthenticate();
+
+        $sControllerForDefaultRoute = $GLOBALS['ROUTER']::getControllerForRoute('default');
+        $sLink = $GLOBALS['ROUTER']::buildRouteForController($sControllerForDefaultRoute, ['loggedout']);
+        Tools::redirect($sLink);
     }
 
-    function render() {
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
     }
 }

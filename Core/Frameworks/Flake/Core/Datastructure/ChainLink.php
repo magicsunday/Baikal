@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,91 +29,156 @@
 
 namespace Flake\Core\Datastructure;
 
-abstract class ChainLink implements \Flake\Core\Datastructure\Chainable {
-    protected $__container;
-    protected $__key;
+use Exception;
+use ReturnTypeWillChange;
 
-    public function chain(Chain $container, $key) {
+/**
+ *
+ */
+abstract class ChainLink implements Chainable
+{
+    protected ?Chain $__container = null;
+    protected $__key = null;
+
+    /**
+     * @param Chain $container
+     * @param       $key
+     *
+     * @return void
+     */
+    public function chain(Chain $container, $key): void
+    {
         $this->__container = $container;
         $this->__key = $key;
     }
 
-    public function offsetSet($offset, $value): void {
-        if (is_null($this->__container)) {
+    /**
+     * @param $offset
+     * @param $value
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $value): void
+    {
+        if ($this->__container === null) {
             return;
         }
 
         $this->__container->offsetSet($offset, $value);
     }
 
-    public function offsetExists($offset): bool {
-        if (is_null($this->__container)) {
+    /**
+     * @param $offset
+     *
+     * @return bool
+     */
+    public function offsetExists($offset): bool
+    {
+        if ($this->__container === null) {
             return false;
         }
 
         return $this->__container->offsetExists($offset);
     }
 
-    public function offsetUnset($offset): void {
-        if (is_null($this->__container)) {
+    /**
+     * @throws Exception
+     */
+    public function offsetUnset($offset): void
+    {
+        if ($this->__container === null) {
             return;
         }
 
         $this->__container->offsetUnset($offset);
     }
 
-    #[\ReturnTypeWillChange]
-    public function &offsetGet($offset) {
-        if (is_null($this->__container)) {
+    /**
+     * @param $offset
+     *
+     * @return mixed|null
+     */
+    #[ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        if ($this->__container === null) {
             return null;
         }
 
-        $oRes = $this->__container->offsetGet($offset);
-
-        return $oRes;
+        return $this->__container->offsetGet($offset);
     }
 
-    public function rewind(): void {
+    /**
+     * @return void
+     */
+    public function rewind(): void
+    {
         $this->__container->rewind();
     }
 
-    #[\ReturnTypeWillChange]
-    public function current() {
+    /**
+     * @return mixed
+     */
+    #[ReturnTypeWillChange]
+    public function current()
+    {
         return $this->__container->current();
     }
 
-    #[\ReturnTypeWillChange]
-    public function key() {
+    /**
+     * @return bool|float|int|string|null
+     */
+    #[ReturnTypeWillChange]
+    public function key()
+    {
         return $this->__container->key();
     }
 
-    public function &next(): void {
+    /**
+     * @return void
+     */
+    public function next(): void
+    {
         $this->__container->next();
     }
 
-    public function &prev() {
-        $oPrev = $this->__container->prev();
-
-        return $oPrev;
+    /**
+     * @return void
+     */
+    public function prev(): void
+    {
+        $this->__container->prev();
     }
 
-    public function valid(): bool {
+    /**
+     * @return bool
+     */
+    public function valid(): bool
+    {
         return $this->__container->valid();
     }
 
-    public function count(): int {
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
         return $this->__container->count();
     }
 
-    public function &first() {
-        $oRes = $this->__container->first();
-
-        return $oRes;
+    /**
+     * @return mixed
+     */
+    public function first()
+    {
+        return $this->__container->first();
     }
 
-    public function &last() {
-        $oRes = $this->__container->last();
-
-        return $oRes;
+    /**
+     * @return mixed
+     */
+    public function last()
+    {
+        return $this->__container->last();
     }
 }

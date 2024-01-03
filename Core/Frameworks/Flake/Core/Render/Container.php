@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,54 +29,84 @@
 
 namespace Flake\Core\Render;
 
-abstract class Container extends \Flake\Core\Controller {
-    public $aSequence = [];
-    public $aBlocks = [];
-    public $aRendu = [];
-    public $aZones = [];
+use Flake\Core\Controller;
 
-    public function addBlock(&$oBlock, $sZone = "_DEFAULT_") {
+use function array_key_exists;
+
+/**
+ *
+ */
+abstract class Container extends Controller
+{
+    public array $aSequence = [];
+    public array $aBlocks = [];
+    public array $aRendu = [];
+    public array $aZones = [];
+
+    /**
+     * @param        $oBlock
+     * @param string $sZone
+     *
+     * @return void
+     */
+    public function addBlock(&$oBlock, string $sZone = '_DEFAULT_'): void
+    {
         $aTemp = [
-            "block" => &$oBlock,
-            "rendu" => "",
+            'block' => &$oBlock,
+            'rendu' => '',
         ];
         $this->aSequence[] = &$aTemp;
-        $this->aBlocks[$sZone][] = &$aTemp["rendu"];
+        $this->aBlocks[$sZone][] = &$aTemp['rendu'];
     }
 
-    public function &zone($sZone) {
+    /**
+     * @param $sZone
+     *
+     * @return Zone|mixed
+     */
+    public function zone($sZone)
+    {
         if (!array_key_exists($sZone, $this->aZones)) {
-            $this->aZones[$sZone] = new \Flake\Core\Render\Zone($this, $sZone);
+            $this->aZones[$sZone] = new Zone($this, $sZone);
         }
 
         return $this->aZones[$sZone];
     }
 
-    public function render() {
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
         $this->execute();
         $aRenderedBlocks = $this->renderBlocks();
 
-        return implode("", $aRenderedBlocks);
+        return implode('', $aRenderedBlocks);
     }
 
-    public function execute() {
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
         foreach ($this->aSequence as $aStep) {
-            $aStep["block"]->execute();
+            $aStep['block']->execute();
         }
     }
 
-    protected function renderBlocks() {
-        $aHtml = [];
+    /**
+     * @return array
+     */
+    protected function renderBlocks(): array
+    {
         foreach ($this->aSequence as $sKey => $aStep) {
-            $this->aSequence[$sKey]["rendu"] = $this->aSequence[$sKey]["block"]->render();
+            $this->aSequence[$sKey]['rendu'] = $this->aSequence[$sKey]['block']->render();
         }
 
         $aHtml = [];
         foreach ($this->aBlocks as $sZone => $aBlock) {
-            $aHtml[$sZone] = implode("", $aBlock);
+            $aHtml[$sZone] = implode('', $aBlock);
         }
-
-        reset($aHtml);
 
         return $aHtml;
     }

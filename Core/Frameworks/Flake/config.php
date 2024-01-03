@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -25,14 +27,14 @@
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
-if (defined("PROJECT_LOCALE")) {
-    define("FLAKE_LOCALE", PROJECT_LOCALE);
+if (defined('PROJECT_LOCALE')) {
+    define('FLAKE_LOCALE', PROJECT_LOCALE);
 } else {
-    define("FLAKE_LOCALE", "fr_FR.UTF-8");
+    define('FLAKE_LOCALE', 'fr_FR.UTF-8');
 }
 
-if (defined("PROJECT_TIMEZONE")) {
-    define("FLAKE_TIMEZONE", PROJECT_TIMEZONE);
+if (defined('PROJECT_TIMEZONE')) {
+    define('FLAKE_TIMEZONE', PROJECT_TIMEZONE);
 } else {
-    define("FLAKE_TIMEZONE", "Europe/Paris");
+    define('FLAKE_TIMEZONE', 'Europe/Paris');
 }

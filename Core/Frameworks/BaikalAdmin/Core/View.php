@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,10 +29,21 @@
 
 namespace BaikalAdmin\Core;
 
-class View extends \Flake\Core\View {
-    function templatesPath() {
+use function get_class;
+use function strlen;
+
+/**
+ *
+ */
+class View extends \Flake\Core\View
+{
+    /**
+     * @return string
+     */
+    public function templatesPath(): string
+    {
         $sViewName = get_class($this);
-        $sTemplate = str_replace("\\", "/", substr($sViewName, strlen("BaikalAdmin\\View\\"))) . ".html";
+        $sTemplate = str_replace("\\", '/', substr($sViewName, strlen("BaikalAdmin\\View\\"))) . '.html';
 
         return BAIKALADMIN_PATH_TEMPLATES . $sTemplate;
     }

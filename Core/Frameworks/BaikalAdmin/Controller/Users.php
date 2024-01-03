@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,20 +29,44 @@
 
 namespace BaikalAdmin\Controller;
 
-class Users extends \Flake\Core\Controller {
-    protected $aMessages = [];
+use Baikal\Model\Calendar;
+use Baikal\Model\User;
+use BaikalAdmin\Controller\User\AddressBooks;
+use BaikalAdmin\Controller\User\Calendars;
+use Exception;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
+use Formal\Core\Message;
+use Formal\Form;
+use ReflectionException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+
+use function array_key_exists;
+
+/**
+ *
+ */
+class Users extends Controller
+{
+    protected array $aMessages = [];
 
     /**
-     * @var \Baikal\Model\User
+     * @var User
      */
-    private $oModel;
+    private User $oModel;
 
     /**
-     * @var \Formal\Form
+     * @var Form
      */
-    private $oForm;
+    private Form $oForm;
 
-    function execute() {
+    /**
+     * @throws Exception
+     */
+    public function execute(): void
+    {
         if ($this->actionEditRequested()) {
             $this->actionEdit();
         }
@@ -54,53 +80,72 @@ class Users extends \Flake\Core\Controller {
         }
     }
 
-    function render() {
+    /**
+     * @throws SyntaxError
+     * @throws ReflectionException
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public function render(): string
+    {
         $oView = new \BaikalAdmin\View\Users();
 
         # List of users
         $aUsers = [];
-        $oUsers = \Baikal\Model\User::getBaseRequester()->execute();
+        $oUsers = User::getBaseRequester()->execute();
 
         foreach ($oUsers as $user) {
             $aUsers[] = [
-                "linkcalendars"    => \BaikalAdmin\Controller\Users::linkCalendars($user),
-                "linkaddressbooks" => \BaikalAdmin\Controller\Users::linkAddressBooks($user),
-                "linkedit"         => \BaikalAdmin\Controller\Users::linkEdit($user),
-                "linkdelete"       => \BaikalAdmin\Controller\Users::linkDelete($user),
-                "mailtouri"        => $user->getMailtoURI(),
-                "username"         => $user->get("username"),
-                "displayname"      => $user->get("displayname"),
-                "email"            => $user->get("email"),
+                'linkcalendars'    => self::linkCalendars($user),
+                'linkaddressbooks' => self::linkAddressBooks($user),
+                'linkedit'         => self::linkEdit($user),
+                'linkdelete'       => self::linkDelete($user),
+                'mailtouri'        => $user->getMailtoURI(),
+                'username'         => $user->get('username'),
+                'displayname'      => $user->get('displayname'),
+                'email'            => $user->get('email'),
             ];
         }
 
-        $oView->setData("users", $aUsers);
-        $oView->setData("calendaricon", \Baikal\Model\Calendar::icon());
-        $oView->setData("usericon", \Baikal\Model\User::icon());
-        $oView->setData("davUri", PROJECT_URI . 'dav.php');
+        $oView->setData('users', $aUsers);
+        $oView->setData('calendaricon', Calendar::icon());
+        $oView->setData('usericon', User::icon());
+        $oView->setData('davUri', PROJECT_URI . 'dav.php');
 
         # Messages
         $sMessages = implode("\n", $this->aMessages);
-        $oView->setData("messages", $sMessages);
+        $oView->setData('messages', $sMessages);
 
         # Form
         if ($this->actionNewRequested() || $this->actionEditRequested()) {
             $sForm = $this->oForm->render();
         } else {
-            $sForm = "";
+            $sForm = '';
         }
 
-        $oView->setData("form", $sForm);
-        $oView->setData("usericon", \Baikal\Model\User::icon());
-        $oView->setData("controller", $this);
+        $oView->setData('form', $sForm);
+        $oView->setData('usericon', User::icon());
+        $oView->setData('controller', $this);
 
         return $oView->render();
     }
 
-    protected function initForm() {
+    /**
+     * @throws Exception
+     */
+    protected function initForm(): void
+    {
         if ($this->actionEditRequested() || $this->actionNewRequested()) {
             $aOptions = [
-                "closeurl" => self::link(),
+                'closeurl' => self::link(),
             ];
 
             $this->oForm = $this->oModel->formForThisModelInstance($aOptions);
@@ -108,18 +153,23 @@ class Users extends \Flake\Core\Controller {
     }
 
     # Action edit
-    protected function actionEditRequested() {
-        $aParams = $this->getParams();
-        if (array_key_exists("edit", $aParams) && intval($aParams["edit"]) > 0) {
-            return true;
-        }
 
-        return false;
+    /**
+     * @return bool
+     */
+    protected function actionEditRequested(): bool
+    {
+        $aParams = $this->getParams();
+        return array_key_exists('edit', $aParams) && (int)$aParams['edit'] > 0;
     }
 
-    protected function actionEdit() {
+    /**
+     * @throws Exception
+     */
+    protected function actionEdit(): void
+    {
         $aParams = $this->getParams();
-        $this->oModel = new \Baikal\Model\User(intval($aParams["edit"]));
+        $this->oModel = new User((int)$aParams['edit']);
         $this->initForm();
 
         if ($this->oForm->submitted()) {
@@ -129,71 +179,80 @@ class Users extends \Flake\Core\Controller {
 
     # Action delete
 
-    protected function actionDeleteRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("delete", $aParams) && intval($aParams["delete"]) > 0) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('delete', $aParams) && (int)$aParams['delete'] > 0;
     }
 
-    protected function actionDeleteConfirmed() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteConfirmed(): bool
+    {
         if ($this->actionDeleteRequested() === false) {
             return false;
         }
 
         $aParams = $this->getParams();
 
-        if (array_key_exists("confirm", $aParams) && intval($aParams["confirm"]) === 1) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('confirm', $aParams) && (int)$aParams['confirm'] === 1;
     }
 
-    protected function actionDelete() {
+    /**
+     * @throws Exception
+     */
+    protected function actionDelete(): void
+    {
         $aParams = $this->getParams();
-        $iUser = intval($aParams["delete"]);
+        $iUser = (int)$aParams['delete'];
 
         if ($this->actionDeleteConfirmed() !== false) {
             # catching Exception thrown when model already destroyed
             # happens when user refreshes delete-page, for instance
 
             try {
-                $oUser = new \Baikal\Model\User($iUser);
+                $oUser = new User($iUser);
                 $oUser->destroy();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 # user is already deleted; silently discarding
                 error_log($e);
             }
 
             # Redirecting to admin home
-            \Flake\Util\Tools::redirectUsingMeta($this->link());
+            Tools::redirectUsingMeta($this->link());
         } else {
-            $oUser = new \Baikal\Model\User($iUser);
-            $this->aMessages[] = \Formal\Core\Message::warningConfirmMessage(
-                "Check twice, you're about to delete " . $oUser->label() . "</strong> from the database !",
+            $oUser = new User($iUser);
+            $this->aMessages[] = Message::warningConfirmMessage(
+                "Check twice, you're about to delete " . $oUser->label() . '</strong> from the database !',
                 "<p>You are about to delete a user and all it's calendars / contacts. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
                 $this->linkDeleteConfirm($oUser),
-                "Delete <strong><i class='" . $oUser->icon() . " icon-white'></i> " . $oUser->label() . "</strong>",
+                "Delete <strong><i class='" . $oUser->icon() . " icon-white'></i> " . $oUser->label() . '</strong>',
                 $this->link()
             );
         }
     }
 
     # Action new
-    protected function actionNewRequested() {
-        $aParams = $this->getParams();
-        if (array_key_exists("new", $aParams) && intval($aParams["new"]) === 1) {
-            return true;
-        }
 
-        return false;
+    /**
+     * @return bool
+     */
+    protected function actionNewRequested(): bool
+    {
+        $aParams = $this->getParams();
+        return array_key_exists('new', $aParams) && (int)$aParams['new'] === 1;
     }
 
-    protected function actionNew() {
-        $this->oModel = new \Baikal\Model\User();
+    /**
+     * @throws Exception
+     */
+    protected function actionNew(): void
+    {
+        $this->oModel = new User();
         $this->initForm();
 
         if ($this->oForm->submitted()) {
@@ -201,7 +260,7 @@ class Users extends \Flake\Core\Controller {
 
             if ($this->oForm->persisted()) {
                 $this->oForm->setOption(
-                    "action",
+                    'action',
                     $this->linkEdit(
                         $this->oForm->modelInstance()
                     )
@@ -210,40 +269,64 @@ class Users extends \Flake\Core\Controller {
         }
     }
 
-    function linkNew() {
+    /**
+     * @return string
+     */
+    public function linkNew(): string
+    {
         return self::buildRoute([
-            "new" => 1,
-        ]) . "#form";
+                'new' => 1,
+            ]) . '#form';
     }
 
-    static function linkEdit(\Baikal\Model\User $user) {
+    /**
+     * @throws Exception
+     */
+    public static function linkEdit(User $user): string
+    {
         return self::buildRoute([
-            "edit" => $user->get("id"),
-        ]) . "#form";
+                'edit' => $user->get('id'),
+            ]) . '#form';
     }
 
-    static function linkDelete(\Baikal\Model\User $user) {
+    /**
+     * @throws Exception
+     */
+    public static function linkDelete(User $user): string
+    {
         return self::buildRoute([
-            "delete" => $user->get("id"),
-        ]) . "#message";
+                'delete' => $user->get('id'),
+            ]) . '#message';
     }
 
-    static function linkDeleteConfirm(\Baikal\Model\User $user) {
+    /**
+     * @throws Exception
+     */
+    public static function linkDeleteConfirm(User $user): string
+    {
         return self::buildRoute([
-            "delete"  => $user->get("id"),
-            "confirm" => 1,
-        ]) . "#message";
+                'delete'  => $user->get('id'),
+                'confirm' => 1,
+            ]) . '#message';
     }
 
-    static function linkCalendars(\Baikal\Model\User $user) {
-        return \BaikalAdmin\Controller\User\Calendars::buildRoute([
-            "user" => $user->get("id"),
+    /**
+     * @throws Exception
+     */
+    public static function linkCalendars(User $user): string
+    {
+        return Calendars::buildRoute([
+            'user' => $user->get('id'),
         ]);
     }
 
-    static function linkAddressBooks(\Baikal\Model\User $user) {
-        return \BaikalAdmin\Controller\User\AddressBooks::buildRoute([
-            "user" => $user->get("id"),
+    /**
+     * @throws Exception
+     */
+    public static function linkAddressBooks(User $user): string
+    {
+        return AddressBooks::buildRoute([
+            'user' => $user->get('id'),
         ]);
     }
 }

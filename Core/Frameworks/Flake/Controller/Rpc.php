@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,38 +29,60 @@
 
 namespace Flake\Controller;
 
-class Rpc extends \Flake\Core\Render\Container {
-    public function initializeContext() {
+use Flake\Core\Render\Container;
+
+/**
+ *
+ */
+class Rpc extends Container
+{
+    /**
+     * @return void
+     */
+    public function initializeContext(): void
+    {
         $this->injectHTTPHeaders();
-        $GLOBALS["POSTCONNECTIONSERVICES"] = [];
+        $GLOBALS['POSTCONNECTIONSERVICES'] = [];
     }
 
-    public function injectHTTPHeaders() {
+    /**
+     * @return void
+     */
+    public function injectHTTPHeaders(): void
+    {
         ob_start();
 
-        header("Access-Control-Allow-Origin: *");    # To allow cross domain AJAX response
-        header("Access-Control-Allow-Credentials: true");    # To allow cross domain cookies
-        header("Content-Type: application/json; charset=UTF-8");
+        header('Access-Control-Allow-Origin: *');    # To allow cross domain AJAX response
+        header('Access-Control-Allow-Credentials: true');    # To allow cross domain cookies
+        header('Content-Type: application/json; charset=UTF-8');
 
         # Needed to cut client off when needed
         header("Connection: close\r\n");
         ignore_user_abort(true);
     }
 
-    public function P3PAllowCrossDomainCookies() {
+    /**
+     * @return void
+     */
+    public function P3PAllowCrossDomainCookies(): void
+    {
         # This tells IE6+ to accept passing cookies allong when establishing a XHR connection to read.codr.fr
         header('P3P: CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"');
     }
 
-    public function sendResponseCutClientAndRunPostConnectionTasks() {
-        header("Content-Length: " . ob_get_length());
+    /**
+     * @return void
+     */
+    public function sendResponseCutClientAndRunPostConnectionTasks(): void
+    {
+        header('Content-Length: ' . ob_get_length());
         ob_end_flush();
         flush();
 
-        reset($GLOBALS["POSTCONNECTIONSERVICES"]);
+        reset($GLOBALS['POSTCONNECTIONSERVICES']);
 
         # If post-connection services are registered, process
-        foreach ($GLOBALS["POSTCONNECTIONSERVICES"] as $service) {
+        foreach ($GLOBALS['POSTCONNECTIONSERVICES'] as $service) {
             $service->execute();
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,30 +29,49 @@
 
 namespace Flake\Core\Database;
 
-class Mysql extends \Flake\Core\Database {
-    protected $sHost = "";
-    protected $sDbName = "";
-    protected $sUsername = "";
-    protected $sPassword = "";
+use Exception;
+use Flake\Core\Database;
+use PDO;
 
-    public function __construct($sHost, $sDbName, $sUsername, $sPassword) {
+/**
+ *
+ */
+class Mysql extends Database
+{
+    protected string $sHost = '';
+    protected string $sDbName = '';
+    protected string $sUsername = '';
+    protected string $sPassword = '';
+
+    /**
+     * @param string $sHost
+     * @param string $sDbName
+     * @param string $sUsername
+     * @param string $sPassword
+     */
+    public function __construct(string $sHost, string $sDbName, string $sUsername, string $sPassword)
+    {
         $this->sHost = $sHost;
         $this->sDbName = $sDbName;
         $this->sUsername = $sUsername;
         $this->sPassword = $sPassword;
 
-        $this->oDb = new \PDO(
+        $this->oDb = new PDO(
             'mysql:host=' . $this->sHost . ';dbname=' . $this->sDbName,
             $this->sUsername,
             $this->sPassword
         );
-        $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->oDb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function tables() {
+    /**
+     * @throws Exception
+     */
+    public function tables(): array
+    {
         $aTables = [];
 
-        $sSql = "SHOW TABLES FROM `" . $this->sDbName . "`";
+        $sSql = 'SHOW TABLES FROM `' . $this->sDbName . '`';
         $oStmt = $this->query($sSql);
 
         while (($aRs = $oStmt->fetch()) !== false) {
@@ -58,7 +79,6 @@ class Mysql extends \Flake\Core\Database {
         }
 
         asort($aTables);
-        reset($aTables);
 
         return $aTables;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,61 +29,84 @@
 
 namespace BaikalAdmin\Controller;
 
+use BaikalAdmin\Core\Auth;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
+use Formal\Core\Message;
 use Symfony\Component\Yaml\Yaml;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-class Login extends \Flake\Core\Controller {
-    function execute() {
+/**
+ *
+ */
+class Login extends Controller
+{
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
     }
 
     function render() {
-        $sActionUrl = $GLOBALS["ROUTER"]::buildRoute("default", []);
-        $sSubmittedFlagName = "auth";
-        $sMessage = "";
+        $sActionUrl = $GLOBALS['ROUTER']::buildRoute('default', []);
+        $sSubmittedFlagName = 'auth';
+        $sMessage = '';
 
-        $sLogin = htmlspecialchars(\Flake\Util\Tools::POST("login"));
+        $sLogin = htmlspecialchars(Tools::POST('login'));
 
-        if (self::isSubmitted() && !\BaikalAdmin\Core\Auth::isAuthenticated()) {
+        if (self::isSubmitted() && !Auth::isAuthenticated()) {
             // Log failed accesses, for further processing by tools like Fail2Ban
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-            if (isset($config['system']["failed_access_message"]) && $config['system']["failed_access_message"] !== "") {
-                $log_msg = str_replace("%u", $sLogin, $config['system']["failed_access_message"]);
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+            if (isset($config['system']['failed_access_message']) && $config['system']['failed_access_message'] !== '') {
+                $log_msg = str_replace('%u', $sLogin, $config['system']['failed_access_message']);
                 error_log($log_msg, 4);
             }
-            $sMessage = \Formal\Core\Message::error(
-                "The login/password you provided is invalid. Please retry.",
-                "Authentication error"
+            $sMessage = Message::error(
+                'The login/password you provided is invalid. Please retry.',
+                'Authentication error'
             );
         } elseif (self::justLoggedOut()) {
-            $sMessage = \Formal\Core\Message::notice(
-                "You have been disconnected from your session.",
-                "Session ended",
+            $sMessage = Message::notice(
+                'You have been disconnected from your session.',
+                'Session ended',
                 false
             );
         }
 
-        $sPassword = htmlspecialchars(\Flake\Util\Tools::POST("password"));
+        $sPassword = htmlspecialchars(Tools::POST('password'));
 
-        if (trim($sLogin) === "") {
-            $sLogin = "admin";
+        if (trim($sLogin) === '') {
+            $sLogin = 'admin';
         }
 
         $oView = new \BaikalAdmin\View\Login();
-        $oView->setData("message", $sMessage);
-        $oView->setData("actionurl", $sActionUrl);
-        $oView->setData("submittedflagname", $sSubmittedFlagName);
-        $oView->setData("login", $sLogin);
-        $oView->setData("password", $sPassword);
+        $oView->setData('message', $sMessage);
+        $oView->setData('actionurl', $sActionUrl);
+        $oView->setData('submittedflagname', $sSubmittedFlagName);
+        $oView->setData('login', $sLogin);
+        $oView->setData('password', $sPassword);
 
         return $oView->render();
     }
 
-    protected static function isSubmitted() {
-        return (intval(\Flake\Util\Tools::POST("auth")) === 1);
+    /**
+     * @return bool
+     */
+    protected static function isSubmitted(): bool
+    {
+        return ((int)Tools::POST('auth') === 1);
     }
 
-    protected static function justLoggedOut() {
-        $aParams = $GLOBALS["ROUTER"]::getURLParams();
+    /**
+     * @return bool
+     */
+    protected static function justLoggedOut(): bool
+    {
+        $aParams = $GLOBALS['ROUTER']::getURLParams();
 
-        return (!empty($aParams) && $aParams[0] === "loggedout");
+        return (!empty($aParams) && $aParams[0] === 'loggedout');
     }
 }

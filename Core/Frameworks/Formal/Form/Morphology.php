@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,24 +29,42 @@
 
 namespace Formal\Form;
 
-class Morphology {
-    protected $oElements;
+use Exception;
+use Flake\Core\CollectionTyped;
+use Formal\Element;
+use ReflectionException;
+use RuntimeException;
 
-    function __construct() {
-        $this->oElements = new \Flake\Core\CollectionTyped("\Formal\Element");
+/**
+ *
+ */
+class Morphology
+{
+    protected ?CollectionTyped $oElements = null;
+
+    public function __construct()
+    {
+        $this->oElements = new CollectionTyped(Element::class);
     }
 
-    function add(\Formal\Element $oElement) {
+    /**
+     * @throws ReflectionException
+     */
+    public function add(Element $oElement): void
+    {
         $this->oElements->push($oElement);
     }
 
-    protected function keyForPropName($sPropName) {
+    /**
+     * @throws Exception
+     */
+    protected function keyForPropName($sPropName)
+    {
         $aKeys = $this->oElements->keys();
-        reset($aKeys);
         foreach ($aKeys as $sKey) {
             $oElement = $this->oElements->getForKey($sKey);
 
-            if ($oElement->option("prop") === $sPropName) {
+            if ($oElement->option('prop') === $sPropName) {
                 return $sKey;
             }
         }
@@ -52,25 +72,39 @@ class Morphology {
         return false;
     }
 
-    function &element($sPropName) {
+    /**
+     * @throws Exception
+     */
+    public function element($sPropName)
+    {
         if (($sKey = $this->keyForPropName($sPropName)) === false) {
-            throw new \Exception("\Formal\Form\Morphology->element(): Element prop='" . $sPropName . "' not found");
+            throw new RuntimeException(
+                "\Formal\Form\Morphology->element(): Element prop='" . $sPropName . "' not found"
+            );
         }
 
-        $oElement = $this->oElements->getForKey($sKey);
-
-        return $oElement;
+        return $this->oElements->getForKey($sKey);
     }
 
-    function remove($sPropName) {
+    /**
+     * @throws Exception
+     */
+    public function remove($sPropName): void
+    {
         if (($sKey = $this->keyForPropName($sPropName)) === false) {
-            throw new \Exception("\Formal\Form\Morphology->element(): Element prop='" . $sPropName . "' not found");
+            throw new RuntimeException(
+                "\Formal\Form\Morphology->element(): Element prop='" . $sPropName . "' not found"
+            );
         }
 
         $this->oElements->remove($sKey);
     }
 
-    function elements() {
+    /**
+     * @return CollectionTyped|null
+     */
+    public function elements(): ?CollectionTyped
+    {
         return $this->oElements;
     }
 }

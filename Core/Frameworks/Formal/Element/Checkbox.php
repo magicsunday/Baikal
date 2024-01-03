@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,46 +29,63 @@
 
 namespace Formal\Element;
 
-class Checkbox extends \Formal\Element {
-    public function setValue($sValue) {
+use Exception;
+use Formal\Element;
+
+/**
+ *
+ */
+class Checkbox extends Element
+{
+    /**
+     * @param $sValue
+     *
+     * @return void
+     */
+    public function setValue($sValue): void
+    {
         # Boolean
-        $this->sValue = ((intval($sValue) === 1));
+        $this->sValue = (((int)$sValue === 1));
     }
 
-    function render() {
-        $disabled = "";
-        $inputclass = "";
-        $groupclass = "";
-        $onchange = "";
-        $helpblock = "";
-        $popover = "";
+    /**
+     * @throws Exception
+     */
+    public function render(): string
+    {
+        $disabled = '';
+        $inputclass = '';
+        $groupclass = '';
+        $onchange = '';
+        $helpblock = '';
+        $popover = '';
 
         $value = $this->value();
 
-        $checked = ($value === true ? " checked=\"checked\" " : "");
-        $label = $this->option("label");
-        $prop = $this->option("prop");
+        $checked = ($value === true ? ' checked="checked" ' : '');
+        $label = $this->option('label');
+        $prop = $this->option('prop');
 
-        if ($this->option("readonly") === true) {
-            $inputclass .= " disabled";
-            $disabled = " disabled";
+        if ($this->option('readonly') === true) {
+            $inputclass .= ' disabled';
+            $disabled = ' disabled';
         }
 
-        if ($this->option("error") === true) {
-            $groupclass .= " error";
+        if ($this->option('error') === true) {
+            $groupclass .= ' error';
         }
 
-        if (($sHelp = trim($this->option("help"))) !== "") {
-            $helpblock = "<p class=\"help-block\">" . $sHelp . "</p>";
+        if (($sHelp = trim($this->option('help'))) !== '') {
+            $helpblock = '<p class="help-block">' . $sHelp . '</p>';
         }
 
-        if (($aPopover = $this->option("popover")) !== "") {
-            $inputclass .= " popover-hover ";
-            $popover = " title=\"" . htmlspecialchars($aPopover["title"]) . "\" ";
-            $popover .= " data-content=\"" . htmlspecialchars($aPopover["content"]) . "\" ";
+        if (($aPopover = $this->option('popover')) !== '') {
+            $inputclass .= ' popover-hover ';
+            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
         }
 
-        if ($this->option("refreshonchange") === true) {
+        if ($this->option('refreshonchange') === true) {
             $onchange = " onchange=\"document.getElementsByTagName('form')[0].elements['refreshed'].value=1;document.getElementsByTagName('form')[0].submit();\" ";
         }
 

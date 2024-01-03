@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,31 +29,48 @@
 
 namespace Flake\Core\Database;
 
-class Sqlite extends \Flake\Core\Database {
-    protected $sDbPath = "";
+use Exception;
+use Flake\Core\Database;
+use PDO;
 
-    public function __construct($sDbPath) {
+/**
+ *
+ */
+class Sqlite extends Database
+{
+    protected string $sDbPath = '';
+
+    /**
+     * @param string $sDbPath
+     */
+    public function __construct(string $sDbPath)
+    {
         $this->sDbPath = $sDbPath;
-        $this->oDb = new \PDO('sqlite:' . $this->sDbPath);
-        $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->oDb = new PDO('sqlite:' . $this->sDbPath);
+        $this->oDb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     # Taken from http://dev.kohanaframework.org/issues/2985
-    public function tables() {
+
+    /**
+     * @throws Exception
+     */
+    public function tables(): array
+    {
         $aTables = [];
 
         # Find all user level table names
-        $oStmt = $this->query('SELECT name '
-        . 'FROM sqlite_master '
-        . 'WHERE type=\'table\' AND name NOT LIKE \'sqlite_%\' '
-        . 'ORDER BY name');
+        $oStmt = $this->query(
+            'SELECT name '
+            . 'FROM sqlite_master '
+            . 'WHERE type=\'table\' AND name NOT LIKE \'sqlite_%\' '
+            . 'ORDER BY name'
+        );
 
         while (($aRs = $oStmt->fetch()) !== false) {
             // Get the table name from the results
             $aTables[] = array_shift($aRs);
         }
-
-        reset($aTables);
 
         return $aTables;
     }

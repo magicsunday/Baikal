@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,85 +29,132 @@
 
 namespace Baikal\Model;
 
+use Exception;
+use Flake\Core\Model\Db;
+use Flake\Core\Requester\Sql;
+use Formal\Element\Password;
+use Formal\Element\Text;
+use Formal\Form\Morphology;
+use ReflectionException;
 use Symfony\Component\Yaml\Yaml;
 
-class User extends \Flake\Core\Model\Db {
-    const DATATABLE = "users";
-    const PRIMARYKEY = "id";
-    const LABELFIELD = "username";
+/**
+ *
+ */
+class User extends Db
+{
+    public const DATATABLE = 'users';
+    public const PRIMARYKEY = 'id';
+    public const LABELFIELD = 'username';
 
-    protected $aData = [
-        "username" => "",
-        "digesta1" => "",
+    protected array $aData = [
+        'username' => '',
+        'digesta1' => '',
     ];
 
-    protected $oIdentityPrincipal;
+    protected ?Principal $oIdentityPrincipal = null;
 
-    function initByPrimary($sPrimary) {
+    /**
+     * @param string|int $sPrimary
+     *
+     * @return void
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    protected function initByPrimary(string|int $sPrimary): void
+    {
         parent::initByPrimary($sPrimary);
 
         # Initializing principals
-        $this->oIdentityPrincipal = \Baikal\Model\Principal::getBaseRequester()
-            ->addClauseEquals("uri", "principals/" . $this->get("username"))
+        $this->oIdentityPrincipal = Principal::getBaseRequester()
+            ->addClauseEquals('uri', 'principals/' . $this->get('username'))
             ->execute()
             ->first();
     }
 
-    function getAddressBooksBaseRequester() {
-        $oBaseRequester = \Baikal\Model\AddressBook::getBaseRequester();
+    /**
+     * @throws Exception
+     */
+    public function getAddressBooksBaseRequester(): Sql
+    {
+        $oBaseRequester = AddressBook::getBaseRequester();
         $oBaseRequester->addClauseEquals(
-            "principaluri",
-            "principals/" . $this->get("username")
+            'principaluri',
+            'principals/' . $this->get('username')
         );
 
         return $oBaseRequester;
     }
 
-    function getCalendarsBaseRequester() {
-        $oBaseRequester = \Baikal\Model\Calendar::getBaseRequester();
+    /**
+     * @throws Exception
+     */
+    public function getCalendarsBaseRequester(): Sql
+    {
+        $oBaseRequester = Calendar::getBaseRequester();
         $oBaseRequester->addClauseEquals(
-            "principaluri",
-            "principals/" . $this->get("username")
+            'principaluri',
+            'principals/' . $this->get('username')
         );
 
         return $oBaseRequester;
     }
 
-    function initFloating() {
+    /**
+     * @return void
+     */
+    public function initFloating(): void
+    {
         parent::initFloating();
 
         # Initializing principals
-        $this->oIdentityPrincipal = new \Baikal\Model\Principal();
+        $this->oIdentityPrincipal = new Principal();
     }
 
-    function get($sPropName) {
-        if ($sPropName === "password" || $sPropName === "passwordconfirm") {
+    /**
+     * @param string $sPropName
+     *
+     * @return bool|int|string|null
+     *
+     * @throws Exception
+     */
+    public function get(string $sPropName): bool|int|string|null
+    {
+        if ($sPropName === 'password' || $sPropName === 'passwordconfirm') {
             # Special handling for password and passwordconfirm
-            return "";
+            return '';
         }
 
         try {
             # does the property exist on the model object ?
             $sRes = parent::get($sPropName);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             # no, it may belong to the oIdentityPrincipal model object
             if ($this->oIdentityPrincipal) {
                 $sRes = $this->oIdentityPrincipal->get($sPropName);
             } else {
-                $sRes = "";
+                $sRes = '';
             }
         }
 
         return $sRes;
     }
 
-    function set($sPropName, $sPropValue) {
-        if ($sPropName === "password" || $sPropName === "passwordconfirm") {
+    /**
+     * @param string               $sPropName
+     * @param bool|int|string|null $sPropValue
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function set(string $sPropName, bool|int|string|null $sPropValue): static
+    {
+        if ($sPropName === 'password' || $sPropName === 'passwordconfirm') {
             # Special handling for password and passwordconfirm
 
-            if ($sPropName === "password" && $sPropValue !== "") {
+            if ($sPropName === 'password' && $sPropValue !== '') {
                 parent::set(
-                    "digesta1",
+                    'digesta1',
                     $this->getPasswordHashForPassword($sPropValue)
                 );
             }
@@ -116,7 +165,7 @@ class User extends \Flake\Core\Model\Db {
         try {
             # does the property exist on the model object ?
             parent::set($sPropName, $sPropValue);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             # no, it may belong to the oIdentityPrincipal model object
             if ($this->oIdentityPrincipal) {
                 $this->oIdentityPrincipal->set($sPropName, $sPropValue);
@@ -126,58 +175,71 @@ class User extends \Flake\Core\Model\Db {
         return $this;
     }
 
-    function persist() {
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function persist(): void
+    {
         $bFloating = $this->floating();
 
         # Persisted first, as Model users loads this data
-        $this->oIdentityPrincipal->set("uri", "principals/" . $this->get("username"));
+        $this->oIdentityPrincipal->set('uri', 'principals/' . $this->get('username'));
         $this->oIdentityPrincipal->persist();
 
         parent::persist();
 
         if ($bFloating) {
             # Creating default calendar for user
-            $oDefaultCalendar = new \Baikal\Model\Calendar();
+            $oDefaultCalendar = new Calendar();
             $oDefaultCalendar->set(
-                "principaluri",
-                "principals/" . $this->get("username")
+                'principaluri',
+                'principals/' . $this->get('username')
             )->set(
-                "displayname",
-                "Default calendar"
+                'displayname',
+                'Default calendar'
             )->set(
-                "uri",
-                "default"
+                'uri',
+                'default'
             )->set(
-                "description",
-                "Default calendar"
+                'description',
+                'Default calendar'
             )->set(
-                "components",
-                "VEVENT,VTODO"
+                'components',
+                'VEVENT,VTODO'
             );
 
             $oDefaultCalendar->persist();
 
             # Creating default address book for user
-            $oDefaultAddressBook = new \Baikal\Model\AddressBook();
+            $oDefaultAddressBook = new AddressBook();
             $oDefaultAddressBook->set(
-                "principaluri",
-                "principals/" . $this->get("username")
+                'principaluri',
+                'principals/' . $this->get('username')
             )->set(
-                "displayname",
-                "Default Address Book"
+                'displayname',
+                'Default Address Book'
             )->set(
-                "uri",
-                "default"
+                'uri',
+                'default'
             )->set(
-                "description",
-                "Default Address Book for " . $this->get("displayname")
+                'description',
+                'Default Address Book for ' . $this->get('displayname')
             );
 
             $oDefaultAddressBook->persist();
         }
     }
 
-    function destroy() {
+    /**
+     * @return void
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public function destroy(): void
+    {
         # TODO: delete all related resources (principals, calendars, calendar events, contact books and contacts)
 
         # Destroying identity principal
@@ -198,93 +260,125 @@ class User extends \Flake\Core\Model\Db {
         parent::destroy();
     }
 
-    function getMailtoURI() {
-        return "mailto:" . rawurlencode($this->get("displayname") . " <" . $this->get("email") . ">");
+    /**
+     * @throws Exception
+     */
+    public function getMailtoURI(): string
+    {
+        return 'mailto:' . rawurlencode($this->get('displayname') . ' <' . $this->get('email') . '>');
     }
 
-    function formMorphologyForThisModelInstance() {
-        $oMorpho = new \Formal\Form\Morphology();
+    /**
+     * @return Morphology
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        $oMorpho = new Morphology();
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "username",
-            "label"      => "Username",
-            "validation" => "required,unique",
-            "popover"    => [
-                "title"   => "Username",
-                "content" => "The login for this user account. It has to be unique.",
+        $oMorpho->add(new Text([
+            'prop'       => 'username',
+            'label'      => 'Username',
+            'validation' => 'required,unique',
+            'popover'    => [
+                'title'   => 'Username',
+                'content' => 'The login for this user account. It has to be unique.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "displayname",
-            "label"      => "Display name",
-            "validation" => "required",
-            "popover"    => [
-                "title"   => "Display name",
-                "content" => "This is the name that will be displayed in your CalDAV/CardDAV clients.",
+        $oMorpho->add(new Text([
+            'prop'       => 'displayname',
+            'label'      => 'Display name',
+            'validation' => 'required',
+            'popover'    => [
+                'title'   => 'Display name',
+                'content' => 'This is the name that will be displayed in your CalDAV/CardDAV clients.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "email",
-            "label"      => "Email",
-            "validation" => "required,email",
+        $oMorpho->add(new Text([
+            'prop'       => 'email',
+            'label'      => 'Email',
+            'validation' => 'required,email',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Password([
-            "prop"  => "password",
-            "label" => "Password",
+        $oMorpho->add(new Password([
+            'prop'  => 'password',
+            'label' => 'Password',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Password([
-            "prop"       => "passwordconfirm",
-            "label"      => "Confirm password",
-            "validation" => "sameas:password",
+        $oMorpho->add(new Password([
+            'prop'       => 'passwordconfirm',
+            'label'      => 'Confirm password',
+            'validation' => 'sameas:password',
         ]));
 
         if ($this->floating()) {
-            $oMorpho->element("username")->setOption("help", "May be an email, but not forcibly.");
-            $oMorpho->element("password")->setOption("validation", "required");
+            $oMorpho->element('username')->setOption('help', 'May be an email, but not forcibly.');
+            $oMorpho->element('password')->setOption('validation', 'required');
         } else {
-            $sNotice = "-- Leave empty to keep current password --";
-            $oMorpho->element("username")->setOption("readonly", true);
+            $sNotice = '-- Leave empty to keep current password --';
+            $oMorpho->element('username')->setOption('readonly', true);
 
-            $oMorpho->element("password")->setOption("popover", [
-                "title"   => "Password",
-                "content" => "Write something here only if you want to change the user password.",
+            $oMorpho->element('password')->setOption('popover', [
+                'title'   => 'Password',
+                'content' => 'Write something here only if you want to change the user password.',
             ]);
 
-            $oMorpho->element("passwordconfirm")->setOption("popover", [
-                "title"   => "Confirm password",
-                "content" => "Write something here only if you want to change the user password.",
+            $oMorpho->element('passwordconfirm')->setOption('popover', [
+                'title'   => 'Confirm password',
+                'content' => 'Write something here only if you want to change the user password.',
             ]);
 
-            $oMorpho->element("password")->setOption("placeholder", $sNotice);
-            $oMorpho->element("passwordconfirm")->setOption("placeholder", $sNotice);
+            $oMorpho->element('password')->setOption('placeholder', $sNotice);
+            $oMorpho->element('passwordconfirm')->setOption('placeholder', $sNotice);
         }
 
         return $oMorpho;
     }
 
-    static function icon() {
-        return "icon-user";
+    /**
+     * @return string
+     */
+    public static function icon(): string
+    {
+        return 'icon-user';
     }
 
-    static function mediumicon() {
-        return "glyph-user";
+    /**
+     * @return string
+     */
+    public static function mediumicon(): string
+    {
+        return 'glyph-user';
     }
 
-    static function bigicon() {
-        return "glyph2x-user";
+    /**
+     * @return string
+     */
+    public static function bigicon(): string
+    {
+        return 'glyph2x-user';
     }
 
-    function getPasswordHashForPassword($sPassword) {
+    /**
+     * @throws Exception
+     */
+    public function getPasswordHashForPassword($sPassword): string
+    {
         try {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-        } catch (\Exception $e) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+        } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
         }
 
-        return md5($this->get("username") . ':' . $config['system']['auth_realm'] . ':' . $sPassword);
+        return md5($this->get('username') . ':' . $config['system']['auth_realm'] . ':' . $sPassword);
     }
 }

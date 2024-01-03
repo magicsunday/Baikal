@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,13 +29,30 @@
 
 namespace BaikalAdmin\Controller\Navigation\Topbar;
 
-class Anonymous extends \Flake\Core\Controller {
-    function execute() {
+use Flake\Core\Controller;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+
+/**
+ *
+ */
+class Anonymous extends Controller
+{
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
     }
 
-    function render() {
-        $oView = new \BaikalAdmin\View\Navigation\Topbar\Anonymous();
-
-        return $oView->render();
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render(): string
+    {
+        return (new \BaikalAdmin\View\Navigation\Topbar\Anonymous())->render();
     }
 }

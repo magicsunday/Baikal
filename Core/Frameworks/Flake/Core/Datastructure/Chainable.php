@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,13 +29,36 @@
 
 namespace Flake\Core\Datastructure;
 
-interface Chainable extends \ArrayAccess, \Iterator, \Countable {
-    #	public function &next();	# This is already specified by interface Iterator
-    public function &prev();
+use ArrayAccess;
+use Countable;
+use Iterator;
 
-    public function &first();
+/**
+ *
+ */
+interface Chainable extends ArrayAccess, Iterator, Countable
+{
+    #	public function next();	# This is already specified by interface Iterator
+    /**
+     * @return mixed
+     */
+    public function prev();
 
-    public function &last();
+    /**
+     * @return mixed
+     */
+    public function first();
 
+    /**
+     * @return mixed
+     */
+    public function last();
+
+    /**
+     * @param Chain $chain
+     * @param       $key
+     *
+     * @return mixed
+     */
     public function chain(Chain $chain, $key);
 }

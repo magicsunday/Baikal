@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,39 +29,62 @@
 
 namespace BaikalAdmin\Controller;
 
+use Baikal\Model\AddressBook;
+use Baikal\Model\AddressBook\Contact;
+use Baikal\Model\Calendar;
+use Baikal\Model\Calendar\Event;
+use Baikal\Model\User;
+use Flake\Core\Controller;
 use Symfony\Component\Yaml\Yaml;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-class Dashboard extends \Flake\Core\Controller {
-    function execute() {
+/**
+ *
+ */
+class Dashboard extends Controller
+{
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
     }
 
-    function render() {
-        $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render(): string
+    {
+        $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
 
         $oView = new \BaikalAdmin\View\Dashboard();
-        $oView->setData("BAIKAL_VERSION", BAIKAL_VERSION);
+        $oView->setData('BAIKAL_VERSION', BAIKAL_VERSION);
 
         # Services status
-        $oView->setData("cal_enabled", $config['system']['cal_enabled']);
-        $oView->setData("card_enabled", $config['system']['card_enabled']);
+        $oView->setData('cal_enabled', $config['system']['cal_enabled']);
+        $oView->setData('card_enabled', $config['system']['card_enabled']);
 
         # Statistics: Users
-        $iNbUsers = \Baikal\Model\User::getBaseRequester()->count();
-        $oView->setData("nbusers", $iNbUsers);
+        $iNbUsers = User::getBaseRequester()->count();
+        $oView->setData('nbusers', $iNbUsers);
 
         # Statistics: CalDAV
-        $iNbCalendars = \Baikal\Model\Calendar::getBaseRequester()->count();
-        $oView->setData("nbcalendars", $iNbCalendars);
+        $iNbCalendars = Calendar::getBaseRequester()->count();
+        $oView->setData('nbcalendars', $iNbCalendars);
 
-        $iNbEvents = \Baikal\Model\Calendar\Event::getBaseRequester()->count();
-        $oView->setData("nbevents", $iNbEvents);
+        $iNbEvents = Event::getBaseRequester()->count();
+        $oView->setData('nbevents', $iNbEvents);
 
         # Statistics: CardDAV
-        $iNbBooks = \Baikal\Model\AddressBook::getBaseRequester()->count();
-        $oView->setData("nbbooks", $iNbBooks);
+        $iNbBooks = AddressBook::getBaseRequester()->count();
+        $oView->setData('nbbooks', $iNbBooks);
 
-        $iNbContacts = \Baikal\Model\AddressBook\Contact::getBaseRequester()->count();
-        $oView->setData("nbcontacts", $iNbContacts);
+        $iNbContacts = Contact::getBaseRequester()->count();
+        $oView->setData('nbcontacts', $iNbContacts);
 
         return $oView->render();
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,73 +29,115 @@
 
 namespace Flake\Controller;
 
-class Cli extends \Flake\Core\Render\Container {
+use Flake\Core\Render\Container;
+
+/**
+ *
+ */
+class Cli extends Container
+{
     /**
      * @var array
      */
-    private $aArgs;
+    private array $aArgs = [];
 
-    public function render() {
+    public string $sLog = '';
+
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
         $this->sys_init();
         $this->init();
 
-        $this->echoFlush($this->notice("process started @" . strftime("%d/%m/%Y %H:%M:%S")));
+        $this->echoFlush($this->notice('process started @' . strftime('%d/%m/%Y %H:%M:%S')));
         $this->execute();
-        $this->echoFlush($this->notice("process ended @" . strftime("%d/%m/%Y %H:%M:%S")) . "\n\n");
+        $this->echoFlush($this->notice('process ended @' . strftime('%d/%m/%Y %H:%M:%S')) . "\n\n");
     }
 
-    public function execute() {
-        foreach ($this->aSequence as $aStep) {
-            $aStep["block"]->execute();
-        }
-    }
-
-    public $sLog = "";
-
-    public function sys_init() {
-        $this->rawLine("Command line: " . (implode(" ", $_SERVER["argv"])));
+    /**
+     * @return void
+     */
+    public function sys_init(): void
+    {
+        $this->rawLine('Command line: ' . (implode(' ', $_SERVER['argv'])));
         $this->initArgs();
     }
 
-    public function init() {
+    /**
+     * @return void
+     */
+    public function init(): void
+    {
     }
 
-    public function initArgs() {
-        $sShortOpts = "";
-        $sShortOpts .= "h";        // help; pas de valeur
-        $sShortOpts .= "w:";    // author; valeur obligatoire
+    /**
+     * @return void
+     */
+    public function initArgs(): void
+    {
+        $sShortOpts = '';
+        $sShortOpts .= 'h';        // help; pas de valeur
+        $sShortOpts .= 'w:';    // author; valeur obligatoire
 
         $aLongOpts = [
-            "help",        // help; pas de valeur
-            "helloworld",    // author; pas de valeur
+            'help',
+            // help; pas de valeur
+            'helloworld',
+            // author; pas de valeur
         ];
 
         $this->aArgs = getopt($sShortOpts, $aLongOpts);
     }
 
-    public function getScriptPath() {
+    /**
+     * @return false|string
+     */
+    public function getScriptPath(): false|string
+    {
         return realpath($_SERVER['argv'][0]);
     }
 
-    public function getSyntax() {
+    /**
+     * @return false|string
+     */
+    public function getSyntax(): false|string
+    {
         return $this->getScriptPath();
     }
 
-    public function syntaxError() {
+    /**
+     * @return void
+     */
+    public function syntaxError(): void
+    {
         $sStr = $this->rawLine("Syntax error.\nUsage: " . $this->getSyntax());
         exit("\n\n" . $sStr . "\n\n");
     }
 
-    public function log($sStr) {
+    /**
+     * @param $sStr
+     *
+     * @return void
+     */
+    public function log($sStr): void
+    {
         $this->sLog .= $sStr;
     }
 
-    public function header($sMsg) {
-        $sStr = "\n" . str_repeat("#", 80);
-        $sStr .= "\n#" . str_repeat(" ", 78) . "#";
-        $sStr .= "\n#" . str_pad(strtoupper($sMsg), 78, " ", STR_PAD_BOTH) . "#";
-        $sStr .= "\n#" . str_repeat(" ", 78) . "#";
-        $sStr .= "\n" . str_repeat("#", 80);
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function header($sMsg): string
+    {
+        $sStr = "\n" . str_repeat('#', 80);
+        $sStr .= "\n" . '#' . str_repeat(' ', 78) . '#';
+        $sStr .= "\n" . '#' . str_pad(strtoupper($sMsg), 78, ' ', STR_PAD_BOTH) . '#';
+        $sStr .= "\n" . '#' . str_repeat(' ', 78) . '#';
+        $sStr .= "\n" . str_repeat('#', 80);
         $sStr .= "\n";
 
         $this->log($sStr);
@@ -101,58 +145,106 @@ class Cli extends \Flake\Core\Render\Container {
         return $sStr;
     }
 
-    public function subHeader($sMsg) {
-        $sStr = "\n\n# " . str_pad(strtoupper($sMsg) . " ", 78, "-", STR_PAD_RIGHT) . "\n";
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function subHeader($sMsg): string
+    {
+        $sStr = "\n\n# " . str_pad(strtoupper($sMsg) . ' ', 78, '-') . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    public function subHeader2($sMsg) {
-        $sStr = "\n# # " . str_pad($sMsg . " ", 76, "-", STR_PAD_RIGHT) . "\n";
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function subHeader2($sMsg): string
+    {
+        $sStr = "\n# # " . str_pad($sMsg . ' ', 76, '-') . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    public function textLine($sMsg) {
-        $sStr = ". " . $sMsg . "\n";
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function textLine($sMsg): string
+    {
+        $sStr = '. ' . $sMsg . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    public function rawLine($sMsg) {
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function rawLine($sMsg): string
+    {
         $sStr = $sMsg . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    public function notice($sMsg) {
-        $sStr = "\n" . str_pad($sMsg, 80, ".", STR_PAD_BOTH) . "\n";
+    /**
+     * @param $sMsg
+     *
+     * @return string
+     */
+    public function notice($sMsg): string
+    {
+        $sStr = "\n" . str_pad($sMsg, 80, '.', STR_PAD_BOTH) . "\n";
         $this->log($sStr);
 
         return $sStr;
     }
 
-    public function getLog() {
+    /**
+     * @return string
+     */
+    public function getLog(): string
+    {
         return $this->sLog;
     }
 
-    public function file_writeBin($sPath, $sData, $bUTF8 = true) {
-        $rFile = fopen($sPath, "wb");
+    /**
+     * @param string $sPath
+     * @param string $sData
+     * @param bool   $bUTF8
+     *
+     * @return void
+     */
+    public function file_writeBin(string $sPath, string $sData, bool $bUTF8 = true): void
+    {
+        $rFile = fopen($sPath, 'wb');
 
         if ($bUTF8 === true) {
-            fputs($rFile, "\xEF\xBB\xBF" . $sData);
+            fwrite($rFile, "\xEF\xBB\xBF" . $sData);
         } else {
-            fputs($rFile, $sData);
+            fwrite($rFile, $sData);
         }
 
         fclose($rFile);
     }
 
-    public function echoFlush($sString = "") {
+    /**
+     * @param string $sString
+     *
+     * @return void
+     */
+    public function echoFlush(string $sString = ''): void
+    {
         echo $sString;
         ob_flush();
         flush();

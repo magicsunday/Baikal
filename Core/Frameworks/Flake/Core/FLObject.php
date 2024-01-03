@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,17 +29,31 @@
 
 namespace Flake\Core;
 
-class FLObject {
-    public function __toString() {
+use Flake\Util\Tools;
+use ReflectionException;
+
+/**
+ *
+ */
+class FLObject
+{
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
         ob_start();
         var_dump($this);
-        $sDump = ob_get_contents();
-        ob_end_clean();
+        $sDump = ob_get_clean();
 
-        return "<pre>" . htmlspecialchars($sDump) . "</pre>";
+        return '<pre>' . htmlspecialchars($sDump) . '</pre>';
     }
 
-    public function isA($sClassOrProtocolName) {
-        return \Flake\Util\Tools::is_a($this, $sClassOrProtocolName);
+    /**
+     * @throws ReflectionException
+     */
+    public function isA($sClassOrProtocolName): bool
+    {
+        return Tools::is_a($this, $sClassOrProtocolName);
     }
 }

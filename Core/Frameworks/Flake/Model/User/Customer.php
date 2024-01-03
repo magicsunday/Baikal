@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,57 +29,93 @@
 
 namespace Flake\Model\User;
 
-class Customer extends \Flake\Core\Model\Db implements \Flake\Model\IUser {
-    public const DATATABLE = "user";
-    public const PRIMARYKEY = "uid";
-    public const LABELFIELD = "username";
+use Exception;
+use Flake\Core\Model\Db;
+use Flake\Model\IUser;
+use ReflectionException;
 
-    protected $aData = [
-        "username"  => "",
-        "firstname" => "",
-        "lastname"  => "",
-        "email"     => "",
-        "password"  => "",
-        "salt"      => "",
-        "crdate"    => 0,
-        "enabled"   => 0,
+/**
+ *
+ */
+class Customer extends Db implements IUser
+{
+    public const DATATABLE = 'user';
+    public const PRIMARYKEY = 'uid';
+    public const LABELFIELD = 'username';
+
+    protected array $aData = [
+        'username'  => '',
+        'firstname' => '',
+        'lastname'  => '',
+        'email'     => '',
+        'password'  => '',
+        'salt'      => '',
+        'crdate'    => 0,
+        'enabled'   => 0,
     ];
 
-    public function isAdmin() {
+    /**
+     * @return false
+     */
+    public function isAdmin(): false
+    {
         return false;
     }
 
-    public function getDisplayName() {
-        return $this->get("firstname") . " " . $this->get("lastname");
+    /**
+     * @throws Exception
+     */
+    public function getDisplayName(): string
+    {
+        return $this->get('firstname') . ' ' . $this->get('lastname');
     }
 
-    public function persist() {
+    /**
+     * @return void
+     */
+    public function persist(): void
+    {
     }
 
-    public function destroy() {
+    /**
+     * @return void
+     */
+    public function destroy(): void
+    {
     }
 
-    public static function hashPassword($sClearPassword, $sSalt) {
-        return sha1(APP_ENCRYPTION_KEY . ":" . $sClearPassword . ":" . $sSalt);
+    /**
+     * @param $sClearPassword
+     * @param $sSalt
+     *
+     * @return string
+     */
+    public static function hashPassword($sClearPassword, $sSalt): string
+    {
+        return sha1(APP_ENCRYPTION_KEY . ':' . $sClearPassword . ':' . $sSalt);
     }
 
-    public static function fetchByCredentials($sUsername, $sClearPassword) {
+    /**
+     * @throws ReflectionException
+     */
+    public static function fetchByCredentials($sUsername, $sClearPassword)
+    {
         # Algorithm:
         #	1- find the user by username
         #	2- hash the given password using the salt for this user
         #	3- compare hashes
 
         $oUser = self::getBaseRequester()
-            ->addClauseEquals("username", $sUsername)
-            ->addClauseEquals("enabled", 1)
+            ->addClauseEquals('username', $sUsername)
+            ->addClauseEquals('enabled', '1')
             ->execute()
             ->first();
 
-        if (is_null($oUser)) {
+        if ($oUser === null) {
             return false;
         }
 
-        if ($oUser->get("password") !== self::hashPassword($sClearPassword, $oUser->get("salt"))) {
+        if ($oUser->get('password') !== self::hashPassword($sClearPassword, $oUser->get('salt'))) {
             return false;
         }
 

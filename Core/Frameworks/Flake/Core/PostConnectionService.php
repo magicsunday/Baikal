@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,18 +29,30 @@
 
 namespace Flake\Core;
 
-abstract class PostConnectionService extends \Flake\Core\FLObject {
+/**
+ *
+ */
+abstract class PostConnectionService extends FLObject
+{
     /**
      * @var array
      */
-    private $aParams;
+    private mixed $aParams;
 
-    public function __construct($aParams = []) {
+    /**
+     * @param array $aParams
+     */
+    public function __construct(array $aParams = [])
+    {
         $this->aParams = $aParams;
     }
 
-    public function execute() {
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
         sleep(10);
-        mail("mail@jeromeschneider.fr", "Hello", "je suis la");
+        mail('mail@jeromeschneider.fr', 'Hello', 'je suis la');
     }
 }

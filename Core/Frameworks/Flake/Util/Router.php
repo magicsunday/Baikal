@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,37 +29,76 @@
 
 namespace Flake\Util;
 
-abstract class Router extends \Flake\Core\FLObject {
-    public static $sURIPath = "";
+use Flake\Core\FLObject;
+use Flake\Core\Render\Container;
+use Flake\Core\Route;
+use RuntimeException;
 
-    /* ----------------------- COMMON METHODS ------------------------------*/
+use function array_key_exists;
+use function call_user_func_array;
+use function func_get_args;
 
-    private function __construct() {
-        # private constructor for static class
+/**
+ *
+ */
+abstract class Router extends FLObject
+{
+    /**
+     * @var string
+     */
+    public static string $sURIPath = '';
+
+    /**
+     * Private constructor for static class.
+     */
+    private function __construct()
+    {
     }
 
-    public static function getRoutes() {
-        reset($GLOBALS["ROUTES"]);
+    /**
+     * @return array
+     */
+    public static function getRoutes(): array
+    {
+        reset($GLOBALS['ROUTES']);
 
-        return $GLOBALS["ROUTES"];
+        return $GLOBALS['ROUTES'];
     }
 
-    public static function getControllerForRoute($sRoute) {
+    /**
+     * @param string $sRoute
+     *
+     * @return string
+     */
+    public static function getControllerForRoute(string $sRoute): string
+    {
         return str_replace("\\Route", "\\Controller", self::getRouteClassForRoute($sRoute));
     }
 
-    public static function getRouteClassForRoute($sRoute) {
-        $aRoutes = $GLOBALS["ROUTER"]::getRoutes();
+    /**
+     * @param string $sRoute
+     *
+     * @return string
+     */
+    public static function getRouteClassForRoute(string $sRoute): string
+    {
+        $aRoutes = $GLOBALS['ROUTER']::getRoutes();
 
         return $aRoutes[$sRoute];
     }
 
-    public static function getRouteForController($sController) {
+    /**
+     * @param string $sController
+     *
+     * @return false|int|string
+     */
+    public static function getRouteForController(string $sController): false|int|string
+    {
         if ($sController[0] !== "\\") {
             $sController = "\\" . $sController;
         }
 
-        $aRoutes = $GLOBALS["ROUTER"]::getRoutes();
+        $aRoutes = $GLOBALS['ROUTER']::getRoutes();
 
         foreach ($aRoutes as $sKey => $sRoute) {
             if (str_replace("\\Route", "\\Controller", $sRoute) === $sController) {
@@ -68,26 +109,42 @@ abstract class Router extends \Flake\Core\FLObject {
         return false;
     }
 
-    public static function route(\Flake\Core\Render\Container &$oRenderContainer) {
-        $sRouteClass = $GLOBALS["ROUTER"]::getRouteClassForRoute(
-            $GLOBALS["ROUTER"]::getCurrentRoute()
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function route(Container $oRenderContainer): void
+    {
+        $sRouteClass = $GLOBALS['ROUTER']::getRouteClassForRoute(
+            $GLOBALS['ROUTER']::getCurrentRoute()
         );
 
         $sRouteClass::layout($oRenderContainer);
     }
 
-    public static function buildRouteForController($sController, $aParams = []) {
+    /**
+     * @param string $sController
+     * @param array  $aParams
+     *
+     * @return string
+     */
+    public static function buildRouteForController(string $sController, array $aParams = []): string
+    {
         #$aParams = func_get_args();
         #array_shift($aParams);	# stripping $sController
-        if (($sRouteForController = $GLOBALS["ROUTER"]::getRouteForController($sController)) === false) {
-            throw new \Exception("buildRouteForController '" . htmlspecialchars($sController) . "': no route available.");
+        if (($sRouteForController = $GLOBALS['ROUTER']::getRouteForController($sController)) === false) {
+            throw new RuntimeException(
+                "buildRouteForController '" . htmlspecialchars($sController) . "': no route available."
+            );
         }
 
         $aRewrittenParams = [];
 
+        /** @var Route $sRouteClass */
         $sRouteClass = self::getRouteClassForRoute($sRouteForController);
         $aParametersMap = $sRouteClass::parametersMap();
-        reset($aParametersMap);
+
         foreach ($aParametersMap as $sParam => $aMap) {
             if (!array_key_exists($sParam, $aParams)) {
                 # if parameter not in parameters map, skip !
@@ -95,8 +152,8 @@ abstract class Router extends \Flake\Core\FLObject {
             }
 
             $sUrlToken = $sParam;
-            if (array_key_exists("urltoken", $aMap)) {
-                $sUrlToken = $aMap["urltoken"];
+            if (array_key_exists('urltoken', $aMap)) {
+                $sUrlToken = $aMap['urltoken'];
             }
 
             $aRewrittenParams[$sUrlToken] = $aParams[$sParam];
@@ -104,23 +161,37 @@ abstract class Router extends \Flake\Core\FLObject {
 
         #array_unshift($aParams, $sRouteForController);	# Injecting route as first param
         #return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
-        return $GLOBALS["ROUTER"]::buildRoute($sRouteForController, $aRewrittenParams);
+        return $GLOBALS['ROUTER']::buildRoute($sRouteForController, $aRewrittenParams);
     }
 
-    public static function buildCurrentRoute(/*[$sParam, $sParam2, ...]*/) {
+    /**
+     * @return string
+     */
+    public static function buildCurrentRoute(/*[$sParam, $sParam2, ...]*/): string
+    {
         $aParams = func_get_args();
-        $sCurrentRoute = $GLOBALS["ROUTER"]::getCurrentRoute();
+        $sCurrentRoute = $GLOBALS['ROUTER']::getCurrentRoute();
 
         array_unshift($aParams, $sCurrentRoute);    # Injecting route as first param
 
-        return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
+        return call_user_func_array($GLOBALS['ROUTER'] . '::buildRoute', $aParams);
     }
 
-    public static function setURIPath($sURIPath) {
+    /**
+     * @param string $sURIPath
+     *
+     * @return void
+     */
+    public static function setURIPath(string $sURIPath): void
+    {
         static::$sURIPath = $sURIPath;
     }
 
-    public static function getUriPath() {
+    /**
+     * @return string
+     */
+    public static function getUriPath(): string
+    {
         return FLAKE_URIPATH . static::$sURIPath;
     }
 
@@ -128,14 +199,31 @@ abstract class Router extends \Flake\Core\FLObject {
 
     # this method is likely to change with every Router implementation
     # should be abstract, but is not, because of PHP's strict standards
-    public static function buildRoute($sRoute, $aParams/* [, $sParam, $sParam2, ...] */) {
+    /**
+     * @param string $sRoute
+     * @param array  $aParams
+     *
+     * @return string
+     */
+    public static function buildRoute(string $sRoute, array $aParams/* [, $sParam, $sParam2, ...] */): string
+    {
     }
 
     # should be abstract, but is not, because of PHP's strict standards
-    public static function getCurrentRoute() {
+
+    /**
+     * @return string
+     */
+    public static function getCurrentRoute(): string
+    {
     }
 
     # should be abstract, but is not, because of PHP's strict standards
-    public static function getURLParams() {
+
+    /**
+     * @return array
+     */
+    public static function getURLParams(): array
+    {
     }
 }

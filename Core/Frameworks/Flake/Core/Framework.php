@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,5 +29,9 @@
 
 namespace Flake\Core;
 
-class Framework {
+/**
+ *
+ */
+class Framework
+{
 }

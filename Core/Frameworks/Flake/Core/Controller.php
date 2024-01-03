@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,32 +29,59 @@
 
 namespace Flake\Core;
 
-abstract class Controller extends \Flake\Core\FLObject {
-    protected $aParams = [];
+/**
+ *
+ */
+abstract class Controller extends FLObject
+{
+    protected mixed $aParams = [];
 
-    public function __construct($aParams = []) {
+    /**
+     * @param array $aParams
+     */
+    public function __construct(array $aParams = [])
+    {
         $this->aParams = $aParams;
     }
 
-    public function getParams() {
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
         return $this->aParams;
     }
 
-    public static function link(/*[$sParam, $sParam2, ...]*/) {
+    /**
+     * @return string
+     */
+    public static function link(/*[$sParam, $sParam2, ...]*/): string
+    {
         return static::buildRoute();
     }
 
-    public static function buildRoute($aParams = []) {
+    /**
+     * @param array $aParams
+     *
+     * @return string
+     */
+    public static function buildRoute(array $aParams = []): string
+    {
         # TODO: il faut remplacer le mécanisme basé sur un nombre variable de paramètres en un mécanisme basé sur un seul paramètre "tableau"
         #$aParams = func_get_args();
-        $sController = "\\" . get_called_class();
-
+        $sController = "\\" . static::class;
         #array_unshift($aParams, $sController);		# Injecting current controller as first param
         #return call_user_func_array($GLOBALS["ROUTER"] . "::buildRouteForController", $aParams);
-        return $GLOBALS["ROUTER"]::buildRouteForController($sController, $aParams);
+        return $GLOBALS['ROUTER']::buildRouteForController($sController, $aParams);
     }
 
-    abstract public function execute();
+    /**
+     * @return void
+     */
+    abstract public function execute(): void;
 
-    abstract public function render();
+    /**
+     * @return string
+     */
+    abstract public function render(): string;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -25,5 +27,5 @@
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
-define("BAIKAL_VERSION", "0.9.5");
-define("BAIKAL_HOMEPAGE", "https://sabre.io/baikal/");
+define('BAIKAL_VERSION', '0.9.5');
+define('BAIKAL_HOMEPAGE', 'https://sabre.io/baikal/');

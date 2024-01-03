@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,15 +29,21 @@
 
 namespace Baikal\Model\Calendar;
 
-class Event extends \Flake\Core\Model\Db {
-    const DATATABLE = "calendarobjects";
-    const PRIMARYKEY = "id";
-    const LABELFIELD = "uri";
+use Flake\Core\Model\Db;
 
-    protected $aData = [
-        "calendardata" => "",
-        "uri"          => "",
-        "calendarid"   => "",
-        "lastmodified" => "",
+/**
+ *
+ */
+class Event extends Db
+{
+    public const DATATABLE = 'calendarobjects';
+    public const PRIMARYKEY = 'id';
+    public const LABELFIELD = 'uri';
+
+    protected array $aData = [
+        'calendardata' => '',
+        'uri'          => '',
+        'calendarid'   => '',
+        'lastmodified' => '',
     ];
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,28 +29,45 @@
 
 namespace BaikalAdmin\Route\User;
 
-class Calendars extends \Flake\Core\Route {
-    static function layout(\Flake\Core\Render\Container &$oRenderContainer) {
+use Flake\Core\Render\Container;
+use Flake\Core\Route;
+
+/**
+ *
+ */
+class Calendars extends Route
+{
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function layout(Container $oRenderContainer): void
+    {
         $aParams = self::getParams();
-        $oRenderContainer->zone("Payload")->addBlock(new \BaikalAdmin\Controller\User\Calendars($aParams));
+        $oRenderContainer->zone('Payload')->addBlock(new \BaikalAdmin\Controller\User\Calendars($aParams));
     }
 
-    static function parametersMap() {
+    /**
+     * @return array
+     */
+    public static function parametersMap(): array
+    {
         return [
-            "user" => [
-                "required" => true,
+            'user'    => [
+                'required' => true,
             ],
-            "new" => [
-                "required" => false,
+            'new'     => [
+                'required' => false,
             ],
-            "edit" => [
-                "required" => false,
+            'edit'    => [
+                'required' => false,
             ],
-            "delete" => [
-                "required" => false,
+            'delete'  => [
+                'required' => false,
             ],
-            "confirm" => [
-                "required" => false,
+            'confirm' => [
+                'required' => false,
             ],
         ];
     }

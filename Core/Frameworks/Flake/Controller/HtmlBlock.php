@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,20 +29,38 @@
 
 namespace Flake\Controller;
 
-class HtmlBlock extends \Flake\Core\Controller {
+use Flake\Core\Controller;
+
+/**
+ *
+ */
+class HtmlBlock extends Controller
+{
     /**
      * @var string
      */
-    private $sHtml;
+    private string $sHtml;
 
-    public function __construct($sHtml) {
+    /**
+     * @param string $sHtml
+     */
+    public function __construct(string $sHtml)
+    {
         $this->sHtml = $sHtml;
     }
 
-    public function execute() {
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
     }
 
-    public function render() {
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
         return $this->sHtml;
     }
 }

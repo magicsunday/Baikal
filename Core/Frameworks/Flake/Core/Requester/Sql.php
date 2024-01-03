@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,98 +29,190 @@
 
 namespace Flake\Core\Requester;
 
-class Sql extends \Flake\Core\Requester {
-    protected $sDataTable = "";
-    protected $aClauses = [];
-    protected $sModelClass = "";
-    protected $sOrderField = "";
-    protected $sOrderDirection = "ASC";
-    protected $iLimitStart = false;
-    protected $iLimitNumber = false;
-    protected $bHasBeenExecuted = false;
+use Flake\Core\CollectionTyped;
+use Flake\Core\Requester;
+use ReflectionException;
 
-    public function setDataTable($sDataTable) {
+/**
+ *
+ */
+class Sql extends Requester
+{
+    protected string $sDataTable = '';
+    protected array $aClauses = [];
+    protected string $sModelClass = '';
+    protected string $sOrderField = '';
+    protected string $sOrderDirection = 'ASC';
+    protected bool|int $iLimitStart = false;
+    protected bool|int $iLimitNumber = false;
+    protected bool $bHasBeenExecuted = false;
+
+    /**
+     * @param $sDataTable
+     *
+     * @return Sql
+     */
+    public function setDataTable($sDataTable): Sql
+    {
         $this->sDataTable = $sDataTable;
 
         return $this;
     }
 
-    public function addClauseEquals($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseEquals(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field}='{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseNotEquals($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseNotEquals(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field}!='{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseLike($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseLike(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} LIKE '%{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseLikeBeginning($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseLikeBeginning(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} LIKE '{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseLikeEnd($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseLikeEnd(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} LIKE '%{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseNotLike($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseNotLike(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} NOT LIKE '%{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseNotLikeBeginning($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseNotLikeBeginning(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} NOT LIKE '{value}%'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseNotLikeEnd($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseNotLikeEnd(string $sField, string $sValue): Sql
+    {
         $sWrap = "{field} NOT LIKE '%{value}'";
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseIn($sField, $sValue) {
-        $sWrap = "{field} IN ({value})";
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseIn(string $sField, string $sValue): Sql
+    {
+        $sWrap = '{field} IN ({value})';
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    public function addClauseNotIn($sField, $sValue) {
-        $sWrap = "{field} NOT IN ({value})";
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return Sql
+     */
+    public function addClauseNotIn(string $sField, string $sValue): Sql
+    {
+        $sWrap = '{field} NOT IN ({value})';
         $this->addClauseWrapped($sField, $sValue, $sWrap);
 
         return $this;
     }
 
-    protected function addClauseWrapped($sField, $sValue, $sWrap) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     * @param string $sWrap
+     *
+     * @return Sql
+     */
+    protected function addClauseWrapped(string $sField, string $sValue, string $sWrap): Sql
+    {
         $sValue = $this->escapeSqlValue($sValue);
         $sClause = str_replace(
             [
-                "{field}",
-                "{value}",
+                '{field}',
+                '{value}',
             ],
             [
                 $sField,
@@ -132,72 +226,109 @@ class Sql extends \Flake\Core\Requester {
         return $this;
     }
 
-    public function addClauseLiteral($sClause) {
+    /**
+     * @param string $sClause
+     *
+     * @return Sql
+     */
+    public function addClauseLiteral(string $sClause): Sql
+    {
         $this->aClauses[] = $sClause;
 
         return $this;
     }
 
-    protected function escapeSqlValue($sValue) {
-        return $GLOBALS["DB"]->quote(
+    /**
+     * @param string $sValue
+     *
+     * @return string
+     */
+    protected function escapeSqlValue(string $sValue): string
+    {
+        return $GLOBALS['DB']->quote(
             $sValue,
             $this->sDataTable
         );
     }
 
-    protected function &reify($aData) {
+    /**
+     * @param array $aData
+     *
+     * @return mixed
+     */
+    protected function reify(array $aData)
+    {
         $sTemp = $this->sModelClass;
-        $res = new $sTemp($aData[$sTemp::getPrimaryKey()]);
 
-        return $res;    # To address 'Notice: Only variable references should be returned by reference'
+        return new $sTemp(
+            $aData[$sTemp::getPrimaryKey()]
+        );    # To address 'Notice: Only variable references should be returned by reference'
     }
 
-    public function hasBeenExecuted() {
+    /**
+     * @return bool
+     */
+    public function hasBeenExecuted(): bool
+    {
         return $this->bHasBeenExecuted;
     }
 
-    public function getQuery($sFields = "*") {
-        $sWhere = "1=1";
-        $sOrderBy = "";
-        $sLimit = "";
+    /**
+     * @param string $sFields
+     *
+     * @return string
+     */
+    public function getQuery(string $sFields = '*'): string
+    {
+        $sWhere = '1=1';
+        $sOrderBy = '';
+        $sLimit = '';
 
         if (!empty($this->aClauses)) {
-            $sWhere = implode(" AND ", $this->aClauses);
+            $sWhere = implode(' AND ', $this->aClauses);
         }
 
-        if (trim($this->sOrderField) !== "") {
-            $sOrderBy = $this->sOrderField . " " . $this->sOrderDirection;
+        if (trim($this->sOrderField) !== '') {
+            $sOrderBy = $this->sOrderField . ' ' . $this->sOrderDirection;
         }
 
         if ($this->iLimitStart !== false) {
             if ($this->iLimitNumber !== false) {
-                $sLimit = $this->iLimitStart . ", " . $this->iLimitNumber;
+                $sLimit = $this->iLimitStart . ', ' . $this->iLimitNumber;
             } else {
                 $sLimit = $this->iLimitStart;
             }
         } elseif ($this->iLimitNumber !== false) {
-            $sLimit = "0, " . $this->iLimitNumber;
+            $sLimit = '0, ' . $this->iLimitNumber;
         }
 
-        return $GLOBALS["DB"]->SELECTquery(
+        return $GLOBALS['DB']->SELECTquery(
             $sFields,
             $this->sDataTable,
             $sWhere,
-            "",
+            '',
             $sOrderBy,
             $sLimit
         );
     }
 
-    public function getCountQuery() {
-        return $this->getQuery("count(*) as nbitems");
+    /**
+     * @return string
+     */
+    public function getCountQuery(): string
+    {
+        return $this->getQuery('count(*) as nbitems');
     }
 
-    public function execute() {
-        $oCollection = new \Flake\Core\CollectionTyped($this->sModelClass);
+    /**
+     * @throws ReflectionException
+     */
+    public function execute(): CollectionTyped
+    {
+        $oCollection = new CollectionTyped($this->sModelClass);
         $sSql = $this->getQuery();
 
-        $rSql = $GLOBALS["DB"]->query($sSql);
+        $rSql = $GLOBALS['DB']->query($sSql);
         while (($aRs = $rSql->fetch()) !== false) {
             $oCollection->push(
                 $this->reify($aRs)
@@ -209,12 +340,16 @@ class Sql extends \Flake\Core\Requester {
         return $oCollection;
     }
 
-    public function count() {
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
         $sSql = $this->getCountQuery();
 
-        $rSql = $GLOBALS["DB"]->query($sSql);
+        $rSql = $GLOBALS['DB']->query($sSql);
         if (($aRs = $rSql->fetch()) !== false) {
-            return intval($aRs["nbitems"]);
+            return (int)$aRs['nbitems'];
         }
 
         return 0;

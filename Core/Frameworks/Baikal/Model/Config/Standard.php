@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,116 +29,165 @@
 
 namespace Baikal\Model\Config;
 
+use Baikal\Core\Tools;
+use Baikal\Model\Config;
+use BaikalAdmin\Core\Auth;
+use Exception;
+use Formal\Element\Checkbox;
+use Formal\Element\Listbox;
+use Formal\Element\Password;
+use Formal\Element\Text;
+use Formal\Form\Morphology;
+use ReflectionException;
 use Symfony\Component\Yaml\Yaml;
 
-class Standard extends \Baikal\Model\Config {
+/**
+ *
+ */
+class Standard extends Config
+{
     # Default values
-    protected $aData = [
-        "configured_version"    => BAIKAL_VERSION,
-        "timezone"              => "Europe/Paris",
-        "card_enabled"          => true,
-        "cal_enabled"           => true,
-        "dav_auth_type"         => "Digest",
-        "admin_passwordhash"    => "",
-        "failed_access_message" => "user %u authentication failure for Baikal",
+    protected array $aData = [
+        'configured_version'    => BAIKAL_VERSION,
+        'timezone'              => 'Europe/Paris',
+        'card_enabled'          => true,
+        'cal_enabled'           => true,
+        'dav_auth_type'         => 'Digest',
+        'admin_passwordhash'    => '',
+        'failed_access_message' => 'user %u authentication failure for Baikal',
         // While not editable as will change admin & any existing user passwords,
         // could be set to different value when migrating from legacy config
-        "auth_realm"            => "BaikalDAV",
-        "base_uri"              => "",
+        'auth_realm'            => 'BaikalDAV',
+        'base_uri'              => '',
     ];
 
-    function __construct() {
-        $this->aData["invite_from"] = "noreply@" . $_SERVER['SERVER_NAME']; // Default value
-        parent::__construct("system");
+    public function __construct()
+    {
+        $this->aData['invite_from'] = 'noreply@' . $_SERVER['SERVER_NAME']; // Default value
+        parent::__construct('system');
     }
 
-    function formMorphologyForThisModelInstance() {
-        $oMorpho = new \Formal\Form\Morphology();
+    /**
+     * @return Morphology
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        $oMorpho = new Morphology();
 
-        $oMorpho->add(new \Formal\Element\Listbox([
-            "prop"       => "timezone",
-            "label"      => "Server Time zone",
-            "validation" => "required",
-            "options"    => \Baikal\Core\Tools::timezones(),
+        $oMorpho->add(new Listbox([
+            'prop'       => 'timezone',
+            'label'      => 'Server Time zone',
+            'validation' => 'required',
+            'options'    => Tools::timezones(),
         ]));
 
-        $oMorpho->add(new \Formal\Element\Checkbox([
-            "prop"  => "card_enabled",
-            "label" => "Enable CardDAV",
+        $oMorpho->add(new Checkbox([
+            'prop'  => 'card_enabled',
+            'label' => 'Enable CardDAV',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Checkbox([
-            "prop"  => "cal_enabled",
-            "label" => "Enable CalDAV",
+        $oMorpho->add(new Checkbox([
+            'prop'  => 'cal_enabled',
+            'label' => 'Enable CalDAV',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "invite_from",
-            "label" => "Email invite sender address",
-            "help"  => "Leave empty to disable sending invite emails",
+        $oMorpho->add(new Text([
+            'prop'  => 'invite_from',
+            'label' => 'Email invite sender address',
+            'help'  => 'Leave empty to disable sending invite emails',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Listbox([
-            "prop"    => "dav_auth_type",
-            "label"   => "WebDAV authentication type",
-            "options" => ["Digest", "Basic", "Apache"],
+        $oMorpho->add(new Listbox([
+            'prop'    => 'dav_auth_type',
+            'label'   => 'WebDAV authentication type',
+            'options' => [
+                'Digest',
+                'Basic',
+                'Apache',
+            ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Password([
-            "prop"  => "admin_passwordhash",
-            "label" => "Admin password",
+        $oMorpho->add(new Password([
+            'prop'  => 'admin_passwordhash',
+            'label' => 'Admin password',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Password([
-            "prop"       => "admin_passwordhash_confirm",
-            "label"      => "Admin password, confirmation",
-            "validation" => "sameas:admin_passwordhash",
+        $oMorpho->add(new Password([
+            'prop'       => 'admin_passwordhash_confirm',
+            'label'      => 'Admin password, confirmation',
+            'validation' => 'sameas:admin_passwordhash',
         ]));
 
         try {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-        } catch (\Exception $e) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+        } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
         }
 
-        if (!isset($config['system']["admin_passwordhash"]) || trim($config['system']["admin_passwordhash"]) === "") {
+        if (!isset($config['system']['admin_passwordhash']) || trim(
+                (string)$config['system']['admin_passwordhash']
+            ) === '') {
             # No password set (Form is used in install tool), so password is required as it has to be defined
-            $oMorpho->element("admin_passwordhash")->setOption("validation", "required");
+            $oMorpho->element('admin_passwordhash')->setOption('validation', 'required');
         } else {
-            $sNotice = "-- Leave empty to keep current password --";
-            $oMorpho->element("admin_passwordhash")->setOption("placeholder", $sNotice);
-            $oMorpho->element("admin_passwordhash_confirm")->setOption("placeholder", $sNotice);
+            $sNotice = '-- Leave empty to keep current password --';
+            $oMorpho->element('admin_passwordhash')->setOption('placeholder', $sNotice);
+            $oMorpho->element('admin_passwordhash_confirm')->setOption('placeholder', $sNotice);
         }
 
         return $oMorpho;
     }
 
-    function label() {
-        return "Baïkal Settings";
+    /**
+     * @return string
+     */
+    public function label(): string
+    {
+        return 'Baïkal Settings';
     }
 
-    function set($sProp, $sValue) {
-        if ($sProp === "admin_passwordhash" || $sProp === "admin_passwordhash_confirm") {
+    /**
+     * @param $sPropName
+     * @param $sPropValue
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function set($sPropName, $sPropValue): static
+    {
+        if ($sPropName === 'admin_passwordhash' || $sPropName === 'admin_passwordhash_confirm') {
             # Special handling for password and passwordconfirm
 
-            if ($sProp === "admin_passwordhash" && $sValue !== "") {
+            if ($sPropName === 'admin_passwordhash' && $sPropValue !== '') {
                 parent::set(
-                    "admin_passwordhash",
-                    \BaikalAdmin\Core\Auth::hashAdminPassword($sValue, $this->aData["auth_realm"])
+                    'admin_passwordhash',
+                    Auth::hashAdminPassword($sPropValue, $this->aData['auth_realm'])
                 );
             }
 
             return $this;
         }
 
-        parent::set($sProp, $sValue);
+        parent::set($sPropName, $sPropValue);
     }
 
-    function get($sProp) {
-        if ($sProp === "admin_passwordhash" || $sProp === "admin_passwordhash_confirm") {
-            return "";
+    /**
+     * @param string $sPropName
+     *
+     * @return bool|int|string|null
+     *
+     * @throws Exception
+     */
+    public function get(string $sPropName): bool|int|string|null
+    {
+        if ($sPropName === 'admin_passwordhash' || $sPropName === 'admin_passwordhash_confirm') {
+            return '';
         }
 
-        return parent::get($sProp);
+        return parent::get($sPropName);
     }
 }

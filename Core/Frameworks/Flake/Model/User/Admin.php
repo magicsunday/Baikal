@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,18 +29,40 @@
 
 namespace Flake\Model\User;
 
-class Admin extends \Flake\Core\Model\NoDb {
-    public function isAdmin() {
+use Flake\Core\Model\NoDb;
+
+/**
+ *
+ */
+class Admin extends NoDb
+{
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
         return true;
     }
 
-    public function getDisplayName() {
-        return "Admin";
+    /**
+     * @return string
+     */
+    public function getDisplayName(): string
+    {
+        return 'Admin';
     }
 
-    public function persist() {
+    /**
+     * @return void
+     */
+    public function persist(): void
+    {
     }
 
-    public function destroy() {
+    /**
+     * @return void
+     */
+    public function destroy(): void
+    {
     }
 }

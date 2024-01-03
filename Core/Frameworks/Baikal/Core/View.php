@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,11 +29,22 @@
 
 namespace Baikal\Core;
 
-class View extends \Flake\Core\View {
-    function templatesPath() {
-        $sViewName = get_class($this);
-        $sTemplate = str_replace("\\", "/", substr($sViewName, strlen("Baikal\\View\\"))) . ".html";
+use function get_class;
+use function strlen;
 
-        return PROJECT_PATH_ROOT . "Core/Resources/Web/Baikal/Templates/" . $sTemplate;
+/**
+ *
+ */
+class View extends \Flake\Core\View
+{
+    /**
+     * @return string
+     */
+    public function templatesPath(): string
+    {
+        $sViewName = get_class($this);
+        $sTemplate = str_replace("\\", '/', substr($sViewName, strlen("Baikal\\View\\"))) . '.html';
+
+        return PROJECT_PATH_ROOT . 'Core/Resources/Web/Baikal/Templates/' . $sTemplate;
     }
 }

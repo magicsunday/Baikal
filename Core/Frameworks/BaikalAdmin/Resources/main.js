@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     $("[rel=tooltip]").tooltip();
     $(".popover-hover").popover();
     $(".popover-focus").popover({
@@ -22,6 +22,6 @@ function copyToClipboard(el) {
     sel.addRange(range);
     document.execCommand("copy");
     sel.removeAllRanges();
-    $(el).css({backgroundColor:"#75c753"});
-    $(el).animate({backgroundColor:"transparent"}, 1500);
+    $(el).css({backgroundColor: "#75c753"});
+    $(el).animate({backgroundColor: "transparent"}, 1500);
 }

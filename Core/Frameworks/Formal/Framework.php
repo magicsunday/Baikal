@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,8 +29,18 @@
 
 namespace Formal;
 
-class Framework extends \Flake\Core\Framework {
-    static function bootstrap() {
-        define("FORMAL_PATH_ROOT", PROJECT_PATH_ROOT . "Core/Frameworks/Formal/");
+use function define;
+
+/**
+ *
+ */
+class Framework extends \Flake\Core\Framework
+{
+    /**
+     * @return void
+     */
+    public static function bootstrap(): void
+    {
+        define('FORMAL_PATH_ROOT', PROJECT_PATH_ROOT . 'Core/Frameworks/Formal/');
     }
 }

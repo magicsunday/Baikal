@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,37 +29,49 @@
 
 namespace BaikalAdmin\Core;
 
+use Exception;
+use Flake\Util\Tools;
 use Symfony\Component\Yaml\Yaml;
 
-class Auth {
-    static function isAuthenticated() {
-        $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
+/**
+ *
+ */
+class Auth
+{
+    /**
+     * @return bool
+     */
+    public static function isAuthenticated(): bool
+    {
+        $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
 
-        if (isset($_SESSION["baikaladminauth"]) && $_SESSION["baikaladminauth"] === md5($config['system']['admin_passwordhash'])) {
-            return true;
-        }
-
-        return false;
+        return isset($_SESSION['baikaladminauth']) && $_SESSION['baikaladminauth'] === md5(
+                $config['system']['admin_passwordhash']
+            );
     }
 
-    static function authenticate() {
-        if (intval(\Flake\Util\Tools::POST("auth")) !== 1) {
+    /**
+     * @return bool
+     */
+    public static function authenticate(): bool
+    {
+        if ((int)Tools::POST('auth') !== 1) {
             return false;
         }
 
-        $sUser = \Flake\Util\Tools::POST("login");
-        $sPass = \Flake\Util\Tools::POST("password");
+        $sUser = Tools::POST('login');
+        $sPass = Tools::POST('password');
 
         try {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-        } catch (\Exception $e) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+        } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
 
             return false;
         }
         $sPassHash = self::hashAdminPassword($sPass, $config['system']['auth_realm']);
-        if ($sUser === "admin" && $sPassHash === $config['system']['admin_passwordhash']) {
-            $_SESSION["baikaladminauth"] = md5($config['system']['admin_passwordhash']);
+        if ($sUser === 'admin' && $sPassHash === $config['system']['admin_passwordhash']) {
+            $_SESSION['baikaladminauth'] = md5($config['system']['admin_passwordhash']);
 
             return true;
         }
@@ -65,11 +79,22 @@ class Auth {
         return false;
     }
 
-    static function unAuthenticate() {
-        unset($_SESSION["baikaladminauth"]);
+    /**
+     * @return void
+     */
+    public static function unAuthenticate(): void
+    {
+        unset($_SESSION['baikaladminauth']);
     }
 
-    static function hashAdminPassword($sPassword, $sAuthRealm) {
+    /**
+     * @param $sPassword
+     * @param $sAuthRealm
+     *
+     * @return string
+     */
+    public static function hashAdminPassword($sPassword, $sAuthRealm): string
+    {
         return hash('sha256', 'admin:' . $sAuthRealm . ':' . $sPassword);
     }
 }

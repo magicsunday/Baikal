@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,23 +29,37 @@
 
 namespace Baikal\Model;
 
+use Exception;
+use Flake\Core\Model\NoDb;
 use Symfony\Component\Yaml\Yaml;
 
-abstract class Config extends \Flake\Core\Model\NoDb {
-    protected $sConfigFileSection = "";
-    protected $aData = [];
+use function array_key_exists;
 
-    function __construct($sConfigFileSection) {
+/**
+ *
+ */
+abstract class Config extends NoDb
+{
+    protected string $sConfigFileSection = '';
+    protected array $aData = [];
+
+    /**
+     * @param $sConfigFileSection
+     */
+    public function __construct($sConfigFileSection)
+    {
         # Note: no call to parent::__construct() to avoid erasing $this->aData
         $this->sConfigFileSection = $sConfigFileSection;
 
         try {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
             if (isset($config[$sConfigFileSection])) {
                 $aConfig = $config[$sConfigFileSection];
             } else {
-                error_log('Section ' . $sConfigFileSection
-                        . ' not found in config file. Using default values.');
+                error_log(
+                    'Section ' . $sConfigFileSection
+                    . ' not found in config file. Using default values.'
+                );
                 $aConfig = [];
             }
 
@@ -52,55 +68,87 @@ abstract class Config extends \Flake\Core\Model\NoDb {
                     $this->aData[$sProp] = $aConfig[$sProp];
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
             // Keep default values in $aData
         }
     }
 
-    protected function getConfigAsString() {
-        if (file_exists(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            return Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml")[$this->sConfigFileSection];
-        } else {
-            return $this->aData;
+    /**
+     * @return array|mixed
+     */
+    protected function getConfigAsString()
+    {
+        if (file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            return Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml')[$this->sConfigFileSection];
         }
+
+        return $this->aData;
     }
 
-    function writable() {
+    /**
+     * @return bool
+     */
+    public function writable(): bool
+    {
         return (
-            @file_exists(PROJECT_PATH_CONFIG . "baikal.yaml")
-            && @is_file(PROJECT_PATH_CONFIG . "baikal.yaml")
-            && @is_writable(PROJECT_PATH_CONFIG . "baikal.yaml")
+            @file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml') &&
+            @is_file(PROJECT_PATH_CONFIG . 'baikal.yaml') &&
+            @is_writable(PROJECT_PATH_CONFIG . 'baikal.yaml')
         );
     }
 
-    static function icon() {
-        return "icon-cog";
+    /**
+     * @return string
+     */
+    public static function icon(): string
+    {
+        return 'icon-cog';
     }
 
-    static function mediumicon() {
-        return "glyph-cogwheel";
+    /**
+     * @return string
+     */
+    public static function mediumicon(): string
+    {
+        return 'glyph-cogwheel';
     }
 
-    static function bigicon() {
-        return "glyph2x-cogwheel";
+    /**
+     * @return string
+     */
+    public static function bigicon(): string
+    {
+        return 'glyph2x-cogwheel';
     }
 
-    function floating() {
+    /**
+     * @return bool
+     */
+    public function floating(): bool
+    {
         return false;
     }
 
-    function persist() {
-        if (file_exists(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
+    /**
+     * @return void
+     */
+    public function persist(): void
+    {
+        if (file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
         } else {
             $config = [];
         }
         $config[$this->sConfigFileSection] = $this->aData;
         $yaml = Yaml::dump($config);
-        file_put_contents(PROJECT_PATH_CONFIG . "baikal.yaml", $yaml);
+        file_put_contents(PROJECT_PATH_CONFIG . 'baikal.yaml', $yaml);
     }
 
-    function destroy() {
+    /**
+     * @return void
+     */
+    public function destroy(): void
+    {
     }
 }

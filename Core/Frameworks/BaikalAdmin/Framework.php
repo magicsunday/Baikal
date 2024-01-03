@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,16 +29,28 @@
 
 namespace BaikalAdmin;
 
-class Framework extends \Flake\Core\Framework {
-    static function bootstrap() {
-        define("BAIKALADMIN_PATH_ROOT", PROJECT_PATH_ROOT . "Core/Frameworks/BaikalAdmin/");    # ./
+use Exception;
+
+use function define;
+
+/**
+ *
+ */
+class Framework extends \Flake\Core\Framework
+{
+    /**
+     * @throws Exception
+     */
+    public static function bootstrap(): void
+    {
+        define('BAIKALADMIN_PATH_ROOT', PROJECT_PATH_ROOT . 'Core/Frameworks/BaikalAdmin/');    # ./
 
         \Baikal\Framework::bootstrap();
         \Formal\Framework::bootstrap();
 
-        $GLOBALS["ROUTER"]::setURIPath("admin/");
+        $GLOBALS['ROUTER']::setURIPath('admin/');
 
         # Include BaikalAdmin Framework config
-        require_once BAIKALADMIN_PATH_ROOT . "config.php";
+        require_once BAIKALADMIN_PATH_ROOT . 'config.php';
     }
 }

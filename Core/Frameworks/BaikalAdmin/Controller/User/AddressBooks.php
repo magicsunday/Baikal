@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,18 +29,41 @@
 
 namespace BaikalAdmin\Controller\User;
 
-class AddressBooks extends \Flake\Core\Controller {
-    protected $aMessages = [];
-    protected $oModel;    # \Baikal\Model\Contact
-    protected $oUser;    # \Baikal\Model\User
-    protected $oForm;    # \Formal\Form
+use Baikal\Model\AddressBook;
+use Baikal\Model\User;
+use BaikalAdmin\Controller\Users;
+use Exception;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
+use Formal\Core\Message;
+use Formal\Form;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-    function execute() {
+use function array_key_exists;
+
+/**
+ *
+ */
+class AddressBooks extends Controller
+{
+    protected array $aMessages = [];
+    protected AddressBook $oModel;    # \Baikal\Model\Contact
+    protected User $oUser;    # \Baikal\Model\User
+    protected Form $oForm;    # \Formal\Form
+
+    /**
+     * @throws Exception
+     */
+    public function execute(): void
+    {
         if (($iUser = $this->currentUserId()) === false) {
-            throw new \Exception("BaikalAdmin\Controller\User\Contacts::render(): User get-parameter not found.");
+            throw new RuntimeException("BaikalAdmin\Controller\User\Contacts::render(): User get-parameter not found.");
         }
 
-        $this->oUser = new \Baikal\Model\User($iUser);
+        $this->oUser = new User($iUser);
 
         if ($this->actionNewRequested()) {
             $this->actionNew();
@@ -53,11 +78,20 @@ class AddressBooks extends \Flake\Core\Controller {
         }
     }
 
-    function render() {
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public function render(): string
+    {
         $oView = new \BaikalAdmin\View\User\AddressBooks();
 
         # User
-        $oView->setData("user", $this->oUser);
+        $oView->setData('user', $this->oUser);
 
         # Render list of address books
         $aAddressBooks = [];
@@ -65,52 +99,61 @@ class AddressBooks extends \Flake\Core\Controller {
 
         foreach ($oAddressBooks as $addressbook) {
             $aAddressBooks[] = [
-                "linkedit"    => $this->linkEdit($addressbook),
-                "linkdelete"  => $this->linkDelete($addressbook),
-                "davuri"      => $this->getDavUri($addressbook),
-                "icon"        => $addressbook->icon(),
-                "label"       => $addressbook->label(),
-                "contacts"    => $addressbook->getContactsBaseRequester()->count(),
-                "description" => $addressbook->get("description"),
+                'linkedit'    => $this->linkEdit($addressbook),
+                'linkdelete'  => $this->linkDelete($addressbook),
+                'davuri'      => $this->getDavUri($addressbook),
+                'icon'        => $addressbook->icon(),
+                'label'       => $addressbook->label(),
+                'contacts'    => $addressbook->getContactsBaseRequester()->count(),
+                'description' => $addressbook->get('description'),
             ];
         }
 
-        $oView->setData("addressbooks", $aAddressBooks);
+        $oView->setData('addressbooks', $aAddressBooks);
 
         # Messages
         $sMessages = implode("\n", $this->aMessages);
-        $oView->setData("messages", $sMessages);
+        $oView->setData('messages', $sMessages);
 
         if ($this->actionNewRequested() || $this->actionEditRequested()) {
             $sForm = $this->oForm->render();
         } else {
-            $sForm = "";
+            $sForm = '';
         }
 
-        $oView->setData("form", $sForm);
-        $oView->setData("titleicon", \Baikal\Model\AddressBook::bigicon());
-        $oView->setData("modelicon", $this->oUser->mediumIcon());
-        $oView->setData("modellabel", $this->oUser->label());
-        $oView->setData("linkback", \BaikalAdmin\Controller\Users::link());
-        $oView->setData("linknew", $this->linkNew());
-        $oView->setData("addressbookicon", \Baikal\Model\AddressBook::icon());
+        $oView->setData('form', $sForm);
+        $oView->setData('titleicon', AddressBook::bigicon());
+        $oView->setData('modelicon', $this->oUser->mediumIcon());
+        $oView->setData('modellabel', $this->oUser->label());
+        $oView->setData('linkback', Users::link());
+        $oView->setData('linknew', $this->linkNew());
+        $oView->setData('addressbookicon', AddressBook::icon());
 
         return $oView->render();
     }
 
-    protected function initForm() {
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function initForm(): void
+    {
         if ($this->actionEditRequested() || $this->actionNewRequested()) {
             $aOptions = [
-                "closeurl" => $this->linkHome(),
+                'closeurl' => $this->linkHome(),
             ];
 
             $this->oForm = $this->oModel->formForThisModelInstance($aOptions);
         }
     }
 
-    protected function currentUserId() {
+    /**
+     * @return false|int
+     */
+    protected function currentUserId(): false|int
+    {
         $aParams = $this->getParams();
-        if (($iUser = intval($aParams["user"])) === 0) {
+        if (($iUser = (int)$aParams['user']) === 0) {
             return false;
         }
 
@@ -119,28 +162,36 @@ class AddressBooks extends \Flake\Core\Controller {
 
     # Action new
 
-    function linkNew() {
+    /**
+     * @return string
+     */
+    public function linkNew(): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
-            "new"  => 1,
-        ]) . "#form";
+                'user' => $this->currentUserId(),
+                'new'  => 1,
+            ]) . '#form';
     }
 
-    protected function actionNewRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionNewRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("new", $aParams) && intval($aParams["new"]) === 1) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('new', $aParams) && (int)$aParams['new'] === 1;
     }
 
-    protected function actionNew() {
+    /**
+     * @throws Exception
+     */
+    protected function actionNew(): void
+    {
         # Building floating model object
-        $this->oModel = new \Baikal\Model\AddressBook();
+        $this->oModel = new AddressBook();
         $this->oModel->set(
-            "principaluri",
-            $this->oUser->get("uri")
+            'principaluri',
+            $this->oUser->get('uri')
         );
 
         $this->initForm();
@@ -150,7 +201,7 @@ class AddressBooks extends \Flake\Core\Controller {
 
             if ($this->oForm->persisted()) {
                 $this->oForm->setOption(
-                    "action",
+                    'action',
                     $this->linkEdit(
                         $this->oForm->modelInstance()
                     )
@@ -161,26 +212,34 @@ class AddressBooks extends \Flake\Core\Controller {
 
     # Action edit
 
-    function linkEdit(\Baikal\Model\AddressBook $oModel) {
+    /**
+     * @throws Exception
+     */
+    public function linkEdit(AddressBook $oModel): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
-            "edit" => $oModel->get("id"),
-        ]) . "#form";
+                'user' => $this->currentUserId(),
+                'edit' => $oModel->get('id'),
+            ]) . '#form';
     }
 
-    protected function actionEditRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionEditRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("edit", $aParams) && intval($aParams["edit"]) > 0) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('edit', $aParams) && (int)$aParams['edit'] > 0;
     }
 
-    protected function actionEdit() {
+    /**
+     * @throws Exception
+     */
+    protected function actionEdit(): void
+    {
         # Building anchored model object
         $aParams = $this->getParams();
-        $this->oModel = new \Baikal\Model\AddressBook(intval($aParams["edit"]));
+        $this->oModel = new AddressBook((int)$aParams['edit']);
 
         # Initialize corresponding form
         $this->initForm();
@@ -193,87 +252,108 @@ class AddressBooks extends \Flake\Core\Controller {
 
     # Action delete + confirm
 
-    function linkDelete(\Baikal\Model\AddressBook $oModel) {
+    /**
+     * @throws Exception
+     */
+    public function linkDelete(AddressBook $oModel): string
+    {
         return self::buildRoute([
-            "user"   => $this->currentUserId(),
-            "delete" => $oModel->get("id"),
-        ]) . "#message";
+                'user'   => $this->currentUserId(),
+                'delete' => $oModel->get('id'),
+            ]) . '#message';
     }
 
-    function linkDeleteConfirm(\Baikal\Model\AddressBook $oModel) {
+    /**
+     * @throws Exception
+     */
+    public function linkDeleteConfirm(AddressBook $oModel): string
+    {
         return self::buildRoute([
-            "user"    => $this->currentUserId(),
-            "delete"  => $oModel->get("id"),
-            "confirm" => 1,
-        ]) . "#message";
+                'user'    => $this->currentUserId(),
+                'delete'  => $oModel->get('id'),
+                'confirm' => 1,
+            ]) . '#message';
     }
 
-    protected function actionDeleteRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("delete", $aParams) && intval($aParams["delete"]) > 0) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('delete', $aParams) && (int)$aParams['delete'] > 0;
     }
 
-    protected function actionDeleteConfirmed() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteConfirmed(): bool
+    {
         if (($iPrimary = $this->actionDeleteRequested()) === false) {
             return false;
         }
 
         $aParams = $this->getParams();
-        if (array_key_exists("confirm", $aParams) && intval($aParams["confirm"]) > 0) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('confirm', $aParams) && (int)$aParams['confirm'] > 0;
     }
 
-    protected function actionDelete() {
+    /**
+     * @throws Exception
+     */
+    protected function actionDelete(): void
+    {
         $aParams = $this->getParams();
-        $iModel = intval($aParams["delete"]);
+        $iModel = (int)$aParams['delete'];
 
         if ($this->actionDeleteConfirmed() !== false) {
             # catching Exception thrown when model already destroyed
             # happens when user refreshes page on delete-URL, for instance
 
             try {
-                $oModel = new \Baikal\Model\AddressBook($iModel);
+                $oModel = new AddressBook($iModel);
                 $oModel->destroy();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 # already deleted; silently discarding
             }
 
             # Redirecting to admin home
-            \Flake\Util\Tools::redirectUsingMeta($this->linkHome());
+            Tools::redirectUsingMeta($this->linkHome());
         } else {
-            $oModel = new \Baikal\Model\AddressBook($iModel);
-            $this->aMessages[] = \Formal\Core\Message::warningConfirmMessage(
-                "Check twice, you're about to delete " . $oModel->label() . "</strong> from the database !",
+            $oModel = new AddressBook($iModel);
+            $this->aMessages[] = Message::warningConfirmMessage(
+                "Check twice, you're about to delete " . $oModel->label() . '</strong> from the database !',
                 "<p>You are about to delete a contact book and all it's visiting cards. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
                 $this->linkDeleteConfirm($oModel),
-                "Delete <strong><i class='" . $oModel->icon() . " icon-white'></i> " . $oModel->label() . "</strong>",
+                "Delete <strong><i class='" . $oModel->icon() . " icon-white'></i> " . $oModel->label() . '</strong>',
                 $this->linkHome()
             );
         }
     }
 
     # Link to home
-    function linkHome() {
+
+    /**
+     * @return string
+     */
+    public function linkHome(): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
+            'user' => $this->currentUserId(),
         ]);
     }
 
     /**
      * Generate a link to the CalDAV/CardDAV URI of the addressbook.
      *
-     * @param \Baikal\Model\AddressBook $addressbook
+     * @param AddressBook $addressbook
      *
      * @return string AddressBook DAV URI
+     * @throws Exception
      */
-    protected function getDavUri(\Baikal\Model\AddressBook $addressbook) {
-        return PROJECT_URI . 'dav.php/addressbooks/' . $this->oUser->get('username') . '/' . $addressbook->get('uri') . '/';
+    protected function getDavUri(AddressBook $addressbook): string
+    {
+        return PROJECT_URI . 'dav.php/addressbooks/' . $this->oUser->get('username') . '/' . $addressbook->get(
+                'uri'
+            ) . '/';
     }
 }

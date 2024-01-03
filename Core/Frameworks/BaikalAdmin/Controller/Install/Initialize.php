@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,41 +29,67 @@
 
 namespace BaikalAdmin\Controller\Install;
 
-class Initialize extends \Flake\Core\Controller {
-    protected $aMessages = [];
-    protected $oModel;
-    protected $oForm;    # \Formal\Form
+use Baikal\Model\Config\Standard;
+use Exception;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
+use Formal\Form;
+use PDO;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-    function execute() {
+use function defined;
+use function in_array;
+
+/**
+ *
+ */
+class Initialize extends Controller
+{
+    protected array $aMessages = [];
+    protected Standard $oModel;
+    protected Form $oForm;    # \Formal\Form
+
+    /**
+     * @throws Exception
+     */
+    public function execute(): void
+    {
         # Assert that /Specific is writable
 
-        if (!file_exists(PROJECT_PATH_SPECIFIC) || !is_dir(PROJECT_PATH_SPECIFIC) || !is_writable(PROJECT_PATH_SPECIFIC) || !file_exists(PROJECT_PATH_CONFIG) || !is_dir(PROJECT_PATH_CONFIG) || !is_writable(PROJECT_PATH_CONFIG)) {
-            $message = "<h1>Error - Insufficient  permissions on the configuration folders</h1><p>";
-            $message .= "<p>In order to work properly, Baïkal needs to have write permissions in the <strong>Specific/</strong> and <strong>config/</strong> folder.</p>";
+        if (!file_exists(PROJECT_PATH_SPECIFIC) || !is_dir(PROJECT_PATH_SPECIFIC) || !is_writable(
+                PROJECT_PATH_SPECIFIC
+            ) || !file_exists(PROJECT_PATH_CONFIG) || !is_dir(PROJECT_PATH_CONFIG) || !is_writable(
+                PROJECT_PATH_CONFIG
+            )) {
+            $message = '<h1>Error - Insufficient  permissions on the configuration folders</h1><p>';
+            $message .= '<p>In order to work properly, Baïkal needs to have write permissions in the <strong>Specific/</strong> and <strong>config/</strong> folder.</p>';
 
             exit($message);
         }
 
         $this->createHtaccessFilesIfNeeded();
 
-        $this->oModel = new \Baikal\Model\Config\Standard();
+        $this->oModel = new Standard();
 
         // If we come from pre-0.7.0, we need to get the values from the config.php and config.system.php files
-        if (file_exists(PROJECT_PATH_SPECIFIC . "config.php")) {
-            require_once PROJECT_PATH_SPECIFIC . "config.php";
+        if (file_exists(PROJECT_PATH_SPECIFIC . 'config.php')) {
+            require_once PROJECT_PATH_SPECIFIC . 'config.php';
             $this->oModel->set('timezone', PROJECT_TIMEZONE);
             $this->oModel->set('card_enabled', BAIKAL_CARD_ENABLED);
             $this->oModel->set('cal_enabled', BAIKAL_CAL_ENABLED);
-            $this->oModel->set('invite_from', defined("BAIKAL_INVITE_FROM") ? BAIKAL_INVITE_FROM : "");
+            $this->oModel->set('invite_from', defined('BAIKAL_INVITE_FROM') ? BAIKAL_INVITE_FROM : '');
             $this->oModel->set('dav_auth_type', BAIKAL_DAV_AUTH_TYPE);
         }
-        if (file_exists(PROJECT_PATH_SPECIFIC . "config.system.php")) {
-            require_once PROJECT_PATH_SPECIFIC . "config.system.php";
+        if (file_exists(PROJECT_PATH_SPECIFIC . 'config.system.php')) {
+            require_once PROJECT_PATH_SPECIFIC . 'config.system.php';
             $this->oModel->set('auth_realm', BAIKAL_AUTH_REALM);
         }
 
         $this->oForm = $this->oModel->formForThisModelInstance([
-            "close" => false,
+            'close' => false,
         ]);
 
         if ($this->oForm->submitted()) {
@@ -72,18 +100,22 @@ class Initialize extends \Flake\Core\Controller {
                 if (file_exists(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED')) {
                     @unlink(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED');
                 }
-                if (file_exists(PROJECT_PATH_SPECIFIC . "config.php")) {
-                    @unlink(PROJECT_PATH_SPECIFIC . "config.php");
+                if (file_exists(PROJECT_PATH_SPECIFIC . 'config.php')) {
+                    @unlink(PROJECT_PATH_SPECIFIC . 'config.php');
                 }
 
                 # Creating system config, and initializing BAIKAL_ENCRYPTION_KEY
                 $oDatabaseConfig = new \Baikal\Model\Config\Database();
-                $oDatabaseConfig->set("encryption_key", md5(microtime() . rand()));
+                $oDatabaseConfig->set('encryption_key', md5(microtime() . mt_rand()));
 
                 # Default: PDO::SQLite or PDO::MySQL ?
-                $aPDODrivers = \PDO::getAvailableDrivers();
-                if (!in_array('sqlite', $aPDODrivers)) {    # PDO::MySQL is already asserted in \Baikal\Core\Tools::assertEnvironmentIsOk()
-                    $oDatabaseConfig->set("mysql", true);
+                $aPDODrivers = PDO::getAvailableDrivers();
+                if (!in_array(
+                    'sqlite',
+                    $aPDODrivers,
+                    true
+                )) {    # PDO::MySQL is already asserted in \Baikal\Core\Tools::assertEnvironmentIsOk()
+                    $oDatabaseConfig->set('mysql', true);
                 }
 
                 $oDatabaseConfig->persist();
@@ -91,48 +123,66 @@ class Initialize extends \Flake\Core\Controller {
         }
     }
 
-    function render() {
-        $sBigIcon = "glyph2x-magic";
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     * @throws Exception
+     */
+    public function render(): string
+    {
+        $sBigIcon = 'glyph2x-magic';
         $sBaikalVersion = BAIKAL_VERSION;
 
         $oView = new \BaikalAdmin\View\Install\Initialize();
-        $oView->setData("baikalversion", BAIKAL_VERSION);
+        $oView->setData('baikalversion', BAIKAL_VERSION);
 
         // If we come from pre-0.7.0 (old config files are still present),
         // we need to tell the installer page to show a warning message.
-        $oView->setData("oldConfigSystem", file_exists(PROJECT_PATH_SPECIFIC . "config.system.php"));
+        $oView->setData('oldConfigSystem', file_exists(PROJECT_PATH_SPECIFIC . 'config.system.php'));
 
         if ($this->oForm->persisted()) {
-            $sLink = PROJECT_URI . "admin/install/?/database";
-            \Flake\Util\Tools::redirect($sLink);
+            $sLink = PROJECT_URI . 'admin/install/?/database';
+            Tools::redirect($sLink);
             exit(0);
 
-        #$sMessage = "<p>Baïkal is now configured. You may <a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Access the Baïkal admin</a></p>";
-        #$sForm = "";
-        } else {
-            $sMessage = "";
-            $sForm = $this->oForm->render();
+            #$sMessage = "<p>Baïkal is now configured. You may <a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Access the Baïkal admin</a></p>";
+            #$sForm = "";
         }
 
-        $oView->setData("message", $sMessage);
-        $oView->setData("form", $sForm);
+        $sMessage = '';
+        $sForm = $this->oForm->render();
+
+        $oView->setData('message', $sMessage);
+        $oView->setData('form', $sForm);
 
         return $oView->render();
     }
 
-    protected function createHtaccessFilesIfNeeded() {
-        $this->copyResourceFile("System/htaccess-documentroot", PROJECT_PATH_DOCUMENTROOT . ".htaccess");
-        $this->copyResourceFile("System/htaccess-deny-all", PROJECT_PATH_SPECIFIC . ".htaccess");
-        $this->copyResourceFile("System/htaccess-deny-all", PROJECT_PATH_CONFIG . ".htaccess");
+    /**
+     * @throws Exception
+     */
+    protected function createHtaccessFilesIfNeeded(): void
+    {
+        $this->copyResourceFile('System/htaccess-documentroot', PROJECT_PATH_DOCUMENTROOT . '.htaccess');
+        $this->copyResourceFile('System/htaccess-deny-all', PROJECT_PATH_SPECIFIC . '.htaccess');
+        $this->copyResourceFile('System/htaccess-deny-all', PROJECT_PATH_CONFIG . '.htaccess');
     }
 
-    private function copyResourceFile($template, $destination) {
+    /**
+     * @throws Exception
+     */
+    private function copyResourceFile($template, $destination): void
+    {
         if (!file_exists($destination)) {
             @copy(PROJECT_PATH_CORERESOURCES . $template, $destination);
         }
 
         if (!file_exists($destination)) {
-            throw new \Exception("Unable to create " . $destination . "; you may try to create it manually by copying " . PROJECT_PATH_CORERESOURCES . $template);
+            throw new RuntimeException(
+                'Unable to create ' . $destination . '; you may try to create it manually by copying ' . PROJECT_PATH_CORERESOURCES . $template
+            );
         }
     }
 }

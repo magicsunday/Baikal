@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,8 +29,18 @@
 
 namespace Flake\Core\Model;
 
-abstract class NoDb extends \Flake\Core\Model {
-    public function __construct($aData = false) {
+use Flake\Core\Model;
+
+/**
+ *
+ */
+abstract class NoDb extends Model
+{
+    /**
+     * @param array|false $aData
+     */
+    public function __construct(array|false $aData = false)
+    {
         if ($aData !== false) {
             $this->aData = $aData;
         }

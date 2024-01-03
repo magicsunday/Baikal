@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,32 +29,54 @@
 
 namespace Flake\Controller;
 
-class HtmlBlockTemplated extends \Flake\Core\Controller {
+use Flake\Core\Controller;
+use Flake\Core\Template;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+
+/**
+ *
+ */
+class HtmlBlockTemplated extends Controller
+{
     /**
      * @var string
      */
-    private $sTemplatePath;
+    private string $sTemplatePath;
 
     /**
      * @var array
      */
-    private $aMarkers;
+    private mixed $aMarkers;
 
-    public function __construct($sTemplatePath, $aMarkers = []) {
+    /**
+     * @param       $sTemplatePath
+     * @param array $aMarkers
+     */
+    public function __construct($sTemplatePath, array $aMarkers = [])
+    {
         $this->sTemplatePath = $sTemplatePath;
         $this->aMarkers = $aMarkers;
     }
 
-    public function render() {
-        $oTemplate = new \Flake\Core\Template($this->sTemplatePath);
-        $sHtml = $oTemplate->parse(
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render(): string
+    {
+        return (new Template($this->sTemplatePath))->parse(
             $this->aMarkers
         );
-
-        return $sHtml;
     }
 
-    public function execute() {
+    /**
+     * @return void
+     */
+    public function execute(): void
+    {
         // TODO: Implement execute() method.
     }
 }

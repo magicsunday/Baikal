@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,25 +29,42 @@
 
 namespace BaikalAdmin\Route;
 
-class Users extends \Flake\Core\Route {
-    static function layout(\Flake\Core\Render\Container &$oRenderContainer) {
+use Flake\Core\Render\Container;
+use Flake\Core\Route;
+
+/**
+ *
+ */
+class Users extends Route
+{
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function layout(Container $oRenderContainer): void
+    {
         $aParams = self::getParams();
-        $oRenderContainer->zone("Payload")->addBlock(new \BaikalAdmin\Controller\Users($aParams));
+        $oRenderContainer->zone('Payload')->addBlock(new \BaikalAdmin\Controller\Users($aParams));
     }
 
-    static function parametersMap() {
+    /**
+     * @return array[]
+     */
+    public static function parametersMap(): array
+    {
         return [
-            "new" => [
-                "required" => false,
+            'new'     => [
+                'required' => false,
             ],
-            "edit" => [
-                "required" => false,
+            'edit'    => [
+                'required' => false,
             ],
-            "delete" => [
-                "required" => false,
+            'delete'  => [
+                'required' => false,
             ],
-            "confirm" => [
-                "required" => false,
+            'confirm' => [
+                'required' => false,
             ],
         ];
     }

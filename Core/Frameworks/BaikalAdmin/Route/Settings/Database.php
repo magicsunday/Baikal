@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,8 +29,21 @@
 
 namespace BaikalAdmin\Route\Settings;
 
-class Database extends \Flake\Core\Route {
-    static function layout(\Flake\Core\Render\Container &$oRenderContainer) {
-        $oRenderContainer->zone("Payload")->addBlock(new \BaikalAdmin\Controller\Settings\Database());
+use Flake\Core\Render\Container;
+use Flake\Core\Route;
+
+/**
+ *
+ */
+class Database extends Route
+{
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function layout(Container $oRenderContainer): void
+    {
+        $oRenderContainer->zone('Payload')->addBlock(new \BaikalAdmin\Controller\Settings\Database());
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,13 +29,28 @@
 
 namespace Flake\Util;
 
-class Frameworks extends \Flake\Core\FLObject {
-    private function __construct() {    # private constructor to force static class
+use Exception;
+use Flake\Core\FLObject;
+use RuntimeException;
+
+/**
+ *
+ */
+class Frameworks extends FLObject
+{
+    private function __construct()
+    {    # private constructor to force static class
     }
 
-    public function isAFramework($sName) {
-        $sName = trim(\Flake\Util\Tools::trimSlashes($sName));
-        if ($sName === "" || $sName === "." || $sName === "..") {
+    /**
+     * @param $sName
+     *
+     * @return bool
+     */
+    public function isAFramework($sName): bool
+    {
+        $sName = trim(Tools::trimSlashes($sName));
+        if ($sName === '' || $sName === '.' || $sName === '..') {
             return false;
         }
 
@@ -42,16 +59,27 @@ class Frameworks extends \Flake\Core\FLObject {
         return file_exists($sFrameworkPath) && is_dir($sFrameworkPath);
     }
 
-    public static function enabled($sFramework) {
+    /**
+     * @param $sFramework
+     *
+     * @return bool
+     */
+    public static function enabled($sFramework): bool
+    {
         return false;
     }
 
     # TODO: Create a 'Framework' Model
-    public function getPath($sName) {
-        if (self::isAFramework($sName)) {
-            throw new \Flake\Core\Exception(htmlspecialchars($$sName) . " is not a framework.", $sName);
+
+    /**
+     * @throws Exception
+     */
+    public function getPath($sName): string
+    {
+        if ($this->isAFramework($sName)) {
+            throw new RuntimeException(htmlspecialchars($$sName) . ' is not a framework.', $sName);
         }
 
-        return \Flake\Util\Tools::appendSlash(PROJECT_PATH_FRAMEWORKS . $sName);
+        return Tools::appendSlash(PROJECT_PATH_FRAMEWORKS . $sName);
     }
 }

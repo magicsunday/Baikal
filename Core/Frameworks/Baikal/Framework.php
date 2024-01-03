@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,39 +29,53 @@
 
 namespace Baikal;
 
+use Baikal\Core\Tools;
+use ErrorException;
+use Exception;
 use Symfony\Component\Yaml\Yaml;
 
-class Framework extends \Flake\Core\Framework {
-    static function installTool() {
-        if (defined("BAIKAL_CONTEXT_INSTALL") && BAIKAL_CONTEXT_INSTALL === true) {
+use function define;
+use function defined;
+
+/**
+ *
+ */
+class Framework extends \Flake\Core\Framework
+{
+    /**
+     * @return void
+     */
+    public static function installTool(): void
+    {
+        if (defined('BAIKAL_CONTEXT_INSTALL') && BAIKAL_CONTEXT_INSTALL === true) {
             # Install tool has been launched and we're already on the install page
             return;
-        } else {
-            # Install tool has been launched; redirecting user
-            $sInstallToolUrl = PROJECT_URI . "admin/install/";
-            header("Location: " . $sInstallToolUrl);
-            exit(0);
         }
+
+# Install tool has been launched; redirecting user
+        $sInstallToolUrl = PROJECT_URI . 'admin/install/';
+        header('Location: ' . $sInstallToolUrl);
+        exit(0);
     }
 
-    static function bootstrap() {
+    /**
+     * @throws Exception
+     */
+    public static function bootstrap(): void
+    {
         # Registering Baikal classloader
-        define("BAIKAL_PATH_FRAMEWORKROOT", dirname(__FILE__) . "/");
+        define('BAIKAL_PATH_FRAMEWORKROOT', __DIR__ . '/');
 
-        \Baikal\Core\Tools::assertEnvironmentIsOk();
-        \Baikal\Core\Tools::configureEnvironment();
+        Tools::assertEnvironmentIsOk();
+        Tools::configureEnvironment();
 
         # Check that a config file exists
-        if (!file_exists(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            self::installTool();
-        } else {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
+        if (file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
             date_default_timezone_set($config['system']['timezone']);
 
             # Check that Baïkal is already configured
-            if (!isset($config['system']['configured_version'])) {
-                self::installTool();
-            } else {
+            if (isset($config['system']['configured_version'])) {
                 # Check that running version matches configured version
                 if (version_compare(BAIKAL_VERSION, $config['system']['configured_version']) > 0) {
                     self::installTool();
@@ -69,16 +85,25 @@ class Framework extends \Flake\Core\Framework {
                         self::installTool();
                     }
 
-                    \Baikal\Core\Tools::assertBaikalIsOk();
+                    Tools::assertBaikalIsOk();
 
                     set_error_handler("\Baikal\Framework::exception_error_handler");
                 }
+            } else {
+                self::installTool();
             }
+        } else {
+            self::installTool();
         }
     }
 
     # Mapping PHP errors to exceptions; needed by SabreDAV
-    static function exception_error_handler($errno, $errstr, $errfile, $errline) {
-        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+
+    /**
+     * @throws ErrorException
+     */
+    public static function exception_error_handler($errno, $errstr, $errfile, $errline): void
+    {
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 }

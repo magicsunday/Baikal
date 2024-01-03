@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,29 +29,48 @@
 
 namespace BaikalAdmin\Route\User;
 
-class AddressBooks extends \Flake\Core\Route {
-    static function layout(\Flake\Core\Render\Container &$oRenderContainer) {
-        $oRenderContainer->zone("Payload")->addBlock(new \BaikalAdmin\Controller\User\AddressBooks(
-            self::getParams()
-        ));
+use Flake\Core\Render\Container;
+use Flake\Core\Route;
+
+/**
+ *
+ */
+class AddressBooks extends Route
+{
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function layout(Container $oRenderContainer): void
+    {
+        $oRenderContainer->zone('Payload')->addBlock(
+            new \BaikalAdmin\Controller\User\AddressBooks(
+                self::getParams()
+            )
+        );
     }
 
-    static function parametersMap() {
+    /**
+     * @return array
+     */
+    public static function parametersMap(): array
+    {
         return [
-            "user" => [
-                "required" => true,
+            'user'    => [
+                'required' => true,
             ],
-            "new" => [
-                "required" => false,
+            'new'     => [
+                'required' => false,
             ],
-            "edit" => [
-                "required" => false,
+            'edit'    => [
+                'required' => false,
             ],
-            "delete" => [
-                "required" => false,
+            'delete'  => [
+                'required' => false,
             ],
-            "confirm" => [
-                "required" => false,
+            'confirm' => [
+                'required' => false,
             ],
         ];
     }

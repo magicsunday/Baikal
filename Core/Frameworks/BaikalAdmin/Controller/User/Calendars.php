@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,18 +29,44 @@
 
 namespace BaikalAdmin\Controller\User;
 
-class Calendars extends \Flake\Core\Controller {
-    protected $aMessages = [];
-    protected $oModel;    # \Baikal\Model\Calendar
-    protected $oUser;    # \Baikal\Model\User
-    protected $oForm;    # \Formal\Form
+use Baikal\Model\Calendar;
+use Baikal\Model\User;
+use BaikalAdmin\Controller\Users;
+use Exception;
+use Flake\Core\Controller;
+use Flake\Util\Tools;
+use Formal\Core\Message;
+use Formal\Form;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-    function execute() {
+use function array_key_exists;
+
+/**
+ *
+ */
+class Calendars extends Controller
+{
+    protected array $aMessages = [];
+    protected Calendar $oModel;    # \Baikal\Model\Calendar
+    protected User $oUser;    # \Baikal\Model\User
+    protected Form $oForm;    # \Formal\Form
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function execute(): void
+    {
         if (($iUser = $this->currentUserId()) === false) {
-            throw new \Exception("BaikalAdmin\Controller\User\Calendars::render(): User get-parameter not found.");
+            throw new RuntimeException(
+                "BaikalAdmin\Controller\User\Calendars::render(): User get-parameter not found."
+            );
         }
 
-        $this->oUser = new \Baikal\Model\User($iUser);
+        $this->oUser = new User($iUser);
 
         if ($this->actionNewRequested()) {
             $this->actionNew();
@@ -49,11 +77,19 @@ class Calendars extends \Flake\Core\Controller {
         }
     }
 
-    function render() {
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     * @throws Exception
+     */
+    public function render(): string
+    {
         $oView = new \BaikalAdmin\View\User\Calendars();
 
         # User
-        $oView->setData("user", $this->oUser);
+        $oView->setData('user', $this->oUser);
 
         # List of calendars
         $oCalendars = $this->oUser->getCalendarsBaseRequester()->execute();
@@ -61,88 +97,106 @@ class Calendars extends \Flake\Core\Controller {
 
         foreach ($oCalendars as $calendar) {
             $aCalendars[] = [
-                "linkedit"    => $this->linkEdit($calendar),
-                "linkdelete"  => $this->linkDelete($calendar),
-                "davuri"      => $this->getDavUri($calendar),
-                "icon"        => $calendar->icon(),
-                "label"       => $calendar->label(),
-                "instanced"   => $calendar->hasInstances(),
-                "events"      => $calendar->getEventsBaseRequester()->count(),
-                "description" => $calendar->get("description"),
+                'linkedit'    => $this->linkEdit($calendar),
+                'linkdelete'  => $this->linkDelete($calendar),
+                'davuri'      => $this->getDavUri($calendar),
+                'icon'        => $calendar->icon(),
+                'label'       => $calendar->label(),
+                'instanced'   => $calendar->hasInstances(),
+                'events'      => $calendar->getEventsBaseRequester()->count(),
+                'description' => $calendar->get('description'),
             ];
         }
 
-        $oView->setData("calendars", $aCalendars);
+        $oView->setData('calendars', $aCalendars);
 
-        # Messages
+        // Messages
         $sMessages = implode("\n", $this->aMessages);
-        $oView->setData("messages", $sMessages);
+        $oView->setData('messages', $sMessages);
 
         if ($this->actionNewRequested() || $this->actionEditRequested()) {
             $sForm = $this->oForm->render();
         } else {
-            $sForm = "";
+            $sForm = '';
         }
 
-        $oView->setData("form", $sForm);
-        $oView->setData("titleicon", \Baikal\Model\Calendar::bigicon());
-        $oView->setData("modelicon", $this->oUser->mediumicon());
-        $oView->setData("modellabel", $this->oUser->label());
-        $oView->setData("linkback", \BaikalAdmin\Controller\Users::link());
-        $oView->setData("linknew", $this->linkNew());
-        $oView->setData("calendaricon", \Baikal\Model\Calendar::icon());
+        $oView->setData('form', $sForm);
+        $oView->setData('titleicon', Calendar::bigicon());
+        $oView->setData('modelicon', $this->oUser->mediumicon());
+        $oView->setData('modellabel', $this->oUser->label());
+        $oView->setData('linkback', Users::link());
+        $oView->setData('linknew', $this->linkNew());
+        $oView->setData('calendaricon', Calendar::icon());
 
         return $oView->render();
     }
 
-    protected function initForm() {
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function initForm(): void
+    {
         if ($this->actionEditRequested() || $this->actionNewRequested()) {
             $aOptions = [
-                "closeurl" => $this->linkHome(),
+                'closeurl' => $this->linkHome(),
             ];
 
             $this->oForm = $this->oModel->formForThisModelInstance($aOptions);
         }
     }
 
-    protected function currentUserId() {
+    /**
+     * @return false|int
+     */
+    protected function currentUserId(): false|int
+    {
         $aParams = $this->getParams();
-        if (($iUser = intval($aParams["user"])) === 0) {
+
+        if (($iUser = ((int)$aParams['user'])) === 0) {
             return false;
         }
 
         return $iUser;
     }
 
-    # Action new
-
-    function linkNew() {
+    /**
+     * @return string
+     */
+    public function linkNew(): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
-            "new"  => 1,
-        ]) . "#form";
+                'user' => $this->currentUserId(),
+                'new'  => 1,
+            ]) . '#form';
     }
 
-    protected function actionNewRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionNewRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("new", $aParams) && intval($aParams["new"]) === 1) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('new', $aParams) && (int)$aParams['new'] === 1;
     }
 
-    protected function actionNew() {
+    /**
+     *
+     * @throws Exception
+     * @throws Exception
+     */
+    protected function actionNew(): void
+    {
         # Building floating model object
-        $this->oModel = new \Baikal\Model\Calendar();
+        $this->oModel = new Calendar();
         $this->oModel->set(
-            "principaluri",
-            $this->oUser->get("uri")
+            'principaluri',
+            $this->oUser->get('uri')
         );
 
         $this->oModel->set(
-            "components",
-            "VEVENT"
+            'components',
+            'VEVENT'
         );
 
         # Initialize corresponding form
@@ -154,7 +208,7 @@ class Calendars extends \Flake\Core\Controller {
 
             if ($this->oForm->persisted()) {
                 $this->oForm->setOption(
-                    "action",
+                    'action',
                     $this->linkEdit(
                         $this->oForm->modelInstance()
                     )
@@ -165,31 +219,41 @@ class Calendars extends \Flake\Core\Controller {
 
     # Action edit
 
-    function linkEdit(\Baikal\Model\Calendar $oModel) {
+    /**
+     *
+     * @throws Exception
+     */
+    public function linkEdit(Calendar $oModel): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
-            "edit" => $oModel->get("id"),
-        ]) . "#form";
+                'user' => $this->currentUserId(),
+                'edit' => $oModel->get('id'),
+            ]) . '#form';
     }
 
-    protected function actionEditRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionEditRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("edit", $aParams) && intval($aParams["edit"]) > 0) {
-            return true;
-        }
 
-        return false;
+        return array_key_exists('edit', $aParams) && (((int)$aParams['edit']) > 0);
     }
 
-    protected function actionEdit() {
-        # Building anchored model object
+    /**
+     * @throws Exception
+     */
+    protected function actionEdit(): void
+    {
+        // Building anchored model object
         $aParams = $this->getParams();
-        $this->oModel = new \Baikal\Model\Calendar(intval($aParams["edit"]));
+        $this->oModel = new Calendar($aParams['edit']);
 
-        # Initialize corresponding form
+        // Initialize corresponding form
         $this->initForm();
 
-        # Process form
+        // Process form
         if ($this->oForm->submitted()) {
             $this->oForm->execute();
         }
@@ -197,88 +261,104 @@ class Calendars extends \Flake\Core\Controller {
 
     # Action delete + confirm
 
-    function linkDelete(\Baikal\Model\Calendar $oModel) {
+    /**
+     * @throws Exception
+     */
+    public function linkDelete(Calendar $oModel): string
+    {
         return self::buildRoute([
-            "user"   => $this->currentUserId(),
-            "delete" => $oModel->get("id"),
-        ]) . "#message";
+                'user'   => $this->currentUserId(),
+                'delete' => $oModel->get('id'),
+            ]) . '#message';
     }
 
-    function linkDeleteConfirm(\Baikal\Model\Calendar $oModel) {
+    /**
+     * @throws Exception
+     */
+    public function linkDeleteConfirm(Calendar $oModel): string
+    {
         return self::buildRoute([
-            "user"    => $this->currentUserId(),
-            "delete"  => $oModel->get("id"),
-            "confirm" => 1,
-        ]) . "#message";
+                'user'    => $this->currentUserId(),
+                'delete'  => $oModel->get('id'),
+                'confirm' => 1,
+            ]) . '#message';
     }
 
-    protected function actionDeleteRequested() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteRequested(): bool
+    {
         $aParams = $this->getParams();
-        if (array_key_exists("delete", $aParams) && intval($aParams["delete"]) > 0) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('delete', $aParams) && (((int)$aParams['delete']) > 0);
     }
 
-    protected function actionDeleteConfirmed() {
+    /**
+     * @return bool
+     */
+    protected function actionDeleteConfirmed(): bool
+    {
         if ($this->actionDeleteRequested() === false) {
             return false;
         }
 
         $aParams = $this->getParams();
-        if (array_key_exists("confirm", $aParams) && intval($aParams["confirm"]) === 1) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists('confirm', $aParams) && (((int)$aParams['confirm']) === 1);
     }
 
-    protected function actionDelete() {
+    /**
+     * @throws Exception
+     */
+    protected function actionDelete(): void
+    {
         $aParams = $this->getParams();
-        $iCalendar = intval($aParams["delete"]);
+        $iCalendar = $aParams['delete'];
 
         if ($this->actionDeleteConfirmed() !== false) {
-            # catching Exception thrown when model already destroyed
-            # happens when user refreshes page on delete-URL, for instance
+            // catching Exception thrown when model already destroyed
+            // happens when user refreshes page on delete-URL, for instance
 
             try {
-                $oModel = new \Baikal\Model\Calendar($iCalendar);
+                $oModel = new Calendar($iCalendar);
                 $oModel->destroy();
-            } catch (\Exception $e) {
-                # already deleted; silently discarding
+            } catch (Exception $e) {
+                // already deleted; silently discarding
             }
 
-            # Redirecting to admin home
-            \Flake\Util\Tools::redirectUsingMeta($this->linkHome());
+            // Redirecting to admin home
+            Tools::redirectUsingMeta($this->linkHome());
         } else {
-            $oModel = new \Baikal\Model\Calendar($iCalendar);
-            $this->aMessages[] = \Formal\Core\Message::warningConfirmMessage(
-                "Check twice, you're about to delete " . $oModel->label() . "</strong> from the database !",
+            $oModel = new Calendar($iCalendar);
+            $this->aMessages[] = Message::warningConfirmMessage(
+                "Check twice, you're about to delete " . $oModel->label() . '</strong> from the database !',
                 "<p>You are about to delete a calendar and all it's scheduled events. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
                 $this->linkDeleteConfirm($oModel),
-                "Delete <strong><i class='" . $oModel->icon() . " icon-white'></i> " . $oModel->label() . "</strong>",
+                "Delete <strong><i class='" . $oModel->icon() . " icon-white'></i> " . $oModel->label() . '</strong>',
                 $this->linkHome()
             );
         }
     }
 
-    # Link to home
-
-    function linkHome() {
+    /**
+     * @return string
+     */
+    public function linkHome(): string
+    {
         return self::buildRoute([
-            "user" => $this->currentUserId(),
+            'user' => $this->currentUserId(),
         ]);
     }
 
     /**
      * Generate a link to the CalDAV/CardDAV URI of the calendar.
      *
-     * @param \Baikal\Model\Calendar $calendar
+     * @param Calendar $calendar
      *
      * @return string Calender DAV URI
+     * @throws Exception
      */
-    protected function getDavUri(\Baikal\Model\Calendar $calendar) {
+    protected function getDavUri(Calendar $calendar): string
+    {
         return PROJECT_URI . 'dav.php/calendars/' . $this->oUser->get('username') . '/' . $calendar->get('uri') . '/';
     }
 }

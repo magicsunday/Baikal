@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,64 +29,81 @@
 
 namespace Formal\Element;
 
-class Text extends \Formal\Element {
-    protected function inputtype() {
-        return "text";
+use Exception;
+use Formal\Element;
+
+use function array_key_exists;
+
+/**
+ *
+ */
+class Text extends Element
+{
+    /**
+     * @return string
+     */
+    protected function inputtype(): string
+    {
+        return 'text';
     }
 
-    function render() {
-        $disabled = "";
-        $inputclass = "";
-        $groupclass = "";
-        $placeholder = "";
+    /**
+     * @throws Exception
+     */
+    public function render(): string
+    {
+        $disabled = '';
+        $inputclass = '';
+        $groupclass = '';
+        $placeholder = '';
 
         $value = $this->value();
-        $label = $this->option("label");
-        $prop = $this->option("prop");
-        $placeholder = "";
-        $helpblock = "";
-        $popover = "";
+        $label = $this->option('label');
+        $prop = $this->option('prop');
+        $placeholder = '';
+        $helpblock = '';
+        $popover = '';
 
-        if ($this->option("readonly") === true) {
-            $inputclass .= " disabled";
-            $disabled = " disabled";
+        if ($this->option('readonly') === true) {
+            $inputclass .= ' disabled';
+            $disabled = ' disabled';
         }
 
-        if ($this->option("error") === true) {
-            $groupclass .= " error";
+        if ($this->option('error') === true) {
+            $groupclass .= ' error';
         }
 
-        if (trim($this->option("class")) !== "") {
-            $groupclass .= " " . $this->option("class");
+        if (trim($this->option('class')) !== '') {
+            $groupclass .= ' ' . $this->option('class');
         }
 
-        if (trim($this->option("inputclass")) !== "") {
-            $inputclass = $this->option("inputclass");
+        if (trim($this->option('inputclass')) !== '') {
+            $inputclass = $this->option('inputclass');
         }
 
-        if (($sPlaceHolder = trim($this->option("placeholder"))) !== "") {
-            $placeholder = " placeholder=\"" . htmlspecialchars($sPlaceHolder) . "\" ";
+        if (($sPlaceHolder = trim($this->option('placeholder'))) !== '') {
+            $placeholder = ' placeholder="' . htmlspecialchars($sPlaceHolder) . '" ';
         }
 
         $clientvalue = htmlspecialchars($value ?? '');
 
         $sInputType = $this->inputtype();
 
-        if (($sHelp = trim($this->option("help"))) !== "") {
-            $helpblock = "<p class=\"help-block\">" . $sHelp . "</p>";
+        if (($sHelp = trim($this->option('help'))) !== '') {
+            $helpblock = '<p class="help-block">' . $sHelp . '</p>';
         }
 
-        if (($aPopover = $this->option("popover")) !== "") {
-            if (array_key_exists("position", $aPopover)) {
-                $sPosition = $aPopover["position"];
-                $inputclass .= " popover-focus-" . $sPosition;
+        if (($aPopover = $this->option('popover')) !== '') {
+            if (array_key_exists('position', $aPopover)) {
+                $sPosition = $aPopover['position'];
+                $inputclass .= ' popover-focus-' . $sPosition;
             } else {
-                $inputclass .= " popover-focus ";
+                $inputclass .= ' popover-focus ';
             }
 
-            $popover = " title=\"" . htmlspecialchars($aPopover["title"]) . "\" ";
-            $popover .= " data-content=\"" . htmlspecialchars($aPopover["content"]) . "\" ";
-            $popover .= " data-html=\"true\"";
+            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
+            $popover .= ' data-html="true"';
         }
 
         $sHtml = <<<HTML

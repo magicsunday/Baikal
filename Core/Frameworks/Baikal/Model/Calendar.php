@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,238 +29,330 @@
 
 namespace Baikal\Model;
 
+use Baikal\Model\Calendar\Event;
+use Exception;
+use Flake\Core\Model;
+use Flake\Core\Model\Db;
+use Flake\Core\Requester\Sql;
+use Formal\Element\Checkbox;
+use Formal\Element\Text;
+use Formal\Form\Morphology;
+use ReflectionException;
 use Symfony\Component\Yaml\Yaml;
 
-class Calendar extends \Flake\Core\Model\Db {
-    const DATATABLE = "calendarinstances";
-    const PRIMARYKEY = "id";
-    const LABELFIELD = "displayname";
+use function in_array;
 
-    protected $aData = [
-        "principaluri"       => "",
-        "displayname"        => "",
-        "uri"                => "",
-        "description"        => "",
-        "calendarorder"      => 0,
-        "calendarcolor"      => "",
-        "timezone"           => null,
-        "calendarid"         => 0,
-        "access"             => 1,
-        "share_invitestatus" => 2,
+/**
+ *
+ */
+class Calendar extends Db
+{
+    public const DATATABLE = 'calendarinstances';
+    public const PRIMARYKEY = 'id';
+    public const LABELFIELD = 'displayname';
+
+    protected array $aData = [
+        'principaluri'       => '',
+        'displayname'        => '',
+        'uri'                => '',
+        'description'        => '',
+        'calendarorder'      => 0,
+        'calendarcolor'      => '',
+        'timezone'           => null,
+        'calendarid'         => 0,
+        'access'             => 1,
+        'share_invitestatus' => 2,
     ];
-    protected $oCalendar; # Baikal\Model\Calendar\Calendar
 
-    function __construct($sPrimary = false) {
+    protected Calendar\Calendar $oCalendar; # Baikal\Model\Calendar\Calendar
+
+    /**
+     * @param false|int|string $sPrimary
+     *
+     * @throws Exception
+     */
+    public function __construct(false|int|string $sPrimary = false)
+    {
         parent::__construct($sPrimary);
+
         try {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-            $this->set("timezone", $config['system']["timezone"]);
-        } catch (\Exception $e) {
+            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+            $this->set('timezone', $config['system']['timezone']);
+        } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
         }
     }
 
-    protected function initFloating() {
+    /**
+     * @return void
+     */
+    protected function initFloating(): void
+    {
         parent::initFloating();
         $this->oCalendar = new Calendar\Calendar();
     }
 
-    protected function initByPrimary($sPrimary) {
+    /**
+     * @param int|string $sPrimary
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function initByPrimary(int|string $sPrimary): void
+    {
         parent::initByPrimary($sPrimary);
-        $this->oCalendar = new Calendar\Calendar($this->get("calendarid"));
+        $this->oCalendar = new Calendar\Calendar($this->get('calendarid'));
     }
 
-    function persist() {
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function persist(): void
+    {
         $this->oCalendar->persist();
-        $this->aData["calendarid"] = $this->oCalendar->get("id");
+        $this->aData['calendarid'] = $this->oCalendar->get('id');
         parent::persist();
     }
 
-    static function icon() {
-        return "icon-calendar";
+    /**
+     * @return string
+     */
+    public static function icon(): string
+    {
+        return 'icon-calendar';
     }
 
-    static function mediumicon() {
-        return "glyph-calendar";
+    /**
+     * @return string
+     */
+    public static function mediumicon(): string
+    {
+        return 'glyph-calendar';
     }
 
-    static function bigicon() {
-        return "glyph2x-calendar";
+    /**
+     * @return string
+     */
+    public static function bigicon(): string
+    {
+        return 'glyph2x-calendar';
     }
 
-    function getEventsBaseRequester() {
-        $oBaseRequester = \Baikal\Model\Calendar\Event::getBaseRequester();
+    /**
+     * @throws Exception
+     */
+    public function getEventsBaseRequester(): Sql
+    {
+        $oBaseRequester = Event::getBaseRequester();
         $oBaseRequester->addClauseEquals(
-            "calendarid",
-            $this->get("calendarid")
+            'calendarid',
+            (string)$this->get('calendarid')
         );
 
         return $oBaseRequester;
     }
 
-    function get($sPropName) {
-        if ($sPropName === "components") {
+    /**
+     * @param string $sPropName
+     *
+     * @return bool|int|string|null
+     *
+     * @throws Exception
+     */
+    public function get(string $sPropName): bool|int|string|null
+    {
+        if ($sPropName === 'components') {
             return $this->oCalendar->get($sPropName);
         }
 
-        if ($sPropName === "todos") {
+        if ($sPropName === 'todos') {
             # TRUE if components contains VTODO, FALSE otherwise
-            if (($sComponents = $this->get("components")) !== "") {
-                $aComponents = explode(",", $sComponents);
+            if (($sComponents = $this->get('components')) !== '') {
+                $aComponents = explode(',', $sComponents);
             } else {
                 $aComponents = [];
             }
 
-            return in_array("VTODO", $aComponents);
+            return in_array('VTODO', $aComponents, true);
         }
 
-        if ($sPropName === "notes") {
+        if ($sPropName === 'notes') {
             # TRUE if components contains VJOURNAL, FALSE otherwise
-            if (($sComponents = $this->get("components")) !== "") {
-                $aComponents = explode(",", $sComponents);
+            if (($sComponents = $this->get('components')) !== '') {
+                $aComponents = explode(',', $sComponents);
             } else {
                 $aComponents = [];
             }
 
-            return in_array("VJOURNAL", $aComponents);
+            return in_array('VJOURNAL', $aComponents, true);
         }
 
         return parent::get($sPropName);
     }
 
-    function set($sPropName, $sValue) {
-        if ($sPropName === "components") {
-            return $this->oCalendar->set($sPropName, $sValue);
+    /**
+     * @param string               $sPropName
+     * @param bool|int|string|null $sPropValue
+     *
+     * @return Model
+     * @throws Exception
+     */
+    public function set(string $sPropName, bool|int|string|null $sPropValue): Model
+    {
+        if ($sPropName === 'components') {
+            return $this->oCalendar->set($sPropName, $sPropValue);
         }
 
-        if ($sPropName === "todos") {
-            if (($sComponents = $this->get("components")) !== "") {
-                $aComponents = explode(",", $sComponents);
+        if ($sPropName === 'todos') {
+            if (($sComponents = $this->get('components')) !== '') {
+                $aComponents = explode(',', $sComponents);
             } else {
                 $aComponents = [];
             }
 
-            if ($sValue === true) {
-                if (!in_array("VTODO", $aComponents)) {
-                    $aComponents[] = "VTODO";
+            if ($sPropValue === true) {
+                if (!in_array('VTODO', $aComponents, true)) {
+                    $aComponents[] = 'VTODO';
                 }
             } else {
-                if (in_array("VTODO", $aComponents)) {
-                    unset($aComponents[array_search("VTODO", $aComponents)]);
+                if (in_array('VTODO', $aComponents, true)) {
+                    unset($aComponents[array_search('VTODO', $aComponents, true)]);
                 }
             }
 
-            return $this->set("components", implode(",", $aComponents));
+            return $this->set('components', implode(',', $aComponents));
         }
 
-        if ($sPropName === "notes") {
-            if (($sComponents = $this->get("components")) !== "") {
-                $aComponents = explode(",", $sComponents);
+        if ($sPropName === 'notes') {
+            if (($sComponents = $this->get('components')) !== '') {
+                $aComponents = explode(',', $sComponents);
             } else {
                 $aComponents = [];
             }
 
-            if ($sValue === true) {
-                if (!in_array("VJOURNAL", $aComponents)) {
-                    $aComponents[] = "VJOURNAL";
+            if ($sPropValue === true) {
+                if (!in_array('VJOURNAL', $aComponents, true)) {
+                    $aComponents[] = 'VJOURNAL';
                 }
             } else {
-                if (in_array("VJOURNAL", $aComponents)) {
-                    unset($aComponents[array_search("VJOURNAL", $aComponents)]);
+                if (in_array('VJOURNAL', $aComponents, true)) {
+                    unset($aComponents[array_search('VJOURNAL', $aComponents, true)]);
                 }
             }
 
-            return $this->set("components", implode(",", $aComponents));
+            return $this->set('components', implode(',', $aComponents));
         }
 
-        return parent::set($sPropName, $sValue);
+        return parent::set($sPropName, $sPropValue);
     }
 
-    function formMorphologyForThisModelInstance() {
-        $oMorpho = new \Formal\Form\Morphology();
+    /**
+     * @return Morphology
+     *
+     * @throws ReflectionException
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        $oMorpho = new Morphology();
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "uri",
-            "label"      => "Calendar token ID",
-            "validation" => "required,tokenid",
-            "popover"    => [
-                "title"   => "Calendar token ID",
-                "content" => "The unique identifier for this calendar.",
+        $oMorpho->add(new Text([
+            'prop'       => 'uri',
+            'label'      => 'Calendar token ID',
+            'validation' => 'required,tokenid',
+            'popover'    => [
+                'title'   => 'Calendar token ID',
+                'content' => 'The unique identifier for this calendar.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "displayname",
-            "label"      => "Display name",
-            "validation" => "required",
-            "popover"    => [
-                "title"   => "Display name",
-                "content" => "This is the name that will be displayed in your CalDAV client.",
+        $oMorpho->add(new Text([
+            'prop'       => 'displayname',
+            'label'      => 'Display name',
+            'validation' => 'required',
+            'popover'    => [
+                'title'   => 'Display name',
+                'content' => 'This is the name that will be displayed in your CalDAV client.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "calendarcolor",
-            "label"      => "Calendar color",
-            "validation" => "color",
-            "popover"    => [
-                "title"   => "Calendar color",
-                "content" => "This is the color that will be displayed in your CalDAV client.<br/>" .
-                "Must be supplied in format '#RRGGBBAA' (alpha channel optional) with hexadecimal values.<br/>" .
-                "This value is optional.",
+        $oMorpho->add(new Text([
+            'prop'       => 'calendarcolor',
+            'label'      => 'Calendar color',
+            'validation' => 'color',
+            'popover'    => [
+                'title'   => 'Calendar color',
+                'content' => 'This is the color that will be displayed in your CalDAV client.<br/>' .
+                    "Must be supplied in format '#RRGGBBAA' (alpha channel optional) with hexadecimal values.<br/>" .
+                    'This value is optional.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "description",
-            "label" => "Description",
+        $oMorpho->add(new Text([
+            'prop'  => 'description',
+            'label' => 'Description',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Checkbox([
-            "prop"  => "todos",
-            "label" => "Todos",
-            "help"  => "If checked, todos will be enabled on this calendar.",
+        $oMorpho->add(new Checkbox([
+            'prop'  => 'todos',
+            'label' => 'Todos',
+            'help'  => 'If checked, todos will be enabled on this calendar.',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Checkbox([
-            "prop"  => "notes",
-            "label" => "Notes",
-            "help"  => "If checked, notes will be enabled on this calendar.",
+        $oMorpho->add(new Checkbox([
+            'prop'  => 'notes',
+            'label' => 'Notes',
+            'help'  => 'If checked, notes will be enabled on this calendar.',
         ]));
 
         if ($this->floating()) {
-            $oMorpho->element("uri")->setOption(
-                "help",
+            $oMorpho->element('uri')->setOption(
+                'help',
                 "Allowed characters are digits, lowercase letters and the dash symbol '-'."
             );
         } else {
-            $oMorpho->element("uri")->setOption("readonly", true);
+            $oMorpho->element('uri')->setOption('readonly', true);
         }
 
         return $oMorpho;
     }
 
-    function isDefault() {
-        return $this->get("uri") === "default";
+    /**
+     * @throws Exception
+     */
+    public function isDefault(): bool
+    {
+        return $this->get('uri') === 'default';
     }
 
-    function hasInstances() {
-        $rSql = $GLOBALS["DB"]->exec_SELECTquery(
-            "count(*)",
-            "calendarinstances",
-            "calendarid='" . $this->aData["calendarid"] . "'"
+    /**
+     * @return bool|null
+     */
+    public function hasInstances(): ?bool
+    {
+        $rSql = $GLOBALS['DB']->exec_SELECTquery(
+            'count(*)',
+            'calendarinstances',
+            'calendarid' . "='" . $this->aData['calendarid'] . "'"
         );
 
         if (($aRs = $rSql->fetch()) === false) {
             return false;
-        } else {
-            reset($aRs);
-
-            return $aRs["count(*)"] > 1;
         }
+
+        reset($aRs);
+
+        return $aRs['count(*)'] > 1;
     }
 
-    function destroy() {
+    /**
+     * @return void
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     */
+    public function destroy(): void
+    {
         $hasInstances = $this->hasInstances();
         if (!$hasInstances) {
             $oEvents = $this->getEventsBaseRequester()->execute();

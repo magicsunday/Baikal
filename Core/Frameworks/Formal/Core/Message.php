@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,29 +29,47 @@
 
 namespace Formal\Core;
 
-class Message {
-    private function __construct() {
+/**
+ *
+ */
+class Message
+{
+    private function __construct()
+    {
     }
 
-    static function error($sMessage, $sTitle = "") {
-        if ($sTitle !== "") {
+    /**
+     * @param        $sMessage
+     * @param string $sTitle
+     *
+     * @return string
+     */
+    public static function error($sMessage, string $sTitle = ''): string
+    {
+        if ($sTitle !== '') {
             $sTitle = '<h3 class="alert-heading">' . $sTitle . '</h3>';
         }
 
-        $sHtml = <<<HTML
+        return <<<HTML
 <div id="message" class="alert alert-block alert-error">
 	{$sTitle}
 	{$sMessage}
 </div>
 HTML;
-
-        return $sHtml;
     }
 
-    static function notice($sMessage, $sTitle = "", $bClose = true) {
-        $sClose = "";
+    /**
+     * @param string $sMessage
+     * @param string $sTitle
+     * @param bool   $bClose
+     *
+     * @return string
+     */
+    public static function notice(string $sMessage, string $sTitle = '', bool $bClose = true): string
+    {
+        $sClose = '';
 
-        if ($sTitle !== "") {
+        if ($sTitle !== '') {
             $sTitle = '<h3 class="alert-heading">' . $sTitle . '</h3>';
         }
 
@@ -57,19 +77,34 @@ HTML;
             $sClose = '<a class="close" data-dismiss="alert" href="#">&times;</a>';
         }
 
-        $sHtml = <<<HTML
+        return <<<HTML
 <div id="message" class="alert alert-info">
 	{$sClose}
 	{$sTitle}
 	{$sMessage}
 </div>
 HTML;
-
-        return $sHtml;
     }
 
-    static function warningConfirmMessage($sHeader, $sDescription, $sActionUrl, $sActionLabel, $sCancelUrl, $sCancelLabel = "Cancel") {
-        $sHtml = <<<HTML
+    /**
+     * @param        $sHeader
+     * @param        $sDescription
+     * @param        $sActionUrl
+     * @param        $sActionLabel
+     * @param        $sCancelUrl
+     * @param string $sCancelLabel
+     *
+     * @return string
+     */
+    public static function warningConfirmMessage(
+        $sHeader,
+        $sDescription,
+        $sActionUrl,
+        $sActionLabel,
+        $sCancelUrl,
+        string $sCancelLabel = 'Cancel'
+    ): string {
+        return <<<HTML
 <div id="message" class="alert alert-block alert-error">
 	<!--a class="close" data-dismiss="alert" href="#">&times;</a-->
 	<h3 class="alert-heading">{$sHeader}</h3>
@@ -79,7 +114,5 @@ HTML;
 	</p>
 </div>
 HTML;
-
-        return $sHtml;
     }
 }

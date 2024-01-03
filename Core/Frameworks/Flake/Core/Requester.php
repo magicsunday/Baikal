@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,24 +29,46 @@
 
 namespace Flake\Core;
 
-abstract class Requester extends \Flake\Core\FLObject {
-    protected $sModelClass = '';
-    protected $sOrderField = '';
-    protected $sOrderDirection = 'ASC';
-    protected $iLimitStart = false;
-    protected $iLimitNumber = false;
+/**
+ *
+ */
+abstract class Requester extends FLObject
+{
+    protected string $sModelClass = '';
+    protected string $sOrderField = '';
+    protected string $sOrderDirection = 'ASC';
+    protected bool|int $iLimitStart = false;
+    protected bool|int $iLimitNumber = false;
 
-    public function __construct($sModelClass) {
+    /**
+     * @param string $sModelClass
+     */
+    public function __construct(string $sModelClass)
+    {
         $this->sModelClass = $sModelClass;
     }
 
-    protected function addClause($sField, $sValue) {
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return $this
+     */
+    protected function addClause(string $sField, string $sValue): Requester
+    {
         $this->addClauseEquals($sField, $sValue);
 
         return $this;
     }
 
-    public function limit($iStart, $iNumber = false) {
+    /**
+     * @param int      $iStart
+     * @param bool|int $iNumber
+     *
+     * @return $this
+     */
+    public function limit(int $iStart, bool|int $iNumber = false): Requester
+    {
         if ($iNumber !== false) {
             return $this->setLimitStart($iStart)->setLimitNumber($iNumber);
         }
@@ -52,28 +76,59 @@ abstract class Requester extends \Flake\Core\FLObject {
         return $this->setLimitStart($iStart);
     }
 
-    public function orderBy($sOrderField, $sOrderDirection = "ASC") {
+    /**
+     * @param string $sOrderField
+     * @param string $sOrderDirection
+     *
+     * @return $this
+     */
+    public function orderBy(string $sOrderField, string $sOrderDirection = 'ASC'): Requester
+    {
         $this->sOrderField = $sOrderField;
         $this->sOrderDirection = $sOrderDirection;
 
         return $this;
     }
 
-    public function setLimitStart($iLimitStart) {
+    /**
+     * @param int $iLimitStart
+     *
+     * @return $this
+     */
+    public function setLimitStart(int $iLimitStart): Requester
+    {
         $this->iLimitStart = $iLimitStart;
 
         return $this;
     }
 
-    public function setLimitNumber($iLimitNumber) {
+    /**
+     * @param int $iLimitNumber
+     *
+     * @return $this
+     */
+    public function setLimitNumber(int $iLimitNumber): Requester
+    {
         $this->iLimitNumber = $iLimitNumber;
 
         return $this;
     }
 
-    abstract public function addClauseEquals($sField, $sValue);
+    /**
+     * @param string $sField
+     * @param string $sValue
+     *
+     * @return mixed
+     */
+    abstract public function addClauseEquals(string $sField, string $sValue);
 
-    abstract public function execute();
+    /**
+     * @return mixed
+     */
+    abstract public function execute(): mixed;
 
-    abstract public function count();
+    /**
+     * @return int
+     */
+    abstract public function count(): int;
 }

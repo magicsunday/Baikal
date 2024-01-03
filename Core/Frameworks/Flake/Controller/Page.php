@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,105 +29,186 @@
 
 namespace Flake\Controller;
 
-class Page extends \Flake\Core\Render\Container {
-    protected $sTitle = "";
-    protected $sMetaKeywords = "";
-    protected $sMetaDescription = "";
-    protected $sTemplatePath = "";
+use Flake\Core\Render\Container;
+use Flake\Core\Template;
+use Flake\Util\Frameworks;
+use Flake\Util\Tools;
+use Frameworks\LessPHP\Delegate;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+
+/**
+ *
+ */
+class Page extends Container
+{
+    protected string $sTitle = '';
+    protected string $sMetaKeywords = '';
+    protected string $sMetaDescription = '';
+    protected string $sTemplatePath = '';
 
     /**
      * @var string
      */
-    private $sBaseUrl;
+    private string $sBaseUrl;
 
-    public function __construct($sTemplatePath) {
+    /**
+     * @param string $sTemplatePath
+     */
+    public function __construct(string $sTemplatePath)
+    {
         $this->sTemplatePath = $sTemplatePath;
     }
 
-    public function setTitle($sTitle) {
+    /**
+     * @param $sTitle
+     *
+     * @return void
+     */
+    public function setTitle($sTitle): void
+    {
         $this->sTitle = $sTitle;
     }
 
-    public function setMetaKeywords($sKeywords) {
+    /**
+     * @param $sKeywords
+     *
+     * @return void
+     */
+    public function setMetaKeywords($sKeywords): void
+    {
         $this->sMetaKeywords = $sKeywords;
     }
 
-    public function setMetaDescription($sDescription) {
+    /**
+     * @param $sDescription
+     *
+     * @return void
+     */
+    public function setMetaDescription($sDescription): void
+    {
         $this->sMetaDescription = $sDescription;
     }
 
-    public function getTitle() {
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
         return $this->sTitle;
     }
 
-    public function getMetaKeywords() {
-        $sString = str_replace(["le", "la", "les", "de", "des", "un", "une"], " ", $this->sMetaKeywords);
-        $sString = \Flake\Util\Tools::stringToUrlToken($sString);
+    /**
+     * @return string
+     */
+    public function getMetaKeywords(): string
+    {
+        $sString = str_replace([
+            'le',
+            'la',
+            'les',
+            'de',
+            'des',
+            'un',
+            'une',
+        ], ' ', $this->sMetaKeywords);
+        $sString = Tools::stringToUrlToken($sString);
 
-        return implode(", ", explode("-", $sString));
+        return implode(', ', explode('-', $sString));
     }
 
-    public function getMetaDescription() {
+    /**
+     * @return string
+     */
+    public function getMetaDescription(): string
+    {
         return $this->sMetaDescription;
     }
 
-    public function setBaseUrl($sBaseUrl) {
+    /**
+     * @param $sBaseUrl
+     *
+     * @return void
+     */
+    public function setBaseUrl($sBaseUrl): void
+    {
         $this->sBaseUrl = $sBaseUrl;
     }
 
-    public function getBaseUrl() {
+    /**
+     * @return string
+     */
+    public function getBaseUrl(): string
+    {
         return $this->sBaseUrl;
     }
 
-    public function injectHTTPHeaders() {
-        header("Content-Type: text/html; charset=UTF-8");
+    /**
+     * @return void
+     */
+    public function injectHTTPHeaders(): void
+    {
+        header('Content-Type: text/html; charset=UTF-8');
 
-        header("X-Frame-Options: DENY");    # Prevent Clickjacking attacks
-        header("X-Content-Type-Options: nosniff");    # Prevent code injection via mime type sniffing
+        header('X-Frame-Options: DENY');    # Prevent Clickjacking attacks
+        header('X-Content-Type-Options: nosniff');    # Prevent code injection via mime type sniffing
     }
 
-    public function render() {
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render(): string
+    {
         $this->execute();
 
         $aRenderedBlocks = $this->renderBlocks();
-        $aRenderedBlocks["pagetitle"] = $this->getTitle();
-        $aRenderedBlocks["pagemetakeywords"] = $this->getMetaKeywords();
-        $aRenderedBlocks["pagemetadescription"] = $this->getMetaDescription();
-        $aRenderedBlocks["baseurl"] = $this->getBaseUrl();
+        $aRenderedBlocks['pagetitle'] = $this->getTitle();
+        $aRenderedBlocks['pagemetakeywords'] = $this->getMetaKeywords();
+        $aRenderedBlocks['pagemetadescription'] = $this->getMetaDescription();
+        $aRenderedBlocks['baseurl'] = $this->getBaseUrl();
 
-        $oTemplate = new \Flake\Core\Template($this->sTemplatePath);
-        $sHtml = $oTemplate->parse(
+        return (new Template($this->sTemplatePath))->parse(
             $aRenderedBlocks
         );
-
-        return $sHtml;
     }
 
-    public function addCss($sCssAbsPath) {
-        if (\Flake\Util\Frameworks::enabled("LessPHP")) {
+    /**
+     * @param $sCssAbsPath
+     *
+     * @return void
+     */
+    public function addCss($sCssAbsPath): void
+    {
+        if (Frameworks::enabled('LessPHP')) {
             $sCompiledPath = PATH_buildcss;
             $sFileName = basename($sCssAbsPath);
 
-            $sCompiledFilePath = $sCompiledPath . \Flake\Util\Tools::shortMD5($sFileName) . "_" . $sFileName;
+            $sCompiledFilePath = $sCompiledPath . Tools::shortMD5($sFileName) . '_' . $sFileName;
 
-            if (substr(strtolower($sCompiledFilePath), -4) !== ".css") {
-                $sCompiledFilePath .= ".css";
+            if (!str_ends_with(strtolower($sCompiledFilePath), '.css')) {
+                $sCompiledFilePath .= '.css';
             }
 
             if (!file_exists($sCompiledPath)) {
-                @mkdir($sCompiledPath);
+                if (!mkdir($sCompiledPath) && !is_dir($sCompiledPath)) {
+                    throw new RuntimeException(sprintf('Directory "%s" was not created', $sCompiledPath));
+                }
                 if (!file_exists($sCompiledPath)) {
-                    exit("Page: Cannot create " . $sCompiledPath);
+                    exit('Page: Cannot create ' . $sCompiledPath);
                 }
             }
 
-            \Frameworks\LessPHP\Delegate::compileCss($sCssAbsPath, $sCompiledFilePath);
-            $sCssUrl = \Flake\Util\Tools::serverToRelativeWebPath($sCompiledFilePath);
+            Delegate::compileCss($sCssAbsPath, $sCompiledFilePath);
+            $sCssUrl = Tools::serverToRelativeWebPath($sCompiledFilePath);
         } else {
-            $sCssUrl = \Flake\Util\Tools::serverToRelativeWebPath($sCssAbsPath);
+            $sCssUrl = Tools::serverToRelativeWebPath($sCssAbsPath);
         }
 
-        $sHtml = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $sCssUrl . "\" media=\"all\"/>";
-        $this->zone("head")->addBlock(new \Flake\Controller\HtmlBlock($sHtml));
+        $sHtml = '<link rel="stylesheet" type="text/css" href="' . $sCssUrl . '" media="all"/>';
+        $this->zone('head')->addBlock(new HtmlBlock($sHtml));
     }
 }

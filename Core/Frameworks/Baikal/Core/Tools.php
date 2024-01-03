@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,15 +29,41 @@
 
 namespace Baikal\Core;
 
-class Tools {
-    static function &db() {
-        return $GLOBALS["pdo"];
+use DateTimeZone;
+use Exception;
+use Flake\Core\Database;
+use Flake\Framework;
+use PDO;
+use ReflectionException;
+use RuntimeException;
+
+use function count;
+use function defined;
+use function in_array;
+use function is_writable;
+use function sys_get_temp_dir;
+
+/**
+ *
+ */
+class Tools
+{
+    /**
+     * @return mixed
+     */
+    public static function db()
+    {
+        return $GLOBALS['pdo'];
     }
 
-    static function assertEnvironmentIsOk() {
+    /**
+     * @return void
+     */
+    public static function assertEnvironmentIsOk(): void
+    {
         # Asserting Baikal Context
-        if (!defined("BAIKAL_CONTEXT") || BAIKAL_CONTEXT !== true) {
-            exit("Bootstrap.php may not be included outside the Baikal context");
+        if (!defined('BAIKAL_CONTEXT') || BAIKAL_CONTEXT !== true) {
+            exit('Bootstrap.php may not be included outside the Baikal context');
         }
 
         # Asserting PDO
@@ -44,31 +72,49 @@ class Tools {
         }
 
         # Asserting PDO::SQLite or PDO::MySQL
-        $aPDODrivers = \PDO::getAvailableDrivers();
+        $aPDODrivers = PDO::getAvailableDrivers();
         if (!in_array('sqlite', $aPDODrivers, true) && !in_array('mysql', $aPDODrivers, true)) {
             exit('<strong>Baikal Fatal Error</strong>: Both <strong>PDO::sqlite</strong> and <strong>PDO::mysql</strong> are unavailable. One of them at least is required by Baikal.');
         }
 
         # Assert that the temp folder is writable
-        if (!\is_writable(\sys_get_temp_dir())) {
+        if (!is_writable(sys_get_temp_dir())) {
             exit('<strong>Baikal Fatal Error</strong>: The system temp directory is not writable.');
         }
     }
 
-    static function configureEnvironment() {
+    /**
+     * @return void
+     */
+    public static function configureEnvironment(): void
+    {
         set_exception_handler('\Baikal\Core\Tools::handleException');
-        ini_set("error_reporting", E_ALL);
+        ini_set('error_reporting', E_ALL);
     }
 
-    static function handleException($exception) {
-        echo "<pre>" . $exception . "<pre>";
+    /**
+     * @param $exception
+     *
+     * @return void
+     */
+    public static function handleException($exception): void
+    {
+        echo '<pre>' . $exception . '<pre>';
     }
 
-    static function assertBaikalIsOk() {
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    public static function assertBaikalIsOk(): void
+    {
         # DB connexion has not been asserted earlier by Flake, to give us a chance to trigger the install tool
         # We assert it right now
-        if (!\Flake\Framework::isDBInitialized() && (!defined("BAIKAL_CONTEXT_INSTALL") || BAIKAL_CONTEXT_INSTALL === false)) {
-            throw new \Exception("<strong>Fatal error</strong>: no connection to a database is available.");
+        if (!Framework::isDBInitialized() && (!defined('BAIKAL_CONTEXT_INSTALL') || BAIKAL_CONTEXT_INSTALL === false)) {
+            throw new RuntimeException('<strong>Fatal error</strong>: no connection to a database is available.');
         }
 
         # Asserting that the database is structurally complete
@@ -77,35 +123,51 @@ class Tools {
         #}
 
         # Asserting config file exists
-        if (!file_exists(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            throw new \Exception("config/baikal.yaml does not exist. Please use the Install tool to create it or duplicate baikal.yaml.dist.");
+        if (!file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            throw new RuntimeException(
+                'config/baikal.yaml does not exist. Please use the Install tool to create it or duplicate baikal.yaml.dist.'
+            );
         }
 
         # Asserting config file is readable
-        if (!is_readable(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            throw new \Exception("config/baikal.yaml is not readable. Please give read permissions to httpd user on file 'config/baikal.yaml'.");
+        if (!is_readable(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            throw new RuntimeException(
+                "config/baikal.yaml is not readable. Please give read permissions to httpd user on file 'config/baikal.yaml'."
+            );
         }
 
         # Asserting config file is writable
-        if (!is_writable(PROJECT_PATH_CONFIG . "baikal.yaml")) {
-            throw new \Exception("config/baikal.yaml is not writable. Please give write permissions to httpd user on file 'config/baikal.yaml'.");
+        if (!is_writable(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
+            throw new RuntimeException(
+                "config/baikal.yaml is not writable. Please give write permissions to httpd user on file 'config/baikal.yaml'."
+            );
         }
     }
 
-    static function getRequiredTablesList() {
+    /**
+     * @return string[]
+     */
+    public static function getRequiredTablesList(): array
+    {
         return [
-            "addressbooks",
-            "calendarobjects",
-            "calendars",
-            "cards",
-            "groupmembers",
-            "locks",
-            "principals",
-            "users",
+            'addressbooks',
+            'calendarobjects',
+            'calendars',
+            'cards',
+            'groupmembers',
+            'locks',
+            'principals',
+            'users',
         ];
     }
 
-    static function isDBStructurallyComplete(\Flake\Core\Database $oDB) {
+    /**
+     * @param Database $oDB
+     *
+     * @return array|true
+     */
+    public static function isDBStructurallyComplete(Database $oDB): array|true
+    {
         $aRequiredTables = self::getRequiredTablesList();
         $aPresentTables = $oDB->tables();
 
@@ -117,7 +179,13 @@ class Tools {
         return true;
     }
 
-    static function bashPrompt($prompt) {
+    /**
+     * @param $prompt
+     *
+     * @return string
+     */
+    public static function bashPrompt($prompt): string
+    {
         echo $prompt;
         @flush();
         @ob_flush();
@@ -125,7 +193,13 @@ class Tools {
         return @trim(fgets(STDIN));
     }
 
-    static function bashPromptSilent($prompt = "Enter Password:") {
+    /**
+     * @param string $prompt
+     *
+     * @return string|void
+     */
+    public static function bashPromptSilent(string $prompt = 'Enter Password:')
+    {
         $command = "/usr/bin/env bash -c 'echo OK'";
 
         if (rtrim(shell_exec($command)) !== 'OK') {
@@ -135,8 +209,8 @@ class Tools {
         }
 
         $command = "/usr/bin/env bash -c 'read -s -p \""
-        . addslashes($prompt)
-        . "\" mypassword && echo \$mypassword'";
+            . addslashes($prompt)
+            . "\" mypassword && echo \$mypassword'";
 
         $password = rtrim(shell_exec($command));
         echo "\n";
@@ -144,16 +218,29 @@ class Tools {
         return $password;
     }
 
-    static function getCopyrightNotice($sLinePrefixChar = "#", $sLineSuffixChar = "", $sOpening = false, $sClosing = false) {
+    /**
+     * @param string      $sLinePrefixChar
+     * @param string      $sLineSuffixChar
+     * @param string|bool $sOpening
+     * @param string|bool $sClosing
+     *
+     * @return string
+     */
+    public static function getCopyrightNotice(
+        string $sLinePrefixChar = '#',
+        string $sLineSuffixChar = '',
+        string|bool $sOpening = false,
+        string|bool $sClosing = false
+    ): string {
         if ($sOpening === false) {
-            $sOpening = str_repeat("#", 78);
+            $sOpening = str_repeat('#', 78);
         }
 
         if ($sClosing === false) {
-            $sClosing = str_repeat("#", 78);
+            $sClosing = str_repeat('#', 78);
         }
 
-        $iYear = date("Y");
+        $iYear = date('Y');
 
         $sCode = <<<CODE
 Copyright notice
@@ -185,19 +272,23 @@ CODE;
             $aCode[$iLineNum] = trim($sLinePrefixChar . "\t" . $aCode[$iLineNum]);
         }
 
-        if (trim($sOpening) !== "") {
+        if (trim($sOpening) !== '') {
             array_unshift($aCode, $sOpening);
         }
 
-        if (trim($sClosing) !== "") {
+        if (trim($sClosing) !== '') {
             $aCode[] = $sClosing;
         }
 
         return implode("\n", $aCode);
     }
 
-    static function timezones() {
-        $aZones = \DateTimeZone::listIdentifiers();
+    /**
+     * @return array
+     */
+    public static function timezones(): array
+    {
+        $aZones = DateTimeZone::listIdentifiers();
 
         reset($aZones);
 

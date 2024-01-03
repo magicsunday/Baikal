@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,94 +29,172 @@
 
 namespace Flake\Core\Model;
 
-abstract class Db extends \Flake\Core\Model {
-    protected $bFloating = true;
+use Exception;
+use Flake\Core\CollectionTyped;
+use Flake\Core\Database;
+use Flake\Core\Model;
+use Flake\Core\Requester\Sql;
+use ReflectionException;
+use RuntimeException;
 
-    public function __construct($sPrimary = false) {
-        if ($sPrimary === false) {
+use function get_class;
+
+/**
+ *
+ */
+abstract class Db extends Model
+{
+    /**
+     * @var bool
+     */
+    protected bool $bFloating = true;
+
+    /**
+     * @param false|string|int $sPrimary
+     *
+     * @throws Exception
+     */
+    public function __construct(false|string|int $sPrimary = false)
+    {
+        if ($sPrimary !== false) {
+            $this->initByPrimary($sPrimary);
+            $this->bFloating = false;
+        } else {
             # Object will be floating
             $this->initFloating();
             $this->bFloating = true;
-        } else {
-            $this->initByPrimary($sPrimary);
-            $this->bFloating = false;
         }
     }
 
-    public static function &getBaseRequester() {
-        $oRequester = new \Flake\Core\Requester\Sql(get_called_class());
+    /**
+     * @return Sql
+     */
+    public static function getBaseRequester(): Sql
+    {
+        $oRequester = new Sql(static::class);
         $oRequester->setDataTable(self::getDataTable());
 
         return $oRequester;
     }
 
-    public static function &getByRequest(\Flake\Core\Requester\Sql $oRequester) {
+    /**
+     * @throws ReflectionException
+     */
+    public static function getByRequest(Sql $oRequester): CollectionTyped
+    {
         // renvoie une collection de la classe du modèle courant (this)
         return $oRequester->execute();
     }
 
-    public static function getDataTable() {
-        $sClass = get_called_class();
+    /**
+     * @return string
+     */
+    public static function getDataTable(): string
+    {
+        $sClass = static::class;
 
         return $sClass::DATATABLE;
     }
 
-    public static function getPrimaryKey() {
-        $sClass = get_called_class();
+    /**
+     * @return string
+     */
+    public static function getPrimaryKey(): string
+    {
+        $sClass = static::class;
 
         return $sClass::PRIMARYKEY;
     }
 
-    public function getPrimary() {
+    /**
+     * @throws Exception
+     */
+    public function getPrimary(): string|int
+    {
         return $this->get(self::getPrimaryKey());
     }
 
-    protected function initByPrimary($sPrimary) {
-        $rSql = $GLOBALS["DB"]->exec_SELECTquery(
-            "*",
+    /**
+     * @param string|int $sPrimary
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    protected function initByPrimary(string|int $sPrimary): void
+    {
+        /** @var Database $db */
+        $db = $GLOBALS['DB'];
+
+        $rSql = $db->exec_SELECTquery(
+            '*',
             self::getDataTable(),
-            self::getPrimaryKey() . "='" . $GLOBALS["DB"]->quote($sPrimary) . "'"
+            self::getPrimaryKey() . "='" . $db->quote((string)$sPrimary) . "'"
         );
 
         if (($aRs = $rSql->fetch()) === false) {
-            throw new \Exception("\Flake\Core\Model '" . htmlspecialchars($sPrimary) . "' not found for model " . get_class($this));
+            throw new RuntimeException(
+                "\Flake\Core\Model '" . htmlspecialchars($sPrimary) . "' not found for model " . get_class($this)
+            );
         }
 
         reset($aRs);
         $this->aData = $aRs;
     }
 
-    public function persist() {
+    /**
+     * @throws Exception
+     */
+    public function persist(): void
+    {
+        /** @var Database $db */
+        $db = $GLOBALS['DB'];
+
         if ($this->floating()) {
-            $GLOBALS["DB"]->exec_INSERTquery(
+            $db->exec_INSERTquery(
                 self::getDataTable(),
                 $this->getData()
             );
 
-            $sPrimary = $GLOBALS["DB"]->lastInsertId();
+            $sPrimary = $db->lastInsertId();
             $this->initByPrimary($sPrimary);
             $this->bFloating = false;
         } else {
-            $GLOBALS["DB"]->exec_UPDATEquery(
+            $db->exec_UPDATEquery(
                 self::getDataTable(),
-                self::getPrimaryKey() . "='" . $GLOBALS["DB"]->quote($this->getPrimary()) . "'",
+                self::getPrimaryKey() . "='" . $db->quote((string)$this->getPrimary()) . "'",
                 $this->getData()
             );
         }
     }
 
-    public function destroy() {
-        $GLOBALS["DB"]->exec_DELETEquery(
+    /**
+     * @throws Exception
+     */
+    public function destroy(): void
+    {
+        /** @var Database $db */
+        $db = $GLOBALS['DB'];
+
+        $db->exec_DELETEquery(
             self::getDataTable(),
-            self::getPrimaryKey() . "='" . $GLOBALS["DB"]->quote($this->getPrimary()) . "'"
+            self::getPrimaryKey() . "='" . $db->quote((string)$this->getPrimary()) . "'"
         );
     }
 
-    protected function initFloating() {
+    /**
+     * @return void
+     */
+    protected function initFloating(): void
+    {
         # nothing; object will be blank
     }
 
-    public function floating() {
+    /**
+     * @return bool
+     */
+    public function floating(): bool
+    {
         return $this->bFloating;
     }
 }

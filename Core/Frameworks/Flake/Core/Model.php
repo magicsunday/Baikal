@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,20 +29,53 @@
 
 namespace Flake\Core;
 
-abstract class Model extends \Flake\Core\FLObject {
-    protected $aData = [];
+use Exception;
+use Formal\Form;
+use Formal\Form\Morphology;
+use RuntimeException;
 
-    protected function getData() {
+use function array_key_exists;
+use function get_class;
+
+/**
+ *
+ */
+abstract class Model extends FLObject
+{
+    /**
+     * @var array<bool|int|string|null>
+     */
+    protected array $aData = [];
+
+    /**
+     * @return array<bool|int|string|null>
+     */
+    protected function getData(): array
+    {
         reset($this->aData);
 
         return $this->aData;
     }
 
-    public function __get($sPropName) {
+    /**
+     * @param string $sPropName
+     *
+     * @return bool|int|string|null
+     *
+     * @throws Exception
+     */
+    public function __get(string $sPropName): bool|int|string|null
+    {
         return $this->get($sPropName);
     }
 
-    public function __isset($name) {
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset(string $name): bool
+    {
         if (array_key_exists($name, $this->aData)) {
             return true;
         }
@@ -48,63 +83,122 @@ abstract class Model extends \Flake\Core\FLObject {
         return false;
     }
 
-    public function get($sPropName) {
+    /**
+     * @param string $sPropName
+     *
+     * @return bool|int|string|null
+     */
+    public function get(string $sPropName): bool|int|string|null
+    {
         if (array_key_exists($sPropName, $this->aData)) {
             return $this->aData[$sPropName];
         }
 
-        throw new \Exception("\Flake\Core\Model->get(): property " . htmlspecialchars($sPropName) . " does not exist on " . get_class($this));
+        throw new RuntimeException(
+            "\Flake\Core\Model->get(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . get_class(
+                $this
+            )
+        );
     }
 
-    public function set($sPropName, $sPropValue) {
+    /**
+     * @param string               $sPropName
+     * @param bool|int|string|null $sPropValue
+     *
+     * @return Model
+     */
+    public function set(string $sPropName, bool|int|string|null $sPropValue): Model
+    {
         if (array_key_exists($sPropName, $this->aData)) {
             $this->aData[$sPropName] = $sPropValue;
 
             return $this;
         }
 
-        throw new \Exception("\Flake\Core\Model->set(): property " . htmlspecialchars($sPropName) . " does not exist on " . get_class($this));
+        throw new RuntimeException(
+            "\Flake\Core\Model->set(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . get_class(
+                $this
+            )
+        );
     }
 
-    public function label() {
-        return $this->get($this::LABELFIELD);
+    /**
+     * @throws Exception
+     */
+    public function label(): string
+    {
+        return (string)$this->get($this::LABELFIELD);
     }
 
-    public static function icon() {
-        return "icon-book";
+    /**
+     * @return string
+     */
+    public static function icon(): string
+    {
+        return 'icon-book';
     }
 
-    public static function mediumicon() {
-        return "glyph-book";
+    /**
+     * @return string
+     */
+    public static function mediumicon(): string
+    {
+        return 'glyph-book';
     }
 
-    public static function bigicon() {
-        return "glyph2x-book";
+    /**
+     * @return string
+     */
+    public static function bigicon(): string
+    {
+        return 'glyph2x-book';
     }
 
-    public static function humanName() {
-        $aRes = explode("\\", get_called_class());
+    /**
+     * @return string|null
+     */
+    public static function humanName(): ?string
+    {
+        $aRes = explode("\\", static::class);
 
         return array_pop($aRes);
     }
 
-    public function floating() {
+    /**
+     * @return bool
+     */
+    public function floating(): bool
+    {
         return true;
     }
 
-    public function formForThisModelInstance($options = []) {
+    /**
+     * @throws Exception
+     */
+    public function formForThisModelInstance($options = []): Form
+    {
         $sClass = get_class($this);
-        $oForm = new \Formal\Form($sClass, $options);
+        $oForm = new Form($sClass, $options);
         $oForm->setModelInstance($this);
 
         return $oForm;
     }
 
-    public function formMorphologyForThisModelInstance() {
-        throw new \Exception(get_class($this) . ": No form morphology provided for Model.");
+    /**
+     * @throws Exception
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        throw new RuntimeException(get_class($this) . ': No form morphology provided for Model.');
     }
 
-    abstract public function persist();
+    /**
+     * @return void
+     */
+    abstract public function persist(): void;
 
-    abstract public function destroy();
+    /**
+     * @return void
+     */
+    abstract public function destroy(): void;
 }

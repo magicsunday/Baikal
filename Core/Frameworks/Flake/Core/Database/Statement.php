@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,16 +29,33 @@
 
 namespace Flake\Core\Database;
 
-class Statement extends \Flake\Core\FLObject {
-    protected $stmt;
+use Flake\Core\FLObject;
+use PDO;
+use PDOStatement;
 
-    public function __construct($stmt) {
+/**
+ *
+ */
+class Statement extends FLObject
+{
+    protected bool|PDOStatement $stmt = false;
+
+    /**
+     * @param $stmt
+     */
+    public function __construct($stmt)
+    {
         $this->stmt = $stmt;
     }
 
-    public function fetch() {
+    /**
+     * @return false|mixed The return value of this function on success depends on the fetch type.
+     *                     In all cases, FALSE is returned on failure.
+     */
+    public function fetch(): mixed
+    {
         if ($this->stmt !== false) {
-            return $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_FIRST);
+            return $this->stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_FIRST);
         }
 
         return false;

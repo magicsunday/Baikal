@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,76 +29,133 @@
 
 namespace Formal;
 
-abstract class Element {
-    protected $aOptions = [
-        "class"           => "",
-        "inputclass"      => "input-xlarge",
-        "readonly"        => false,
-        "validation"      => "",
-        "error"           => false,
-        "placeholder"     => "",
-        "help"            => "",
-        "popover"         => "",
-        "refreshonchange" => false,
+use Exception;
+use Flake\Util\Tools;
+use RuntimeException;
+
+use function array_key_exists;
+use function get_class;
+use function is_array;
+
+/**
+ *
+ */
+abstract class Element
+{
+    /**
+     * @var array<string, string|bool>
+     */
+    protected array $aOptions = [
+        'class'           => '',
+        'inputclass'      => 'input-xlarge',
+        'readonly'        => false,
+        'validation'      => '',
+        'error'           => false,
+        'placeholder'     => '',
+        'help'            => '',
+        'popover'         => '',
+        'refreshonchange' => false,
     ];
 
-    protected $sValue = "";
+    protected string|bool $sValue = '';
 
-    function __construct($aOptions) {
+    /**
+     * @param $aOptions
+     */
+    public function __construct(array $aOptions)
+    {
         $this->aOptions = array_merge($this->aOptions, $aOptions);
     }
 
-    function option($sName) {
+    /**
+     * @throws Exception
+     */
+    public function option(string $sName)
+    {
         if (array_key_exists($sName, $this->aOptions)) {
             return $this->aOptions[$sName];
         }
 
-        throw new \Exception("\Formal\Element->option(): Option '" . htmlspecialchars($sName) . "' not found.");
+        throw new RuntimeException("\Formal\Element->option(): Option '" . htmlspecialchars($sName) . "' not found.");
     }
 
-    function optionArray($sOptionName) {
+    /**
+     * @throws Exception
+     */
+    public function optionArray(string $sOptionName): array
+    {
         $sOption = trim($this->option($sOptionName));
-        if ($sOption !== "") {
-            $aOptions = explode(",", $sOption);
+        if ($sOption !== '') {
+            $aOptions = explode(',', $sOption);
         } else {
             $aOptions = [];
         }
 
-        reset($aOptions);
-
         return $aOptions;
     }
 
-    function setOption($sOptionName, $sOptionValue) {
+    /**
+     * @param string      $sOptionName
+     * @param string|bool $sOptionValue
+     *
+     * @return void
+     */
+    public function setOption(string $sOptionName, string|bool $sOptionValue): void
+    {
         $this->aOptions[$sOptionName] = $sOptionValue;
     }
 
-    function value() {
+    /**
+     * @return string|bool
+     */
+    public function value(): string|bool
+    {
         return $this->sValue;
     }
 
-    function setValue($sValue) {
+    /**
+     * @param string|bool $sValue
+     *
+     * @return void
+     */
+    public function setValue(string|bool $sValue): void
+    {
         $this->sValue = $sValue;
     }
 
-    function __toString() {
-        return get_class($this) . "<" . $this->option("label") . ">";
+    /**
+     * @throws Exception
+     */
+    public function __toString()
+    {
+        return get_class($this) . '<' . $this->option('label') . '>';
     }
 
-    function renderWitness() {
-        return '<input type="hidden" name="witness[' . $this->option("prop") . ']" value="1" />';
+    /**
+     * @throws Exception
+     */
+    public function renderWitness(): string
+    {
+        return '<input type="hidden" name="witness[' . $this->option('prop') . ']" value="1" />';
     }
 
-    function posted() {
-        $aPost = \Flake\Util\Tools::POST("witness");
+    /**
+     * @throws Exception
+     */
+    public function posted(): bool
+    {
+        $aPost = Tools::POST('witness');
         if (is_array($aPost)) {
-            $sProp = $this->option("prop");
+            $sProp = $this->option('prop');
 
-            return (array_key_exists($sProp, $aPost)) && (intval($aPost[$sProp]) === 1);
+            return (array_key_exists($sProp, $aPost)) && ((int)$aPost[$sProp] === 1);
         }
 
         return false;
     }
 
-    abstract function render();
+    /**
+     * @return string
+     */
+    abstract public function render(): string;
 }

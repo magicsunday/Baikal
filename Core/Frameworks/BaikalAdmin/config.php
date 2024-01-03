@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -25,14 +27,22 @@
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
-define("BAIKALADMIN_PATH_TEMPLATES", BAIKALADMIN_PATH_ROOT . "Resources/Templates/");
+define('BAIKALADMIN_PATH_TEMPLATES', BAIKALADMIN_PATH_ROOT . 'Resources/Templates/');
 
-$GLOBALS["ROUTES"] = [
-    "default"            => "\BaikalAdmin\Route\Dashboard",
-    "users"              => "\BaikalAdmin\Route\Users",
-    "users/calendars"    => "\BaikalAdmin\Route\User\Calendars",
-    "users/addressbooks" => "\BaikalAdmin\Route\User\AddressBooks",
-    "settings/standard"  => "\BaikalAdmin\Route\Settings\Standard",
-    "settings/database"  => "\BaikalAdmin\Route\Settings\Database",
-    "logout"             => "\BaikalAdmin\Route\Logout",
+$GLOBALS['ROUTES'] = [
+    'default'            => '\BaikalAdmin\Route\Dashboard',
+    'users'              => '\BaikalAdmin\Route\Users',
+    'users/calendars'    => '\BaikalAdmin\Route\User\Calendars',
+    'users/addressbooks' => '\BaikalAdmin\Route\User\AddressBooks',
+    'settings/standard'  => '\BaikalAdmin\Route\Settings\Standard',
+    'settings/database'  => '\BaikalAdmin\Route\Settings\Database',
+    'logout'             => '\BaikalAdmin\Route\Logout',
+
+    //    'default'            => Dashboard::class,
+    //    'users'              => Users::class,
+    //    'users/calendars'    => Calendars::class,
+    //    'users/addressbooks' => AddressBooks::class,
+    //    'settings/standard'  => Standard::class,
+    //    'settings/database'  => Database::class,
+    //    'logout'             => Logout::class,
 ];

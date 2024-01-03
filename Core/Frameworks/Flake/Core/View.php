@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,22 +29,53 @@
 
 namespace Flake\Core;
 
-abstract class View extends \Flake\Core\FLObject {
-    protected $aData;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
-    public function __construct() {
+use function array_key_exists;
+
+/**
+ *
+ */
+abstract class View extends FLObject
+{
+    protected array $aData;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
         $this->aData = [];
     }
 
-    public function setData($sName, $mData) {
+    /**
+     * @param string $sName
+     * @param mixed  $mData
+     *
+     * @return void
+     */
+    public function setData(string $sName, mixed $mData): void
+    {
         $this->aData[$sName] = $mData;
     }
 
-    public function getData() {
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
         return $this->aData;
     }
 
-    public function get($sWhat) {
+    /**
+     * @param string $sWhat
+     *
+     * @return false|mixed
+     */
+    public function get(string $sWhat)
+    {
         if (array_key_exists($sWhat, $this->aData)) {
             return $this->aData[$sWhat];
         }
@@ -50,12 +83,19 @@ abstract class View extends \Flake\Core\FLObject {
         return false;
     }
 
-    public function render() {
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    public function render(): string
+    {
         $sTemplatePath = $this->templatesPath();
-        $oTemplate = new \Flake\Core\Template($this->templatesPath());
-
-        return $oTemplate->parse($this->getData());
+        return (new Template($this->templatesPath()))->parse($this->getData());
     }
 
-    abstract public function templatesPath();
+    /**
+     * @return string
+     */
+    abstract public function templatesPath(): string;
 }

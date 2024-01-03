@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baikal\Core;
+
+use PDO;
+use Sabre\DAV\Auth\Backend\AbstractBasic;
+
+use function count;
 
 /**
  * This is an authentication backend that uses a database to manage passwords.
@@ -8,45 +15,48 @@ namespace Baikal\Core;
  * Format of the database tables must match to the one of \Sabre\DAV\Auth\Backend\PDO
  *
  * @copyright Copyright (C) 2013 Lukasz Janyst. All rights reserved.
- * @author Lukasz Janyst <ljanyst@buggybrain.net>
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @author    Lukasz Janyst <ljanyst@buggybrain.net>
+ * @license   http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDOBasicAuth extends \Sabre\DAV\Auth\Backend\AbstractBasic {
+class PDOBasicAuth extends AbstractBasic
+{
     /**
      * Reference to PDO connection.
      *
      * @var PDO
      */
-    protected $pdo;
+    protected PDO $pdo;
 
     /**
      * PDO table name we'll be using.
      *
      * @var string
      */
-    protected $tableName;
+    protected string $tableName;
 
     /**
      * Authentication realm.
      *
      * @var string
      */
-    protected $authRealm;
+    protected string $authRealm;
 
     /**
      * @var string
      */
-    private $currentUser;
+    private string $currentUser;
 
     /**
      * Creates the backend object.
      *
      * If the filename argument is passed in, it will parse out the specified file fist.
      *
-     * @param PDO $pdo
+     * @param PDO    $pdo
+     * @param        $authRealm
      * @param string $tableName The PDO table name to use
      */
-    function __construct(\PDO $pdo, $authRealm, $tableName = 'users') {
+    public function __construct(PDO $pdo, $authRealm, string $tableName = 'users')
+    {
         $this->pdo = $pdo;
         $this->tableName = $tableName;
         $this->authRealm = $authRealm;
@@ -63,7 +73,8 @@ class PDOBasicAuth extends \Sabre\DAV\Auth\Backend\AbstractBasic {
      *
      * @return bool
      */
-    function validateUserPass($username, $password) {
+    public function validateUserPass($username, $password): bool
+    {
         $stmt = $this->pdo->prepare('SELECT username, digesta1 FROM ' . $this->tableName . ' WHERE username = ?');
         $stmt->execute([$username]);
         $result = $stmt->fetchAll();

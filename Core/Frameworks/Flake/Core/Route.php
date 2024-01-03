@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -29,37 +31,54 @@ namespace Flake\Core;
 
 use Flake\Core\Render\Container;
 
-abstract class Route extends \Flake\Core\FLObject {
+use function array_key_exists;
+
+/**
+ *
+ */
+abstract class Route extends FLObject
+{
     # should be abstract, but is not, due to PHP strict standard
-    public static function layout(Container &$oRenderContainer) {
+    /**
+     * @param Container $oRenderContainer
+     *
+     * @return void
+     */
+    public static function layout(Container $oRenderContainer): void
+    {
     }
 
-    public static function parametersMap() {
+    /**
+     * @return array
+     */
+    public static function parametersMap(): array
+    {
         return [];
     }
 
     # converts raw url params "a/b/c/d"=[a, b, c, d] in route params [a=>b, c=>d]
 
-    public static function getParams() {
+    /**
+     * @return array
+     */
+    public static function getParams(): array
+    {
         $aRouteParams = [];
 
         $aParametersMap = static::parametersMap();    # static to use method as defined in derived class
-        $aURLParams = $GLOBALS["ROUTER"]::getURLParams();
+        $aURLParams = $GLOBALS['ROUTER']::getURLParams();
 
-        reset($aParametersMap);
         foreach ($aParametersMap as $sParam => $aMap) {
             $sURLToken = $sParam;
 
-            if (array_key_exists("urltoken", $aMap)) {
-                $sURLToken = $aMap["urltoken"];
+            if (array_key_exists('urltoken', $aMap)) {
+                $sURLToken = $aMap['urltoken'];
             }
 
-            if (($iPos = array_search($sURLToken, $aURLParams)) !== false) {
+            if (($iPos = array_search($sURLToken, $aURLParams, true)) !== false) {
                 $aRouteParams[$sParam] = $aURLParams[($iPos + 1)];    # the value corresponding to this param is the next one in the URL
             }
         }
-
-        reset($aRouteParams);
 
         return $aRouteParams;
     }

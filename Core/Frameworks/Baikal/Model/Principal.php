@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,12 +29,18 @@
 
 namespace Baikal\Model;
 
-class Principal extends \Flake\Core\Model\Db {
-    const DATATABLE = "principals";
-    const PRIMARYKEY = "id";
-    protected $aData = [
-        "uri"         => "",
-        "displayname" => "",
-        "email"       => "",
+use Flake\Core\Model\Db;
+
+/**
+ *
+ */
+class Principal extends Db
+{
+    public const DATATABLE = 'principals';
+    public const PRIMARYKEY = 'id';
+    protected array $aData = [
+        'uri'         => '',
+        'displayname' => '',
+        'email'       => '',
     ];
 }

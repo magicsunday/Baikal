@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,65 +29,86 @@
 
 namespace Baikal\Model\Config;
 
-class Database extends \Baikal\Model\Config {
+use Baikal\Model\Config;
+use Formal\Element\Checkbox;
+use Formal\Element\Password;
+use Formal\Element\Text;
+use Formal\Form\Morphology;
+use ReflectionException;
+
+/**
+ *
+ */
+class Database extends Config
+{
     # Default values
-    protected $aData = [
-        "sqlite_file"    => PROJECT_PATH_SPECIFIC . "db/db.sqlite",
-        "mysql"          => false,
-        "mysql_host"     => "",
-        "mysql_dbname"   => "",
-        "mysql_username" => "",
-        "mysql_password" => "",
-        "encryption_key" => "",
+    protected array $aData = [
+        'sqlite_file'    => PROJECT_PATH_SPECIFIC . 'db/db.sqlite',
+        'mysql'          => false,
+        'mysql_host'     => '',
+        'mysql_dbname'   => '',
+        'mysql_username' => '',
+        'mysql_password' => '',
+        'encryption_key' => '',
     ];
 
-    function __construct() {
-        parent::__construct("database");
+    public function __construct()
+    {
+        parent::__construct('database');
     }
 
-    function formMorphologyForThisModelInstance() {
-        $oMorpho = new \Formal\Form\Morphology();
+    /**
+     * @return Morphology
+     * @throws ReflectionException
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        $oMorpho = new Morphology();
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "sqlite_file",
-            "label"      => "SQLite file path",
-            "validation" => "required",
-            "inputclass" => "input-xxlarge",
-            "help"       => "The absolute server path to the SQLite file",
+        $oMorpho->add(new Text([
+            'prop'       => 'sqlite_file',
+            'label'      => 'SQLite file path',
+            'validation' => 'required',
+            'inputclass' => 'input-xxlarge',
+            'help'       => 'The absolute server path to the SQLite file',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Checkbox([
-            "prop"            => "mysql",
-            "label"           => "Use MySQL",
-            "help"            => "If checked, Baïkal will use MySQL instead of SQLite.",
-            "refreshonchange" => true,
+        $oMorpho->add(new Checkbox([
+            'prop'            => 'mysql',
+            'label'           => 'Use MySQL',
+            'help'            => 'If checked, Baïkal will use MySQL instead of SQLite.',
+            'refreshonchange' => true,
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "mysql_host",
-            "label" => "MySQL host",
-            "help"  => "Host ip or name, including ':portnumber' if port is not the default one (3306)",
+        $oMorpho->add(new Text([
+            'prop'  => 'mysql_host',
+            'label' => 'MySQL host',
+            'help'  => "Host ip or name, including ':portnumber' if port is not the default one (3306)",
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "mysql_dbname",
-            "label" => "MySQL database name",
+        $oMorpho->add(new Text([
+            'prop'  => 'mysql_dbname',
+            'label' => 'MySQL database name',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "mysql_username",
-            "label" => "MySQL username",
+        $oMorpho->add(new Text([
+            'prop'  => 'mysql_username',
+            'label' => 'MySQL username',
         ]));
 
-        $oMorpho->add(new \Formal\Element\Password([
-            "prop"  => "mysql_password",
-            "label" => "MySQL password",
+        $oMorpho->add(new Password([
+            'prop'  => 'mysql_password',
+            'label' => 'MySQL password',
         ]));
 
         return $oMorpho;
     }
 
-    function label() {
-        return "Baïkal Database Settings";
+    /**
+     * @return string
+     */
+    public function label(): string
+    {
+        return 'Baïkal Database Settings';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,41 +29,66 @@
 
 namespace Flake\Core\Datastructure;
 
+use Exception;
+use RuntimeException;
+use SplDoublyLinkedList;
+
 /**
- * @extends \SplDoublyLinkedList<\Flake\Core\Datastructure\Chainable>
+ * @extends SplDoublyLinkedList<Chainable>
  */
-class Chain extends \SplDoublyLinkedList {
-    public function push($value): void {
+class Chain extends SplDoublyLinkedList
+{
+    /**
+     * @param $value
+     *
+     * @return void
+     */
+    public function push($value): void
+    {
         $value->chain($this, $this->count());
         parent::push($value);
     }
 
-    public function offsetUnset($offset): void {
-        throw new \Exception("Cannot delete Chainable in Chain");
+    /**
+     * @throws Exception
+     */
+    public function offsetUnset($offset): void
+    {
+        throw new RuntimeException('Cannot delete Chainable in Chain');
     }
 
-    public function &first() {
-        $oRes = $this->bottom();
-
-        return $oRes;
+    /**
+     * @return mixed
+     */
+    public function first()
+    {
+        return $this->bottom();
     }
 
-    public function &last() {
-        $oRes = $this->top();
-
-        return $oRes;
+    /**
+     * @return mixed
+     */
+    public function last()
+    {
+        return $this->top();
     }
 
-    public function reset() {
-        reset($this);
+    /**
+     * @return void
+     */
+    public function reset(): void
+    {
     }
 
-    public function __toString() {
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
         ob_start();
         var_dump($this);
-        $sDump = ob_get_contents();
-        ob_end_clean();
+        $sDump = ob_get_clean();
 
-        return "<pre>" . htmlspecialchars($sDump) . "</pre>";
+        return '<pre>' . htmlspecialchars($sDump) . '</pre>';
     }
 }

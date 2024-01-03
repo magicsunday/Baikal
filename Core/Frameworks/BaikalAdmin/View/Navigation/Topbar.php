@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,5 +29,11 @@
 
 namespace BaikalAdmin\View\Navigation;
 
-class Topbar extends \BaikalAdmin\Core\View {
+use BaikalAdmin\Core\View;
+
+/**
+ *
+ */
+class Topbar extends View
+{
 }

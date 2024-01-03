@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,5 +29,11 @@
 
 namespace Baikal\View;
 
-class Main extends \Baikal\Core\View {
+use Baikal\Core\View;
+
+/**
+ *
+ */
+class Main extends View
+{
 }

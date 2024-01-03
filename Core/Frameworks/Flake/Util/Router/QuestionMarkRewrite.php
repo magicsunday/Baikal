@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,17 +29,34 @@
 
 namespace Flake\Util\Router;
 
-class QuestionMarkRewrite extends \Flake\Util\Router {
-    public static function getCurrentRoute() {
+use Exception;
+use Flake\Util\Router;
+use Flake\Util\Tools;
+use RuntimeException;
+
+use function array_key_exists;
+use function array_slice;
+use function strlen;
+
+/**
+ *
+ */
+class QuestionMarkRewrite extends Router
+{
+    /**
+     * @return string
+     */
+    public static function getCurrentRoute(): string
+    {
         $aMatches = [];
-        $sRouteTokens = implode("/", self::getRouteTokens());
+        $sRouteTokens = implode('/', self::getRouteTokens());
 
         $aRoutes = self::getRoutes();
         reset($aRoutes);
         foreach ($aRoutes as $sDefinedRoute => $sDefinedController) {
-            if (strpos($sRouteTokens, $sDefinedRoute) === 0) {
+            if (str_starts_with($sRouteTokens, $sDefinedRoute)) {
                 # found a match
-                $iSlashCount = substr_count($sDefinedRoute, "/");
+                $iSlashCount = substr_count($sDefinedRoute, '/');
                 if (!array_key_exists($iSlashCount, $aMatches)) {
                     $aMatches[$iSlashCount] = [];
                 }
@@ -47,7 +66,7 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         }
 
         if (empty($aMatches)) {
-            return "default";
+            return 'default';
         }
 
         $aBestMatches = array_pop($aMatches);    // obtains the deepest matching route (higher number of slashes)
@@ -55,7 +74,14 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         return array_shift($aBestMatches);        // first route amongst best matches
     }
 
-    public static function buildRoute($sRoute, $aParams = []/* [, $sParam, $sParam2, ...] */) {
+    /**
+     * @param string $sRoute
+     * @param array  $aParams
+     *
+     * @return string
+     */
+    public static function buildRoute(string $sRoute, array $aParams = []/* [, $sParam, $sParam2, ...] */): string
+    {
         #		$aParams = func_get_args();
         #		array_shift($aParams);	# Stripping $sRoute
 
@@ -64,51 +90,59 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         $aParamsSegments = [];
         reset($aParams);
         foreach ($aParams as $sParamName => $sParamValue) {
-            $aParamsSegments[] = rawurlencode($sParamName) . "/" . rawurlencode($sParamValue);
+            $aParamsSegments[] = rawurlencode($sParamName) . '/' . rawurlencode((string)$sParamValue);
         }
 
-        $sParams = implode("/", $aParamsSegments);
+        $sParams = implode('/', $aParamsSegments);
 
-        if (trim($sParams) !== "") {
-            $sParams .= "/";
+        if (trim($sParams) !== '') {
+            $sParams .= '/';
         }
 
-        if ($sRoute === "default" && empty($aParams)) {
-            $sUrl = "/";
+        if ($sRoute === 'default' && empty($aParams)) {
+            $sUrl = '/';
         } else {
-            $sUrl = "/" . $sRoute . "/" . $sParams;
+            $sUrl = '/' . $sRoute . '/' . $sParams;
         }
 
         $sUriPath = self::getUriPath();
-        if ($sUriPath === "" || $sUriPath === "/") {
-            if ($sUrl !== "/") {
-                $sUrl = "?" . $sUrl;
+        if ($sUriPath === '' || $sUriPath === '/') {
+            if ($sUrl !== '/') {
+                $sUrl = '?' . $sUrl;
             }
         } else {
-            if ($sUrl !== "/") {
-                $sUrl = "/" . self::getUriPath() . "?" . $sUrl;
+            if ($sUrl !== '/') {
+                $sUrl = '/' . self::getUriPath() . '?' . $sUrl;
             } else {
-                $sUrl = "/" . self::getUriPath();
+                $sUrl = '/' . self::getUriPath();
             }
         }
 
         return $sUrl;
     }
 
-    protected static function getUrlTokens() {
-        $sQuery = "";
-        $sUrl = \Flake\Util\Tools::stripBeginSlash(\Flake\Util\Tools::getCurrentUrl());
+    /**
+     * @return array
+     */
+    protected static function getUrlTokens(): array
+    {
+        $sQuery = '';
+        $sUrl = Tools::stripBeginSlash(Tools::getCurrentUrl());
         $aUrlParts = parse_url($sUrl);
 
         $aParams = [];
-        if (array_key_exists("query", $aUrlParts)) {
-            $aParams = explode("/", "?" . $aUrlParts["query"]);
+        if (array_key_exists('query', $aUrlParts)) {
+            $aParams = explode('/', '?' . $aUrlParts['query']);
         }
 
         return $aParams;
     }
 
-    protected static function getRouteTokens() {
+    /**
+     * @return array
+     */
+    protected static function getRouteTokens(): array
+    {
         $aUrlTokens = self::getUrlTokens();
 
         if (!empty($aUrlTokens)) {
@@ -118,26 +152,31 @@ class QuestionMarkRewrite extends \Flake\Util\Router {
         return [];
     }
 
-    public static function getURLParams() {
+    /**
+     * @throws Exception
+     */
+    public static function getURLParams(): array
+    {
         $aTokens = self::getRouteTokens();
 
         # stripping route
         if (!empty($aTokens)) {
-            $sRouteUrl = implode("/", $aTokens);
-            $sCurrentRoute = $GLOBALS["ROUTER"]::getCurrentRoute();
+            $sRouteUrl = implode('/', $aTokens);
+            $sCurrentRoute = $GLOBALS['ROUTER']::getCurrentRoute();
 
-            if (strpos($sRouteUrl, $sCurrentRoute) === false) {
-                throw new \Exception("Flake\Util\Router\QuestionMarkRewrite::getURLParams(): unrecognized route.");
+            if (!str_contains($sRouteUrl, $sCurrentRoute)) {
+                throw new RuntimeException(
+                    "Flake\Util\Router\QuestionMarkRewrite::getURLParams(): unrecognized route."
+                );
             }
 
-            $sParams = \Flake\Util\Tools::trimSlashes(substr($sRouteUrl, strlen($sCurrentRoute)));
+            $sParams = Tools::trimSlashes(substr($sRouteUrl, strlen($sCurrentRoute)));
 
             $aParams = [];
-            if ($sParams !== "") {
-                $aParams = explode("/", $sParams);
+            if ($sParams !== '') {
+                $aParams = explode('/', $sParams);
             }
 
-            reset($aParams);
             foreach ($aParams as $sParam => $sValue) {
                 $aParams[$sParam] = rawurldecode($sValue);
             }

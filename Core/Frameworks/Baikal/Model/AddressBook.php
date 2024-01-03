@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 #################################################################
 #  Copyright notice
 #
@@ -27,85 +29,131 @@
 
 namespace Baikal\Model;
 
-class AddressBook extends \Flake\Core\Model\Db {
-    const DATATABLE = "addressbooks";
-    const PRIMARYKEY = "id";
-    const LABELFIELD = "displayname";
+use Baikal\Model\AddressBook\Contact;
+use Exception;
+use Flake\Core\Model\Db;
+use Flake\Core\Requester\Sql;
+use Formal\Element\Text;
+use Formal\Form\Morphology;
+use ReflectionException;
 
-    protected $aData = [
-        "principaluri" => "",
-        "displayname"  => "",
-        "uri"          => "",
-        "description"  => "",
+/**
+ *
+ */
+class AddressBook extends Db
+{
+    public const DATATABLE = 'addressbooks';
+    public const PRIMARYKEY = 'id';
+    public const LABELFIELD = 'displayname';
+
+    protected array $aData = [
+        'principaluri' => '',
+        'displayname'  => '',
+        'uri'          => '',
+        'description'  => '',
     ];
 
-    static function humanName() {
-        return "Address Book";
+    /**
+     * @return string|null
+     */
+    public static function humanName(): ?string
+    {
+        return 'Address Book';
     }
 
-    static function icon() {
-        return "icon-book";
+    /**
+     * @return string
+     */
+    public static function icon(): string
+    {
+        return 'icon-book';
     }
 
-    static function mediumicon() {
-        return "glyph-adress-book";
+    /**
+     * @return string
+     */
+    public static function mediumicon(): string
+    {
+        return 'glyph-adress-book';
     }
 
-    static function bigicon() {
-        return "glyph2x-adress-book";
+    /**
+     * @return string
+     */
+    public static function bigicon(): string
+    {
+        return 'glyph2x-adress-book';
     }
 
-    function getContactsBaseRequester() {
-        $oBaseRequester = \Baikal\Model\AddressBook\Contact::getBaseRequester();
+    /**
+     * @throws Exception
+     */
+    public function getContactsBaseRequester(): Sql
+    {
+        $oBaseRequester = Contact::getBaseRequester();
         $oBaseRequester->addClauseEquals(
-            "addressbookid",
-            $this->get("id")
+            'addressbookid',
+            (string)$this->get('id')
         );
 
         return $oBaseRequester;
     }
 
-    function formMorphologyForThisModelInstance() {
-        $oMorpho = new \Formal\Form\Morphology();
+    /**
+     * @return Morphology
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     */
+    public function formMorphologyForThisModelInstance(): Morphology
+    {
+        $oMorpho = new Morphology();
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "uri",
-            "label"      => "Address Book token ID",
-            "validation" => "required,tokenid",
-            "popover"    => [
-                "title"   => "Address Book token ID",
-                "content" => "The unique identifier for this address book.",
+        $oMorpho->add(new Text([
+            'prop'       => 'uri',
+            'label'      => 'Address Book token ID',
+            'validation' => 'required,tokenid',
+            'popover'    => [
+                'title'   => 'Address Book token ID',
+                'content' => 'The unique identifier for this address book.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"       => "displayname",
-            "label"      => "Display name",
-            "validation" => "required",
-            "popover"    => [
-                "title"   => "Display name",
-                "content" => "This is the name that will be displayed in your CardDAV client.",
+        $oMorpho->add(new Text([
+            'prop'       => 'displayname',
+            'label'      => 'Display name',
+            'validation' => 'required',
+            'popover'    => [
+                'title'   => 'Display name',
+                'content' => 'This is the name that will be displayed in your CardDAV client.',
             ],
         ]));
 
-        $oMorpho->add(new \Formal\Element\Text([
-            "prop"  => "description",
-            "label" => "Description",
+        $oMorpho->add(new Text([
+            'prop'  => 'description',
+            'label' => 'Description',
         ]));
 
         if ($this->floating()) {
-            $oMorpho->element("uri")->setOption(
-                "help",
+            $oMorpho->element('uri')->setOption(
+                'help',
                 "Allowed characters are digits, lowercase letters and the dash symbol '-'."
             );
         } else {
-            $oMorpho->element("uri")->setOption("readonly", true);
+            $oMorpho->element('uri')->setOption('readonly', true);
         }
 
         return $oMorpho;
     }
 
-    function destroy() {
+    /**
+     * @return void
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     */
+    public function destroy(): void
+    {
         $oContacts = $this->getContactsBaseRequester()->execute();
         foreach ($oContacts as $contact) {
             $contact->destroy();
