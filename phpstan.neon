@@ -1,16 +1,23 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
 parameters:
-  level: 0
-  excludePaths:
-    - Core/Frameworks/BaikalAdmin/Resources/GlyphiconsPro/generate-sprite.php
-    - Core/Resources/Web/BaikalAdmin/GlyphiconsPro/generate-sprite.php
-    - html/res/core/BaikalAdmin/GlyphiconsPro/generate-sprite.php
-  ignoreErrors:
-    -
-      message: '#Instantiated class Flake\\Core\\Exception not found.#'
-      path: Core/Frameworks/Flake/Util/Frameworks.php
-    -
-      message: '#Call to static method compileCss\(\) on an unknown class Frameworks\\LessPHP\\Delegate.#'
-      path: Core/Frameworks/Flake/Controller/Page.php
-    -
-      message: '#Access to undefined constant Flake\\Core\\Model::LABELFIELD.#'
-      path: Core/Frameworks/Flake/Core/Model.php
+    # You can currently choose from 10 levels (0 is the loosest and "max" is the strictest).
+    level: max
+
+    paths:
+        - Core
+        - html
+
+    fileExtensions:
+        - php
+
+    excludePaths:
+        - vendor/
+        - Core/Frameworks/BaikalAdmin/Resources/GlyphiconsPro/generate-sprite.php
+        - Core/Resources/Web/BaikalAdmin/GlyphiconsPro/generate-sprite.php
+        - html/res/core/BaikalAdmin/GlyphiconsPro/generate-sprite.php
+
+    # Ignored errors
+    ignoreErrors:
