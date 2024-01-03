@@ -21,6 +21,7 @@ vendor
 
 # IDE
 nbproject
+.idea
 
 # Tests
 .php-cs-fixer.cache
