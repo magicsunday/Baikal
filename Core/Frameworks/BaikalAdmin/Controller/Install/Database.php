@@ -55,7 +55,8 @@ class Database extends Controller
     protected Form $oForm;    # \Formal\Form
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws \ReflectionException
      */
     public function execute(): void
     {
@@ -109,11 +110,10 @@ class Database extends Controller
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
      * @throws LoaderError
-     * @throws Exception
-     * @throws Exception
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(): string
     {
@@ -269,7 +269,10 @@ class Database extends Controller
     }
 
     /**
-     * @throws Exception
+     * @param Form       $oForm
+     * @param Morphology $oMorpho
+     *
+     * @return void
      */
     public function hideMySQLFieldWhenNeeded(Form $oForm, Morphology $oMorpho): void
     {

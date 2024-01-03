@@ -42,6 +42,8 @@ class FLObject
      */
     public function __toString(): string
     {
+var_dump(__METHOD__);
+exit;
         ob_start();
         var_dump($this);
         $sDump = ob_get_clean();

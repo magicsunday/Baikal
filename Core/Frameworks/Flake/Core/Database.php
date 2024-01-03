@@ -79,7 +79,11 @@ abstract class Database extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @param string            $table
+     * @param array             $fields_values
+     * @param array|bool|string $no_quote_fields
+     *
+     * @return Statement
      */
     public function exec_INSERTquery(
         string $table,
@@ -129,7 +133,12 @@ abstract class Database extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @param string            $table
+     * @param string            $where
+     * @param array             $fields_values
+     * @param array|bool|string $no_quote_fields
+     *
+     * @return Statement
      */
     public function exec_UPDATEquery(
         string $table,
@@ -186,7 +195,10 @@ abstract class Database extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @param string $table
+     * @param string $where
+     *
+     * @return Statement
      */
     public function exec_DELETEquery(string $table, string $where): Database\Statement
     {
@@ -215,7 +227,14 @@ abstract class Database extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @param string $select_fields
+     * @param string $from_table
+     * @param string $where_clause
+     * @param string $groupBy
+     * @param string $orderBy
+     * @param string $limit
+     *
+     * @return Statement
      */
     public function exec_SELECTquery(
         string $select_fields,

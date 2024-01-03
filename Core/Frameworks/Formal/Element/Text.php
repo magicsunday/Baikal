@@ -48,7 +48,7 @@ class Text extends Element
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function render(): string
     {

@@ -30,8 +30,8 @@ declare(strict_types=1);
 namespace Formal\Form;
 
 use Exception;
-use Flake\Core\CollectionTyped;
 use Formal\Element;
+use Formal\ElementCollection;
 use ReflectionException;
 use RuntimeException;
 
@@ -40,15 +40,18 @@ use RuntimeException;
  */
 class Morphology
 {
-    protected ?CollectionTyped $oElements = null;
+    /**
+     * @var ElementCollection
+     */
+    protected ElementCollection $oElements;
 
     public function __construct()
     {
-        $this->oElements = new CollectionTyped(Element::class);
+        $this->oElements = new ElementCollection();
     }
 
     /**
-     * @throws ReflectionException
+     * @param Element $oElement
      */
     public function add(Element $oElement): void
     {
@@ -56,12 +59,16 @@ class Morphology
     }
 
     /**
-     * @throws Exception
+     * @param string $sPropName
+     *
+     * @return int|string|bool
      */
-    protected function keyForPropName($sPropName)
+    protected function keyForPropName(string $sPropName): int|string|bool
     {
         $aKeys = $this->oElements->keys();
+
         foreach ($aKeys as $sKey) {
+            /** @var Element $oElement */
             $oElement = $this->oElements->getForKey($sKey);
 
             if ($oElement->option('prop') === $sPropName) {
@@ -73,9 +80,11 @@ class Morphology
     }
 
     /**
-     * @throws Exception
+     * @param string $sPropName
+     *
+     * @return Element
      */
-    public function element($sPropName)
+    public function element(string $sPropName): Element
     {
         if (($sKey = $this->keyForPropName($sPropName)) === false) {
             throw new RuntimeException(
@@ -87,9 +96,11 @@ class Morphology
     }
 
     /**
-     * @throws Exception
+     * @param string $sPropName
+     *
+     * @return void
      */
-    public function remove($sPropName): void
+    public function remove(string $sPropName): void
     {
         if (($sKey = $this->keyForPropName($sPropName)) === false) {
             throw new RuntimeException(
@@ -101,9 +112,9 @@ class Morphology
     }
 
     /**
-     * @return CollectionTyped|null
+     * @return ElementCollection
      */
-    public function elements(): ?CollectionTyped
+    public function elements(): ElementCollection
     {
         return $this->oElements;
     }

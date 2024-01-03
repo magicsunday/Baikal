@@ -30,7 +30,6 @@ declare(strict_types=1);
 namespace Formal;
 
 use Exception;
-use Flake\Core\CollectionTyped;
 use Flake\Core\Model;
 use Flake\Util\Tools;
 use Formal\Core\Message;
@@ -57,7 +56,7 @@ class Form
         'hook.morphology' => false,
     ];
     protected ?Model $oModelInstance = null;
-    protected ?CollectionTyped $oElements = null;
+    protected ElementCollection $oElements;
     protected array $aErrors = [];
     protected ?bool $bPersisted = null;        # TRUE when form has persisted; available only after execute
 
@@ -74,11 +73,13 @@ class Form
     {
         $this->sModelClass = $sModelClass;
         $this->aOptions = array_merge($this->aOptions, $aOptions);
-        $this->oElements = new CollectionTyped(Element::class);
+        $this->oElements = new ElementCollection();
     }
 
     /**
-     * @throws Exception
+     * @param $sName
+     *
+     * @return mixed
      */
     public function option($sName)
     {
@@ -111,7 +112,7 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @return Morphology|null
      */
     public function getMorpho(): ?Morphology
     {
@@ -130,9 +131,10 @@ class Form
     }
 
     /**
+     * @param Model $oModelInstance
+     *
+     * @return $this
      * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
      */
     public function setModelInstance(Model $oModelInstance): Form
     {
@@ -171,7 +173,7 @@ class Form
     /**
      * @return Model|null
      */
-    public function modelInstance()
+    public function modelInstance(): ?Model
     {
         return $this->oModelInstance;
     }
@@ -179,13 +181,13 @@ class Form
     /**
      * @return bool
      */
-    public function floatingModelInstance()
+    public function floatingModelInstance(): bool
     {
         return $this->modelInstance()->floating();
     }
 
     /**
-     * @throws Exception
+     * @return void
      */
     public function execute(): void
     {
@@ -322,7 +324,7 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @return bool|null
      */
     public function persisted(): ?bool
     {
@@ -340,7 +342,11 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @param            $sValue
+     * @param Morphology $oMorpho
+     * @param Element    $oElement
+     *
+     * @return true|string
      */
     public function validateRequired($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
@@ -352,7 +358,11 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @param            $sValue
+     * @param Morphology $oMorpho
+     * @param Element    $oElement
+     *
+     * @return true|string
      */
     public function validateEmail($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
@@ -364,7 +374,12 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @param            $sValue
+     * @param Morphology $oMorpho
+     * @param Element    $oElement
+     * @param            $sReferencePropName
+     *
+     * @return true|string
      */
     public function validateSameas($sValue, Morphology $oMorpho, Element $oElement, $sReferencePropName): true|string
     {
@@ -421,7 +436,11 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @param            $sValue
+     * @param Morphology $oMorpho
+     * @param Element    $oElement
+     *
+     * @return true|string
      */
     public function validateTokenid($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
@@ -435,7 +454,11 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @param            $sValue
+     * @param Morphology $oMorpho
+     * @param Element    $oElement
+     *
+     * @return true|string
      */
     public function validateColor($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
@@ -453,7 +476,7 @@ class Form
      *
      * @return mixed|string
      */
-    public function postValue($sPropName)
+    public function postValue($sPropName): mixed
     {
         $aData = Tools::POST('data');
 
@@ -465,7 +488,7 @@ class Form
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function render(): string
     {

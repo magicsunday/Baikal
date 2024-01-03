@@ -29,7 +29,7 @@ declare(strict_types=1);
 
 namespace Flake\Core\Requester;
 
-use Flake\Core\CollectionTyped;
+use Flake\Core\Collection;
 use Flake\Core\Requester;
 use ReflectionException;
 
@@ -256,7 +256,7 @@ class Sql extends Requester
      *
      * @return mixed
      */
-    protected function reify(array $aData)
+    protected function reify(array $aData): mixed
     {
         $sTemp = $this->sModelClass;
 
@@ -323,9 +323,9 @@ class Sql extends Requester
     /**
      * @throws ReflectionException
      */
-    public function execute(): CollectionTyped
+    public function execute(): Collection
     {
-        $oCollection = new CollectionTyped($this->sModelClass);
+        $oCollection = new Collection();
         $sSql = $this->getQuery();
 
         $rSql = $GLOBALS['DB']->query($sSql);

@@ -41,14 +41,14 @@ abstract class ChainLink implements Chainable
     protected $__key = null;
 
     /**
-     * @param Chain $container
+     * @param Chain $chain
      * @param       $key
      *
      * @return void
      */
-    public function chain(Chain $container, $key): void
+    public function chain(Chain $chain, $key): void
     {
-        $this->__container = $container;
+        $this->__container = $chain;
         $this->__key = $key;
     }
 
@@ -82,7 +82,9 @@ abstract class ChainLink implements Chainable
     }
 
     /**
-     * @throws Exception
+     * @param $offset
+     *
+     * @return void
      */
     public function offsetUnset($offset): void
     {
@@ -99,7 +101,7 @@ abstract class ChainLink implements Chainable
      * @return mixed|null
      */
     #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if ($this->__container === null) {
             return null;
@@ -120,7 +122,7 @@ abstract class ChainLink implements Chainable
      * @return mixed
      */
     #[ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         return $this->__container->current();
     }
@@ -129,7 +131,7 @@ abstract class ChainLink implements Chainable
      * @return bool|float|int|string|null
      */
     #[ReturnTypeWillChange]
-    public function key()
+    public function key(): float|bool|int|string|null
     {
         return $this->__container->key();
     }
@@ -169,7 +171,7 @@ abstract class ChainLink implements Chainable
     /**
      * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         return $this->__container->first();
     }
@@ -177,7 +179,7 @@ abstract class ChainLink implements Chainable
     /**
      * @return mixed
      */
-    public function last()
+    public function last(): mixed
     {
         return $this->__container->last();
     }

@@ -31,7 +31,6 @@ namespace Flake\Core;
 
 use Exception;
 use Iterator;
-use ReturnTypeWillChange;
 use RuntimeException;
 
 use function array_key_exists;
@@ -41,37 +40,46 @@ use function in_array;
 use function strlen;
 
 /**
+ * @template TKey of int|string
+ * @template TValue
  *
+ * @implements Iterator<TKey, TValue>
  */
 class Collection extends FLObject implements Iterator
 {
-    protected array $aCollection = [];
+    /**
+     * An array containing the elements of this collection
+     *
+     * @var TValue[]
+     */
+    protected array $elements = [];
     protected array $aMeta = [];
 
     /**
-     * @return false|mixed
+     * @return false|TValue
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function current()
     {
-        return current($this->aCollection);
+        return current($this->elements);
     }
 
     /**
-     * @return int|string|null
+     * @return null|int|string
      */
-    #[ReturnTypeWillChange]
-    public function key()
+    #[\ReturnTypeWillChange]
+    public function key(): int|string|null
     {
-        return key($this->aCollection);
+        return key($this->elements);
     }
 
     /**
-     * @return void
+     * @return false|TValue
      */
-    public function next(): void
+    #[\ReturnTypeWillChange]
+    public function next()
     {
-        next($this->aCollection);
+        return next($this->elements);
     }
 
     /**
@@ -87,13 +95,19 @@ class Collection extends FLObject implements Iterator
      */
     public function valid(): bool
     {
-        $key = key($this->aCollection);
+        $key = $this->key();
 
-        return ($key !== null && $key !== false);
+        if ($key !== null) {
+            return array_key_exists($key, $this->elements);
+        }
+
+        return false;
     }
 
     /**
-     * @throws Exception
+     * @param $sKey
+     *
+     * @return mixed
      */
     public function getForKey($sKey)
     {
@@ -104,7 +118,7 @@ class Collection extends FLObject implements Iterator
             );
         }
 
-        return $this->aCollection[$sKey];
+        return $this->elements[$sKey];
     }
 
     /**
@@ -112,15 +126,15 @@ class Collection extends FLObject implements Iterator
      */
     public function reset(): void
     {
-        reset($this->aCollection);
+        reset($this->elements);
     }
 
     /**
      * @return false|mixed
      */
-    public function prev()
+    public function prev(): mixed
     {
-        return prev($this->aCollection);
+        return prev($this->elements);
     }
 
     /**
@@ -128,15 +142,15 @@ class Collection extends FLObject implements Iterator
      */
     public function count(): int
     {
-        return count($this->aCollection);
+        return count($this->elements);
     }
 
     /**
-     * @return array
+     * @return array<int|string>
      */
     public function keys(): array
     {
-        return array_keys($this->aCollection);
+        return array_keys($this->elements);
     }
 
     /**
@@ -166,13 +180,13 @@ class Collection extends FLObject implements Iterator
     }
 
     /**
-     * @param $mMixed
+     * @param TValue $value A value
      *
      * @return void
      */
-    public function push($mMixed): void
+    public function push($value): void
     {
-        $this->aCollection[] = $mMixed;
+        $this->elements[] = $value;
     }
 
     /**
@@ -180,19 +194,19 @@ class Collection extends FLObject implements Iterator
      */
     public function flush(): void
     {
-        unset($this->aCollection);
-        $this->aCollection = [];
+        unset($this->elements);
+        $this->elements = [];
     }
 
     /**
      * @return mixed|null
      */
-    public function first()
+    public function first(): mixed
     {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
-            return $this->aCollection[array_shift($aKeys)];
+            return $this->elements[array_shift($aKeys)];
         }
 
         # two lines instead of one
@@ -203,12 +217,12 @@ class Collection extends FLObject implements Iterator
     /**
      * @return mixed|null
      */
-    public function last()
+    public function last(): mixed
     {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
 
-            return $this->aCollection[array_pop($aKeys)];
+            return $this->elements[array_pop($aKeys)];
         }
 
         return null;
@@ -219,7 +233,7 @@ class Collection extends FLObject implements Iterator
      */
     public function toArray(): array
     {
-        return $this->aCollection;
+        return $this->elements;
     }
 
     /**
@@ -236,18 +250,6 @@ class Collection extends FLObject implements Iterator
         }
 
         return $oColl;
-    }
-
-    # Create a new collection like this one
-    # This abstraction is useful because of CollectionTyped
-    /**
-     * @return Collection
-     */
-    protected function newCollectionLikeThisOne(): Collection
-    {
-        # two lines instead of one
-
-        return new self();                            # as PHP needs a variable to return by ref
     }
 
     /**
@@ -274,7 +276,9 @@ class Collection extends FLObject implements Iterator
     }
 
     /**
-     * @throws Exception
+     * @param $sKey
+     *
+     * @return void
      */
     public function remove($sKey): void
     {
@@ -283,12 +287,15 @@ class Collection extends FLObject implements Iterator
             throw new RuntimeException("\Flake\Core\Collection->remove(): key '" . $sKey . "' not found in Collection");
         }
 
-        unset($this->aCollection[$sKey]);
-        $this->aCollection = array_values($this->aCollection);
+        unset($this->elements[$sKey]);
+        $this->elements = array_values($this->elements);
     }
 
     /**
-     * @throws Exception
+     * @param $sName
+     * @param $aArguments
+     *
+     * @return mixed|null
      */
     public function __call($sName, $aArguments)
     {

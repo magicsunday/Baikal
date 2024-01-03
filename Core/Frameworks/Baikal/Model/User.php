@@ -59,7 +59,6 @@ class User extends Db
      *
      * @return void
      * @throws ReflectionException
-     * @throws Exception
      */
     protected function initByPrimary(string|int $sPrimary): void
     {
@@ -73,6 +72,7 @@ class User extends Db
     }
 
     /**
+     * @return Sql
      * @throws Exception
      */
     public function getAddressBooksBaseRequester(): Sql
@@ -87,6 +87,7 @@ class User extends Db
     }
 
     /**
+     * @return Sql
      * @throws Exception
      */
     public function getCalendarsBaseRequester(): Sql
@@ -233,9 +234,6 @@ class User extends Db
 
     /**
      * @return void
-     * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
      * @throws Exception
      */
     public function destroy(): void
@@ -247,11 +245,13 @@ class User extends Db
             $this->oIdentityPrincipal->destroy();
         }
 
+        /** @var Calendar[] $oCalendars */
         $oCalendars = $this->getCalendarsBaseRequester()->execute();
         foreach ($oCalendars as $calendar) {
             $calendar->destroy();
         }
 
+        /** @var AddressBook[] $oAddressBooks */
         $oAddressBooks = $this->getAddressBooksBaseRequester()->execute();
         foreach ($oAddressBooks as $addressbook) {
             $addressbook->destroy();
@@ -261,6 +261,7 @@ class User extends Db
     }
 
     /**
+     * @return string
      * @throws Exception
      */
     public function getMailtoURI(): string
@@ -270,14 +271,6 @@ class User extends Db
 
     /**
      * @return Morphology
-     * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
@@ -369,6 +362,9 @@ class User extends Db
     }
 
     /**
+     * @param $sPassword
+     *
+     * @return string
      * @throws Exception
      */
     public function getPasswordHashForPassword($sPassword): string

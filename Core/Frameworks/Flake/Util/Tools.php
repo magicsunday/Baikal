@@ -65,7 +65,7 @@ class Tools extends FLObject
     /**
      * @return mixed|string
      */
-    public static function getCurrentUrl()
+    public static function getCurrentUrl(): mixed
     {
         $sUrl = $GLOBALS['_SERVER']['REQUEST_URI'];
         if (MONGOOSE_SERVER) {
@@ -82,7 +82,7 @@ class Tools extends FLObject
     /**
      * @return mixed|string
      */
-    public static function getCurrentProtocol()
+    public static function getCurrentProtocol(): mixed
     {
         if (!empty($GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO'])) {
             return $GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO'];
@@ -255,7 +255,7 @@ class Tools extends FLObject
      *
      * @return array|mixed|string
      */
-    public static function POST(string|bool $sVar = false)
+    public static function POST(string|bool $sVar = false): mixed
     {
         if ($sVar !== false) {
             $aData = self::POST();
@@ -274,7 +274,7 @@ class Tools extends FLObject
      *
      * @return array|string
      */
-    public static function GET(string|bool $sVar = false)
+    public static function GET(string|bool $sVar = false): array|string
     {
         if ($sVar !== false) {
             $aData = self::GET();
@@ -293,7 +293,7 @@ class Tools extends FLObject
      *
      * @return array|string
      */
-    public static function GP(string|bool $sVar = false)
+    public static function GP(string|bool $sVar = false): array|string
     {
         if ($sVar !== false) {
             $aData = self::GP();
@@ -915,7 +915,7 @@ TEST;
      *
      * @return mixed|string
      */
-    public static function stripBeginString($sString, $sAppend)
+    public static function stripBeginString($sString, $sAppend): mixed
     {
         if (str_starts_with($sString, $sAppend)) {
             $sString = substr($sString, strlen($sAppend));
@@ -961,8 +961,6 @@ TEST;
         return str_ends_with($sHaystack, $sNeedle);
     }
 
-    ###########
-
     /**
      * @return string
      */
@@ -972,7 +970,9 @@ TEST;
     }
 
     /**
-     * @throws Exception
+     * @param array $aArray
+     *
+     * @return bool
      */
     public static function arrayIsAssoc(array $aArray): bool
     {
@@ -986,7 +986,9 @@ TEST;
     }
 
     /**
-     * @throws Exception
+     * @param array $aArray
+     *
+     * @return bool
      */
     public static function arrayIsSeq(array $aArray): bool
     {
@@ -1001,12 +1003,13 @@ TEST;
     public static function echoAndCutClient(string $sMessage = ''): void
     {
         ignore_user_abort(true);
-        #		set_time_limit(0);
 
         header('Connection: close');
         header('Content-Length: ' . strlen($sMessage));
+
         echo $sMessage;
         echo str_repeat("\r\n", 10); // just to be sure
+
         flush();
     }
 
@@ -1025,7 +1028,6 @@ TEST;
      */
     public static function stopWatch(string $sWhat): void
     {
-        #		return;
         $iStop = self::milliseconds();
 
         $trail = debug_backtrace();

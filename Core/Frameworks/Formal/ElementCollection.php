@@ -8,9 +8,9 @@ declare(strict_types=1);
 #  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
 #  All rights reserved
 #
-#  http://flake.codr.fr
+#  http://formal.codr.fr
 #
-#  This script is part of the Flake project. The Flake
+#  This script is part of the Formal project. The Formal
 #  project is free software; you can redistribute it
 #  and/or modify it under the terms of the GNU General Public
 #  License as published by the Free Software Foundation; either
@@ -27,20 +27,13 @@ declare(strict_types=1);
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
-namespace Flake\Model;
+namespace Formal;
+
+use Flake\Core\Collection;
 
 /**
- *
+ * @extends Collection<int, Element>
  */
-interface IUser
+class ElementCollection extends Collection
 {
-    /**
-     * @return mixed
-     */
-    public function isAdmin(): mixed;
-
-    /**
-     * @return mixed
-     */
-    public function getDisplayName(): mixed;
 }

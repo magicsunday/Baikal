@@ -51,7 +51,7 @@ class Tools
     /**
      * @return mixed
      */
-    public static function db()
+    public static function db(): mixed
     {
         return $GLOBALS['pdo'];
     }
@@ -103,11 +103,8 @@ class Tools
     }
 
     /**
+     * @return void
      * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
     public static function assertBaikalIsOk(): void
     {

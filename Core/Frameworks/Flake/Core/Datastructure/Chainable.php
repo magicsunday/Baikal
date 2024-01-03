@@ -42,23 +42,23 @@ interface Chainable extends ArrayAccess, Iterator, Countable
     /**
      * @return mixed
      */
-    public function prev();
+    public function prev(): mixed;
 
     /**
      * @return mixed
      */
-    public function first();
+    public function first(): mixed;
 
     /**
      * @return mixed
      */
-    public function last();
+    public function last(): mixed;
 
     /**
      * @param Chain $chain
      * @param       $key
      *
-     * @return mixed
+     * @return void
      */
-    public function chain(Chain $chain, $key);
+    public function chain(Chain $chain, $key): void;
 }

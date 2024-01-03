@@ -64,7 +64,7 @@ abstract class Container extends Controller
      *
      * @return Zone|mixed
      */
-    public function zone($sZone)
+    public function zone($sZone): mixed
     {
         if (!array_key_exists($sZone, $this->aZones)) {
             $this->aZones[$sZone] = new Zone($this, $sZone);

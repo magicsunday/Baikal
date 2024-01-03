@@ -77,7 +77,7 @@ abstract class Config extends NoDb
     /**
      * @return array|mixed
      */
-    protected function getConfigAsString()
+    protected function getConfigAsString(): mixed
     {
         if (file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
             return Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml')[$this->sConfigFileSection];

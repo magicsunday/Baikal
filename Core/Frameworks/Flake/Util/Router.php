@@ -207,6 +207,7 @@ abstract class Router extends FLObject
      */
     public static function buildRoute(string $sRoute, array $aParams/* [, $sParam, $sParam2, ...] */): string
     {
+        return '';
     }
 
     # should be abstract, but is not, because of PHP's strict standards
@@ -216,6 +217,7 @@ abstract class Router extends FLObject
      */
     public static function getCurrentRoute(): string
     {
+        return '';
     }
 
     # should be abstract, but is not, because of PHP's strict standards
@@ -225,5 +227,6 @@ abstract class Router extends FLObject
      */
     public static function getURLParams(): array
     {
+        return [];
     }
 }

@@ -65,7 +65,7 @@ class Mysql extends Database
     }
 
     /**
-     * @throws Exception
+     * @return array
      */
     public function tables(): array
     {

@@ -53,7 +53,8 @@ class Initialize extends Controller
     protected Form $oForm;    # \Formal\Form
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws \ReflectionException
      */
     public function execute(): void
     {
@@ -124,11 +125,10 @@ class Initialize extends Controller
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
      * @throws LoaderError
-     * @throws Exception
-     * @throws Exception
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(): string
     {
@@ -161,7 +161,7 @@ class Initialize extends Controller
     }
 
     /**
-     * @throws Exception
+     * @return void
      */
     protected function createHtaccessFilesIfNeeded(): void
     {
@@ -171,7 +171,10 @@ class Initialize extends Controller
     }
 
     /**
-     * @throws Exception
+     * @param $template
+     * @param $destination
+     *
+     * @return void
      */
     private function copyResourceFile($template, $destination): void
     {

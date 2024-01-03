@@ -69,10 +69,6 @@ class Standard extends Config
 
     /**
      * @return Morphology
-     * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
@@ -172,7 +168,7 @@ class Standard extends Config
             return $this;
         }
 
-        parent::set($sPropName, $sPropValue);
+        return parent::set($sPropName, $sPropValue);
     }
 
     /**

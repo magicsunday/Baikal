@@ -42,7 +42,7 @@ use function is_array;
 class Listbox extends Element
 {
     /**
-     * @throws Exception
+     * @return string
      */
     public function render(): string
     {

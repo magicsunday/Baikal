@@ -140,6 +140,7 @@ class Calendar extends Db
     }
 
     /**
+     * @return Sql
      * @throws Exception
      */
     public function getEventsBaseRequester(): Sql
@@ -250,7 +251,6 @@ class Calendar extends Db
     /**
      * @return Morphology
      *
-     * @throws ReflectionException
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
@@ -318,6 +318,7 @@ class Calendar extends Db
     }
 
     /**
+     * @return bool
      * @throws Exception
      */
     public function isDefault(): bool
@@ -348,20 +349,22 @@ class Calendar extends Db
     /**
      * @return void
      * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
      */
     public function destroy(): void
     {
         $hasInstances = $this->hasInstances();
+
         if (!$hasInstances) {
+            /** @var Event[] $oEvents */
             $oEvents = $this->getEventsBaseRequester()->execute();
+
             foreach ($oEvents as $event) {
                 $event->destroy();
             }
         }
 
         parent::destroy();
+
         if (!$hasInstances) {
             $this->oCalendar->destroy();
         }

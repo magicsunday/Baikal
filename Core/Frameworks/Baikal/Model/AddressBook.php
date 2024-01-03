@@ -86,7 +86,7 @@ class AddressBook extends Db
     }
 
     /**
-     * @throws Exception
+     * @return Sql<AddressBook>
      */
     public function getContactsBaseRequester(): Sql
     {
@@ -101,9 +101,6 @@ class AddressBook extends Db
 
     /**
      * @return Morphology
-     * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
@@ -149,12 +146,12 @@ class AddressBook extends Db
     /**
      * @return void
      * @throws ReflectionException
-     * @throws Exception
-     * @throws Exception
      */
     public function destroy(): void
     {
+        /** @var Contact[] $oContacts */
         $oContacts = $this->getContactsBaseRequester()->execute();
+
         foreach ($oContacts as $contact) {
             $contact->destroy();
         }

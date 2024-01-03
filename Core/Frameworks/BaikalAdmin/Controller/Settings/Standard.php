@@ -49,7 +49,8 @@ class Standard extends Controller
     private Form $oForm;
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws \ReflectionException
      */
     public function execute(): void
     {
@@ -70,10 +71,10 @@ class Standard extends Controller
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
      * @throws LoaderError
-     * @throws Exception
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(): string
     {

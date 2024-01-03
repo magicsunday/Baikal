@@ -49,7 +49,7 @@ class Checkbox extends Element
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function render(): string
     {

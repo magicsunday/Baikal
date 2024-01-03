@@ -63,7 +63,7 @@ class Customer extends Db implements IUser
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function getDisplayName(): string
     {

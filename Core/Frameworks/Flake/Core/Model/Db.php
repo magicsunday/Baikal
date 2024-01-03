@@ -30,11 +30,9 @@ declare(strict_types=1);
 namespace Flake\Core\Model;
 
 use Exception;
-use Flake\Core\CollectionTyped;
 use Flake\Core\Database;
 use Flake\Core\Model;
 use Flake\Core\Requester\Sql;
-use ReflectionException;
 use RuntimeException;
 
 use function get_class;
@@ -78,15 +76,6 @@ abstract class Db extends Model
     }
 
     /**
-     * @throws ReflectionException
-     */
-    public static function getByRequest(Sql $oRequester): CollectionTyped
-    {
-        // renvoie une collection de la classe du modèle courant (this)
-        return $oRequester->execute();
-    }
-
-    /**
      * @return string
      */
     public static function getDataTable(): string
@@ -107,7 +96,7 @@ abstract class Db extends Model
     }
 
     /**
-     * @throws Exception
+     * @return string|int
      */
     public function getPrimary(): string|int
     {
@@ -143,6 +132,7 @@ abstract class Db extends Model
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     public function persist(): void
@@ -169,7 +159,7 @@ abstract class Db extends Model
     }
 
     /**
-     * @throws Exception
+     * @return void
      */
     public function destroy(): void
     {

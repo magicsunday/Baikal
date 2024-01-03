@@ -53,7 +53,7 @@ class Sqlite extends Database
     # Taken from http://dev.kohanaframework.org/issues/2985
 
     /**
-     * @throws Exception
+     * @return array
      */
     public function tables(): array
     {

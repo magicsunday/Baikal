@@ -78,11 +78,11 @@ class Calendars extends Controller
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
      * @throws LoaderError
-     * @throws Exception
-     * @throws Exception
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \ReflectionException
      */
     public function render(): string
     {
@@ -181,8 +181,7 @@ class Calendars extends Controller
     }
 
     /**
-     *
-     * @throws Exception
+     * @return void
      * @throws Exception
      */
     protected function actionNew(): void
@@ -220,7 +219,9 @@ class Calendars extends Controller
     # Action edit
 
     /**
+     * @param Calendar $oModel
      *
+     * @return string
      * @throws Exception
      */
     public function linkEdit(Calendar $oModel): string
@@ -242,6 +243,7 @@ class Calendars extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionEdit(): void
@@ -262,6 +264,9 @@ class Calendars extends Controller
     # Action delete + confirm
 
     /**
+     * @param Calendar $oModel
+     *
+     * @return string
      * @throws Exception
      */
     public function linkDelete(Calendar $oModel): string
@@ -273,6 +278,9 @@ class Calendars extends Controller
     }
 
     /**
+     * @param Calendar $oModel
+     *
+     * @return string
      * @throws Exception
      */
     public function linkDeleteConfirm(Calendar $oModel): string
@@ -307,6 +315,7 @@ class Calendars extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionDelete(): void

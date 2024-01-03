@@ -123,11 +123,11 @@ abstract class Model extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function label(): string
     {
-        return (string)$this->get($this::LABELFIELD);
+        return (string) $this->get(static::LABELFIELD);
     }
 
     /**
@@ -173,7 +173,10 @@ abstract class Model extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @param array $options
+     *
+     * @return Form
+     * @throws \ReflectionException
      */
     public function formForThisModelInstance($options = []): Form
     {
@@ -185,7 +188,7 @@ abstract class Model extends FLObject
     }
 
     /**
-     * @throws Exception
+     * @return Morphology
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {

@@ -72,7 +72,9 @@ class Frameworks extends FLObject
     # TODO: Create a 'Framework' Model
 
     /**
-     * @throws Exception
+     * @param $sName
+     *
+     * @return string
      */
     public function getPath($sName): string
     {

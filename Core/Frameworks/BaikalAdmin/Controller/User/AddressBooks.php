@@ -33,6 +33,7 @@ use Baikal\Model\AddressBook;
 use Baikal\Model\User;
 use BaikalAdmin\Controller\Users;
 use Exception;
+use Flake\Core\Collection;
 use Flake\Core\Controller;
 use Flake\Util\Tools;
 use Formal\Core\Message;
@@ -55,6 +56,7 @@ class AddressBooks extends Controller
     protected Form $oForm;    # \Formal\Form
 
     /**
+     * @return void
      * @throws Exception
      */
     public function execute(): void
@@ -79,12 +81,11 @@ class AddressBooks extends Controller
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
      * @throws LoaderError
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \ReflectionException
      */
     public function render(): string
     {
@@ -95,6 +96,8 @@ class AddressBooks extends Controller
 
         # Render list of address books
         $aAddressBooks = [];
+
+        /** @var Collection<AddressBook> $oAddressBooks */
         $oAddressBooks = $this->oUser->getAddressBooksBaseRequester()->execute();
 
         foreach ($oAddressBooks as $addressbook) {
@@ -183,6 +186,7 @@ class AddressBooks extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionNew(): void
@@ -213,7 +217,9 @@ class AddressBooks extends Controller
     # Action edit
 
     /**
-     * @throws Exception
+     * @param AddressBook $oModel
+     *
+     * @return string
      */
     public function linkEdit(AddressBook $oModel): string
     {
@@ -233,6 +239,7 @@ class AddressBooks extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionEdit(): void
@@ -253,7 +260,9 @@ class AddressBooks extends Controller
     # Action delete + confirm
 
     /**
-     * @throws Exception
+     * @param AddressBook $oModel
+     *
+     * @return string
      */
     public function linkDelete(AddressBook $oModel): string
     {
@@ -264,7 +273,9 @@ class AddressBooks extends Controller
     }
 
     /**
-     * @throws Exception
+     * @param AddressBook $oModel
+     *
+     * @return string
      */
     public function linkDeleteConfirm(AddressBook $oModel): string
     {
@@ -298,6 +309,7 @@ class AddressBooks extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionDelete(): void

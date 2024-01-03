@@ -59,7 +59,6 @@ class Database extends Config
 
     /**
      * @return Morphology
-     * @throws ReflectionException
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {

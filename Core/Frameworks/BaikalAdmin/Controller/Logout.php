@@ -55,5 +55,6 @@ class Logout extends Controller
      */
     public function render(): string
     {
+        return '';
     }
 }

@@ -46,10 +46,6 @@ use function strlen;
  */
 class VersionUpgrade extends Controller
 {
-    protected array $aMessages = [];
-    protected $oModel;
-    protected Form $oForm;    # \Formal\Form
-
     protected array $aErrors = [];
     protected array $aSuccess = [];
 
@@ -113,9 +109,14 @@ HTML;
     }
 
     /**
+     * @param string $databaseConfig
+     * @param string $sVersionFrom
+     * @param string $sVersionTo
+     *
+     * @return bool
      * @throws Exception
      */
-    protected function upgrade($databaseConfig, $sVersionFrom, $sVersionTo): bool
+    protected function upgrade(string $databaseConfig, string $sVersionFrom, string $sVersionTo): bool
     {
         if (version_compare($sVersionFrom, '0.2.3', '<=')) {
             throw new RuntimeException(
@@ -593,9 +594,12 @@ SQL
     }
 
     /**
+     * @param string $sVersionTo
+     *
+     * @return void
      * @throws Exception
      */
-    protected function updateConfiguredVersion($sVersionTo): void
+    protected function updateConfiguredVersion(string $sVersionTo): void
     {
         # Update BAIKAL_CONFIGURED_VERSION
         $oConfig = new Standard();
@@ -604,7 +608,7 @@ SQL
     }
 
     /**
-     * @throws Exception
+     * @return void
      */
     protected function assertConfigWritable(): void
     {

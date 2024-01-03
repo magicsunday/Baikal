@@ -54,6 +54,8 @@ class Cli extends Container
         $this->echoFlush($this->notice('process started @' . strftime('%d/%m/%Y %H:%M:%S')));
         $this->execute();
         $this->echoFlush($this->notice('process ended @' . strftime('%d/%m/%Y %H:%M:%S')) . "\n\n");
+
+        return '';
     }
 
     /**

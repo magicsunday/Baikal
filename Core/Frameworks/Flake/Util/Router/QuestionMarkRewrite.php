@@ -153,7 +153,7 @@ class QuestionMarkRewrite extends Router
     }
 
     /**
-     * @throws Exception
+     * @return array
      */
     public static function getURLParams(): array
     {

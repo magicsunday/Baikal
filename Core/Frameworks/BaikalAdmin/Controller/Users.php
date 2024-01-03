@@ -63,6 +63,7 @@ class Users extends Controller
     private Form $oForm;
 
     /**
+     * @return void
      * @throws Exception
      */
     public function execute(): void
@@ -81,18 +82,11 @@ class Users extends Controller
     }
 
     /**
-     * @throws SyntaxError
+     * @return string
+     * @throws LoaderError
      * @throws ReflectionException
      * @throws RuntimeError
-     * @throws LoaderError
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     * @throws SyntaxError
      */
     public function render(): string
     {
@@ -139,7 +133,8 @@ class Users extends Controller
     }
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ReflectionException
      */
     protected function initForm(): void
     {
@@ -164,6 +159,7 @@ class Users extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionEdit(): void
@@ -203,6 +199,7 @@ class Users extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionDelete(): void
@@ -248,6 +245,7 @@ class Users extends Controller
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     protected function actionNew(): void
@@ -280,6 +278,9 @@ class Users extends Controller
     }
 
     /**
+     * @param User $user
+     *
+     * @return string
      * @throws Exception
      */
     public static function linkEdit(User $user): string
@@ -290,6 +291,9 @@ class Users extends Controller
     }
 
     /**
+     * @param User $user
+     *
+     * @return string
      * @throws Exception
      */
     public static function linkDelete(User $user): string
@@ -300,6 +304,9 @@ class Users extends Controller
     }
 
     /**
+     * @param User $user
+     *
+     * @return string
      * @throws Exception
      */
     public static function linkDeleteConfirm(User $user): string
@@ -311,6 +318,9 @@ class Users extends Controller
     }
 
     /**
+     * @param User $user
+     *
+     * @return string
      * @throws Exception
      */
     public static function linkCalendars(User $user): string
@@ -321,6 +331,9 @@ class Users extends Controller
     }
 
     /**
+     * @param User $user
+     *
+     * @return string
      * @throws Exception
      */
     public static function linkAddressBooks(User $user): string

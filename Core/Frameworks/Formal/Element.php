@@ -43,7 +43,7 @@ use function is_array;
 abstract class Element
 {
     /**
-     * @var array<string, string|bool>
+     * @var array<string, array|string|bool>
      */
     protected array $aOptions = [
         'class'           => '',
@@ -60,7 +60,7 @@ abstract class Element
     protected string|bool $sValue = '';
 
     /**
-     * @param $aOptions
+     * @param array $aOptions
      */
     public function __construct(array $aOptions)
     {
@@ -68,7 +68,9 @@ abstract class Element
     }
 
     /**
-     * @throws Exception
+     * @param string $sName
+     *
+     * @return array|bool|mixed|string
      */
     public function option(string $sName)
     {
@@ -80,7 +82,9 @@ abstract class Element
     }
 
     /**
-     * @throws Exception
+     * @param string $sOptionName
+     *
+     * @return array
      */
     public function optionArray(string $sOptionName): array
     {
@@ -95,12 +99,12 @@ abstract class Element
     }
 
     /**
-     * @param string      $sOptionName
-     * @param string|bool $sOptionValue
+     * @param string            $sOptionName
+     * @param array|string|bool $sOptionValue
      *
      * @return void
      */
-    public function setOption(string $sOptionName, string|bool $sOptionValue): void
+    public function setOption(string $sOptionName, array|string|bool $sOptionValue): void
     {
         $this->aOptions[$sOptionName] = $sOptionValue;
     }
@@ -124,7 +128,7 @@ abstract class Element
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function __toString()
     {
@@ -132,7 +136,7 @@ abstract class Element
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     public function renderWitness(): string
     {
@@ -140,7 +144,7 @@ abstract class Element
     }
 
     /**
-     * @throws Exception
+     * @return bool
      */
     public function posted(): bool
     {

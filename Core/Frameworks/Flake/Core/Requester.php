@@ -120,7 +120,7 @@ abstract class Requester extends FLObject
      *
      * @return mixed
      */
-    abstract public function addClauseEquals(string $sField, string $sValue);
+    abstract public function addClauseEquals(string $sField, string $sValue): mixed;
 
     /**
      * @return mixed

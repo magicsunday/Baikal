@@ -50,7 +50,9 @@ class Chain extends SplDoublyLinkedList
     }
 
     /**
-     * @throws Exception
+     * @param $offset
+     *
+     * @return void
      */
     public function offsetUnset($offset): void
     {
@@ -60,7 +62,7 @@ class Chain extends SplDoublyLinkedList
     /**
      * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         return $this->bottom();
     }
@@ -68,7 +70,7 @@ class Chain extends SplDoublyLinkedList
     /**
      * @return mixed
      */
-    public function last()
+    public function last(): mixed
     {
         return $this->top();
     }

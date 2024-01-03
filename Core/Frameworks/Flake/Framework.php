@@ -56,7 +56,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function rmBeginSlash($sString)
+    public static function rmBeginSlash($sString): mixed
     {
         if (str_starts_with($sString, '/')) {
             $sString = substr($sString, 1);
@@ -70,7 +70,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function rmEndSlash($sString)
+    public static function rmEndSlash($sString): mixed
     {
         if (str_ends_with($sString, '/')) {
             $sString = substr($sString, 0, -1);
@@ -84,7 +84,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function appendSlash($sString)
+    public static function appendSlash($sString): mixed
     {
         if (!str_ends_with($sString, '/')) {
             $sString .= '/';
@@ -98,7 +98,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function prependSlash($sString)
+    public static function prependSlash($sString): mixed
     {
         if (!str_starts_with($sString, '/')) {
             $sString = '/' . $sString;
@@ -140,7 +140,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function rmProjectContext($sString)
+    public static function rmProjectContext($sString): mixed
     {
         return self::appendSlash(
             substr($sString, 0, -1 * strlen(PROJECT_CONTEXT_BASEURI))

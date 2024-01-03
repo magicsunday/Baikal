@@ -39,7 +39,8 @@ use function define;
 class Framework extends \Flake\Core\Framework
 {
     /**
-     * @throws Exception
+     * @return void
+     * @throws \ReflectionException
      */
     public static function bootstrap(): void
     {

@@ -74,7 +74,7 @@ abstract class View extends FLObject
      *
      * @return false|mixed
      */
-    public function get(string $sWhat)
+    public function get(string $sWhat): mixed
     {
         if (array_key_exists($sWhat, $this->aData)) {
             return $this->aData[$sWhat];
