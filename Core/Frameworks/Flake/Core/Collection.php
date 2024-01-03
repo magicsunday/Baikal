@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Flake\Core;
 
-use Exception;
 use Iterator;
 use RuntimeException;
 
@@ -45,7 +44,7 @@ use function strlen;
  *
  * @implements Iterator<TKey, TValue>
  */
-class Collection extends FLObject implements Iterator
+class Collection implements Iterator
 {
     /**
      * An array containing the elements of this collection

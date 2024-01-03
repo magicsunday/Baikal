@@ -36,7 +36,7 @@ use function array_key_exists;
 /**
  *
  */
-abstract class Route extends FLObject
+abstract class Route
 {
     # should be abstract, but is not, due to PHP strict standard
     /**

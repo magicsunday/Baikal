@@ -29,12 +29,10 @@ declare(strict_types=1);
 
 namespace Flake\Util;
 
-use Flake\Core\FLObject;
-
 /**
  *
  */
-class Profiler extends FLObject
+class Profiler
 {
     protected static float $TUSAGE;
     protected static float $RUSAGE;

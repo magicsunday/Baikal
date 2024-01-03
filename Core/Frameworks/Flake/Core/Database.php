@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Flake\Core;
 
-use Exception;
 use Flake\Core\Database\Statement;
 use PDO;
 use RuntimeException;
@@ -43,7 +42,7 @@ use function is_string;
 /**
  *
  */
-abstract class Database extends FLObject
+abstract class Database
 {
     /**
      * @var bool

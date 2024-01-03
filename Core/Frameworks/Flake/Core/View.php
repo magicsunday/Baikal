@@ -38,7 +38,7 @@ use function array_key_exists;
 /**
  *
  */
-abstract class View extends FLObject
+abstract class View
 {
     protected array $aData;
 

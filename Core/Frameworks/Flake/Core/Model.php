@@ -40,7 +40,7 @@ use function get_class;
 /**
  *
  */
-abstract class Model extends FLObject
+abstract class Model
 {
     /**
      * @var array<bool|int|string|null>

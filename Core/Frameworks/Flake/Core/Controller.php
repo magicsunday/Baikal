@@ -32,7 +32,7 @@ namespace Flake\Core;
 /**
  *
  */
-abstract class Controller extends FLObject
+abstract class Controller
 {
     protected mixed $aParams = [];
 

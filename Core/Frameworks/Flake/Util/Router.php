@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Flake\Util;
 
-use Flake\Core\FLObject;
 use Flake\Core\Render\Container;
 use Flake\Core\Route;
 use RuntimeException;
@@ -41,7 +40,7 @@ use function func_get_args;
 /**
  *
  */
-abstract class Router extends FLObject
+abstract class Router
 {
     /**
      * @var string

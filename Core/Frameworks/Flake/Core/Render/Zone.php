@@ -29,12 +29,10 @@ declare(strict_types=1);
 
 namespace Flake\Core\Render;
 
-use Flake\Core\FLObject;
-
 /**
  *
  */
-class Zone extends FLObject
+class Zone
 {
     private $oZonableObject;
     private string $sZone;

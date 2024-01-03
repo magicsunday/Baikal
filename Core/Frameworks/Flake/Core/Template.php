@@ -37,7 +37,7 @@ use Twig\Error\SyntaxError;
 /**
  *
  */
-class Template extends FLObject
+class Template
 {
     private string $sAbsPath;
     private string|false $sHtml;

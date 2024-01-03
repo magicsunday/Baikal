@@ -30,7 +30,6 @@ declare(strict_types=1);
 namespace Flake\Util;
 
 use Exception;
-use Flake\Core\FLObject;
 use Flake\Util\Router\QuestionMarkRewrite;
 use ReflectionClass;
 use ReflectionException;
@@ -56,7 +55,7 @@ use function strlen;
 /**
  *
  */
-class Tools extends FLObject
+class Tools
 {
     private function __construct()
     {    # private constructor to force static class

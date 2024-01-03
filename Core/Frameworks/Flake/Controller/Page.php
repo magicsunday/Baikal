@@ -31,10 +31,7 @@ namespace Flake\Controller;
 
 use Flake\Core\Render\Container;
 use Flake\Core\Template;
-use Flake\Util\Frameworks;
 use Flake\Util\Tools;
-use Frameworks\LessPHP\Delegate;
-use RuntimeException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -63,33 +60,13 @@ class Page extends Container
     }
 
     /**
-     * @param $sTitle
+     * @param string $sTitle
      *
      * @return void
      */
-    public function setTitle($sTitle): void
+    public function setTitle(string $sTitle): void
     {
         $this->sTitle = $sTitle;
-    }
-
-    /**
-     * @param $sKeywords
-     *
-     * @return void
-     */
-    public function setMetaKeywords($sKeywords): void
-    {
-        $this->sMetaKeywords = $sKeywords;
-    }
-
-    /**
-     * @param $sDescription
-     *
-     * @return void
-     */
-    public function setMetaDescription($sDescription): void
-    {
-        $this->sMetaDescription = $sDescription;
     }
 
     /**
@@ -157,9 +134,11 @@ class Page extends Container
     }
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * @return string
+     *
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(): string
     {
@@ -174,41 +153,5 @@ class Page extends Container
         return (new Template($this->sTemplatePath))->parse(
             $aRenderedBlocks
         );
-    }
-
-    /**
-     * @param $sCssAbsPath
-     *
-     * @return void
-     */
-    public function addCss($sCssAbsPath): void
-    {
-        if (Frameworks::enabled('LessPHP')) {
-            $sCompiledPath = PATH_buildcss;
-            $sFileName = basename($sCssAbsPath);
-
-            $sCompiledFilePath = $sCompiledPath . Tools::shortMD5($sFileName) . '_' . $sFileName;
-
-            if (!str_ends_with(strtolower($sCompiledFilePath), '.css')) {
-                $sCompiledFilePath .= '.css';
-            }
-
-            if (!file_exists($sCompiledPath)) {
-                if (!mkdir($sCompiledPath) && !is_dir($sCompiledPath)) {
-                    throw new RuntimeException(sprintf('Directory "%s" was not created', $sCompiledPath));
-                }
-                if (!file_exists($sCompiledPath)) {
-                    exit('Page: Cannot create ' . $sCompiledPath);
-                }
-            }
-
-            Delegate::compileCss($sCssAbsPath, $sCompiledFilePath);
-            $sCssUrl = Tools::serverToRelativeWebPath($sCompiledFilePath);
-        } else {
-            $sCssUrl = Tools::serverToRelativeWebPath($sCssAbsPath);
-        }
-
-        $sHtml = '<link rel="stylesheet" type="text/css" href="' . $sCssUrl . '" media="all"/>';
-        $this->zone('head')->addBlock(new HtmlBlock($sHtml));
     }
 }

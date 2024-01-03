@@ -32,7 +32,7 @@ namespace Flake\Core;
 /**
  *
  */
-abstract class Requester extends FLObject
+abstract class Requester
 {
     protected string $sModelClass = '';
     protected string $sOrderField = '';

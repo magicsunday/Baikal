@@ -29,21 +29,20 @@ declare(strict_types=1);
 
 namespace Flake\Core\Database;
 
-use Flake\Core\FLObject;
 use PDO;
 use PDOStatement;
 
 /**
  *
  */
-class Statement extends FLObject
+class Statement
 {
     protected bool|PDOStatement $stmt = false;
 
     /**
-     * @param $stmt
+     * @param bool|PDOStatement $stmt
      */
-    public function __construct($stmt)
+    public function __construct(bool|PDOStatement $stmt)
     {
         $this->stmt = $stmt;
     }

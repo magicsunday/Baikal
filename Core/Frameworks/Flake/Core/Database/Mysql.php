@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Flake\Core\Database;
 
-use Exception;
 use Flake\Core\Database;
 use PDO;
 

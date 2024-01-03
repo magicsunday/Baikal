@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Flake\Util\Router;
 
-use Exception;
 use Flake\Util\Router;
 use Flake\Util\Tools;
 use RuntimeException;
