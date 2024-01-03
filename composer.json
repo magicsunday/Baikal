@@ -22,12 +22,12 @@
         "ext-pdo": "*",
         "ext-zlib": "*",
         "sabre/dav": "~4.6.0",
-        "twig/twig": "~2.14.8",
-        "symfony/yaml": "^3.4",
-        "psr/log": "^1"
+        "twig/twig": "~3.8.0",
+        "symfony/yaml": "^7.0",
+        "psr/log": "^3.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "3.51.0",
+        "friendsofphp/php-cs-fixer": "^3.51.0",
         "rector/rector": "^0.18",
         "phpro/grumphp": "^2.4",
         "phpstan/phpstan": "^1.10",
@@ -58,5 +58,10 @@
             "composer cs-fixer",
             "composer phpstan"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp": true
+        }
     }
 }
