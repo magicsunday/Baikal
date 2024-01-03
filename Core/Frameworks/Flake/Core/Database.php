@@ -64,19 +64,6 @@ abstract class Database
      */
     protected ?PDO $oDb = null;
 
-    /* common stuff */
-
-    /**
-     * @param string $sMessage
-     *
-     * @return void
-     */
-    protected function messageAndDie(string $sMessage): void
-    {
-        $sError = '<h2>' . get_class($this) . ': ' . $sMessage . '</h2>';
-        exit($sError);
-    }
-
     /**
      * @param string            $table
      * @param array             $fields_values

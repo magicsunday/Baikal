@@ -40,7 +40,6 @@ abstract class Container extends Controller
 {
     public array $aSequence = [];
     public array $aBlocks = [];
-    public array $aRendu = [];
     public array $aZones = [];
 
     /**

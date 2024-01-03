@@ -70,20 +70,6 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function rmEndSlash($sString): mixed
-    {
-        if (str_ends_with($sString, '/')) {
-            $sString = substr($sString, 0, -1);
-        }
-
-        return $sString;
-    }
-
-    /**
-     * @param $sString
-     *
-     * @return mixed|string
-     */
     public static function appendSlash($sString): mixed
     {
         if (!str_ends_with($sString, '/')) {

@@ -29,7 +29,7 @@ declare(strict_types=1);
 
 namespace BaikalAdmin;
 
-use Exception;
+use ReflectionException;
 
 use function define;
 
@@ -40,7 +40,7 @@ class Framework extends \Flake\Core\Framework
 {
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function bootstrap(): void
     {

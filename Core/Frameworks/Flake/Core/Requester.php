@@ -49,19 +49,6 @@ abstract class Requester
     }
 
     /**
-     * @param string $sField
-     * @param string $sValue
-     *
-     * @return $this
-     */
-    protected function addClause(string $sField, string $sValue): Requester
-    {
-        $this->addClauseEquals($sField, $sValue);
-
-        return $this;
-    }
-
-    /**
      * @param int      $iStart
      * @param bool|int $iNumber
      *
@@ -74,20 +61,6 @@ abstract class Requester
         }
 
         return $this->setLimitStart($iStart);
-    }
-
-    /**
-     * @param string $sOrderField
-     * @param string $sOrderDirection
-     *
-     * @return $this
-     */
-    public function orderBy(string $sOrderField, string $sOrderDirection = 'ASC'): Requester
-    {
-        $this->sOrderField = $sOrderField;
-        $this->sOrderDirection = $sOrderDirection;
-
-        return $this;
     }
 
     /**

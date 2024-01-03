@@ -112,9 +112,9 @@ class Form
     }
 
     /**
-     * @return Morphology|null
+     * @return Morphology
      */
-    public function getMorpho(): ?Morphology
+    public function getMorpho(): Morphology
     {
         if ($this->oMorpho !== null) {
             return $this->oMorpho;
@@ -122,9 +122,9 @@ class Form
 
         $this->oMorpho = $this->modelInstance()->formMorphologyForThisModelInstance();
 
-        # Calling validation hook if defined
+        // Calling validation hook if defined
         if (($aHook = $this->option('hook.morphology')) !== false) {
-            call_user_func($aHook, $this, $this->oMorpho);
+            $aHook($this, $this->oMorpho);
         }
 
         return $this->oMorpho;
@@ -267,7 +267,7 @@ class Form
 
         # Calling validation hook if defined
         if (($aHook = $this->option('hook.validation')) !== false) {
-            call_user_func($aHook, $this, $oMorpho);
+            $aHook($this, $oMorpho);
         }
 
         if (!$this->refreshed() && empty($this->aErrors)) {

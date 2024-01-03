@@ -32,6 +32,7 @@ namespace Flake\Core;
 use Exception;
 use Formal\Form;
 use Formal\Form\Morphology;
+use ReflectionException;
 use RuntimeException;
 
 use function array_key_exists;
@@ -176,7 +177,7 @@ abstract class Model
      * @param array $options
      *
      * @return Form
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function formForThisModelInstance($options = []): Form
     {
