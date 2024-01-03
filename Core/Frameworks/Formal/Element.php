@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Formal;
 
-use Exception;
 use Flake\Util\Tools;
 use RuntimeException;
 
@@ -70,9 +69,9 @@ abstract class Element
     /**
      * @param string $sName
      *
-     * @return array|bool|mixed|string
+     * @return string|bool|array
      */
-    public function option(string $sName)
+    public function option(string $sName): string|bool|array
     {
         if (array_key_exists($sName, $this->aOptions)) {
             return $this->aOptions[$sName];

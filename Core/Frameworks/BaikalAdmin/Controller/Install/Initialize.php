@@ -30,11 +30,11 @@ declare(strict_types=1);
 namespace BaikalAdmin\Controller\Install;
 
 use Baikal\Model\Config\Standard;
-use Exception;
 use Flake\Core\Controller;
 use Flake\Util\Tools;
 use Formal\Form;
 use PDO;
+use ReflectionException;
 use RuntimeException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -54,7 +54,14 @@ class Initialize extends Controller
 
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
      */
     public function execute(): void
     {
@@ -132,9 +139,6 @@ class Initialize extends Controller
      */
     public function render(): string
     {
-        $sBigIcon = 'glyph2x-magic';
-        $sBaikalVersion = BAIKAL_VERSION;
-
         $oView = new \BaikalAdmin\View\Install\Initialize();
         $oView->setData('baikalversion', BAIKAL_VERSION);
 

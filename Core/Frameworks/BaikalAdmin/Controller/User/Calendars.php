@@ -34,9 +34,11 @@ use Baikal\Model\User;
 use BaikalAdmin\Controller\Users;
 use Exception;
 use Flake\Core\Controller;
+use Flake\Core\Model;
 use Flake\Util\Tools;
 use Formal\Core\Message;
 use Formal\Form;
+use ReflectionException;
 use RuntimeException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -82,7 +84,8 @@ class Calendars extends Controller
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws Exception
      */
     public function render(): string
     {
@@ -121,12 +124,12 @@ class Calendars extends Controller
         }
 
         $oView->setData('form', $sForm);
-        $oView->setData('titleicon', Calendar::bigicon());
+        $oView->setData('titleicon', (new \Baikal\Model\Calendar)->bigicon());
         $oView->setData('modelicon', $this->oUser->mediumicon());
         $oView->setData('modellabel', $this->oUser->label());
         $oView->setData('linkback', Users::link());
         $oView->setData('linknew', $this->linkNew());
-        $oView->setData('calendaricon', Calendar::icon());
+        $oView->setData('calendaricon', (new \Baikal\Model\Calendar)->icon());
 
         return $oView->render();
     }
@@ -219,17 +222,17 @@ class Calendars extends Controller
     # Action edit
 
     /**
-     * @param Calendar $oModel
+     * @param Model $oModel
      *
      * @return string
      * @throws Exception
      */
-    public function linkEdit(Calendar $oModel): string
+    public function linkEdit(Model $oModel): string
     {
         return self::buildRoute([
-                'user' => $this->currentUserId(),
-                'edit' => $oModel->get('id'),
-            ]) . '#form';
+            'user' => $this->currentUserId(),
+            'edit' => $oModel->get('id'),
+        ]) . '#form';
     }
 
     /**
@@ -330,7 +333,7 @@ class Calendars extends Controller
             try {
                 $oModel = new Calendar($iCalendar);
                 $oModel->destroy();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // already deleted; silently discarding
             }
 

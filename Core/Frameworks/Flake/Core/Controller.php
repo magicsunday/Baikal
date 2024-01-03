@@ -67,12 +67,7 @@ abstract class Controller
      */
     public static function buildRoute(array $aParams = []): string
     {
-        # TODO: il faut remplacer le mécanisme basé sur un nombre variable de paramètres en un mécanisme basé sur un seul paramètre "tableau"
-        #$aParams = func_get_args();
-        $sController = "\\" . static::class;
-        #array_unshift($aParams, $sController);		# Injecting current controller as first param
-        #return call_user_func_array($GLOBALS["ROUTER"] . "::buildRouteForController", $aParams);
-        return $GLOBALS['ROUTER']::buildRouteForController($sController, $aParams);
+        return $GLOBALS['ROUTER']::buildRouteForController(static::class, $aParams);
     }
 
     /**

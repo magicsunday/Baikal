@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Formal\Element;
 
-use Exception;
 use Flake\Util\Tools;
 use Formal\Element;
 use RuntimeException;
@@ -49,7 +48,6 @@ class Listbox extends Element
         $disabled = '';
         $inputclass = '';
         $groupclass = '';
-        $placeholder = '';
         $onchange = '';
 
         $value = $this->value();
@@ -86,19 +84,17 @@ class Listbox extends Element
             $onchange = " onchange=\"document.getElementsByTagName('form')[0].elements['refreshed'].value=1;document.getElementsByTagName('form')[0].submit();\" ";
         }
 
-        $clientvalue = htmlspecialchars($value);
-
         $aRenderedOptions = [];
 
         if (Tools::arrayIsSeq($aOptions)) {
-            # Array is sequential
+            // Array is sequential
             reset($aOptions);
             foreach ($aOptions as $sOptionValue) {
                 $selected = ($sOptionValue === $value) ? ' selected="selected"' : '';
                 $aRenderedOptions[] = '<option' . $selected . '>' . htmlspecialchars($sOptionValue) . '</option>';
             }
         } else {
-            # Array is associative
+            // Array is associative
             reset($aOptions);
             foreach ($aOptions as $sOptionValue => $sOptionCaption) {
                 $selected = ($sOptionValue === $value) ? ' selected="selected"' : '';

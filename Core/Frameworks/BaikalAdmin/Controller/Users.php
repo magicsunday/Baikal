@@ -29,12 +29,12 @@ declare(strict_types=1);
 
 namespace BaikalAdmin\Controller;
 
-use Baikal\Model\Calendar;
 use Baikal\Model\User;
 use BaikalAdmin\Controller\User\AddressBooks;
 use BaikalAdmin\Controller\User\Calendars;
 use Exception;
 use Flake\Core\Controller;
+use Flake\Core\Model;
 use Flake\Util\Tools;
 use Formal\Core\Message;
 use Formal\Form;
@@ -87,6 +87,7 @@ class Users extends Controller
      * @throws ReflectionException
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws Exception
      */
     public function render(): string
     {
@@ -110,8 +111,8 @@ class Users extends Controller
         }
 
         $oView->setData('users', $aUsers);
-        $oView->setData('calendaricon', Calendar::icon());
-        $oView->setData('usericon', User::icon());
+        $oView->setData('calendaricon', (new \Baikal\Model\Calendar)->icon());
+        $oView->setData('usericon', (new \Baikal\Model\User)->icon());
         $oView->setData('davUri', PROJECT_URI . 'dav.php');
 
         # Messages
@@ -126,7 +127,7 @@ class Users extends Controller
         }
 
         $oView->setData('form', $sForm);
-        $oView->setData('usericon', User::icon());
+        $oView->setData('usericon', (new \Baikal\Model\User)->icon());
         $oView->setData('controller', $this);
 
         return $oView->render();
@@ -216,11 +217,11 @@ class Users extends Controller
                 $oUser->destroy();
             } catch (Exception $e) {
                 # user is already deleted; silently discarding
-                error_log($e);
+                error_log((string) $e);
             }
 
             # Redirecting to admin home
-            Tools::redirectUsingMeta($this->link());
+            Tools::redirectUsingMeta(self::link());
         } else {
             $oUser = new User($iUser);
             $this->aMessages[] = Message::warningConfirmMessage(
@@ -278,16 +279,16 @@ class Users extends Controller
     }
 
     /**
-     * @param User $user
+     * @param Model $user
      *
      * @return string
      * @throws Exception
      */
-    public static function linkEdit(User $user): string
+    public static function linkEdit(Model $user): string
     {
         return self::buildRoute([
-                'edit' => $user->get('id'),
-            ]) . '#form';
+            'edit' => $user->get('id'),
+        ]) . '#form';
     }
 
     /**

@@ -87,22 +87,20 @@ HTML;
     }
 
     /**
-     * @param        $sHeader
-     * @param        $sDescription
-     * @param        $sActionUrl
-     * @param        $sActionLabel
-     * @param        $sCancelUrl
-     * @param string $sCancelLabel
+     * @param string $sHeader
+     * @param string $sDescription
+     * @param string $sActionUrl
+     * @param string $sActionLabel
+     * @param string $sCancelUrl
      *
      * @return string
      */
     public static function warningConfirmMessage(
-        $sHeader,
-        $sDescription,
-        $sActionUrl,
-        $sActionLabel,
-        $sCancelUrl,
-        string $sCancelLabel = 'Cancel'
+        string $sHeader,
+        string $sDescription,
+        string $sActionUrl,
+        string $sActionLabel,
+        string $sCancelUrl
     ): string {
         return <<<HTML
 <div id="message" class="alert alert-block alert-error">

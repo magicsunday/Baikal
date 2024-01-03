@@ -29,9 +29,9 @@ declare(strict_types=1);
 
 namespace BaikalAdmin\Controller\Settings;
 
-use Exception;
 use Flake\Core\Controller;
 use Formal\Form;
+use ReflectionException;
 use RuntimeException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -50,7 +50,7 @@ class Standard extends Controller
 
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function execute(): void
     {

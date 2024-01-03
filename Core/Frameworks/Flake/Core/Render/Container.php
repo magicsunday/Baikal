@@ -43,12 +43,12 @@ abstract class Container extends Controller
     public array $aZones = [];
 
     /**
-     * @param        $oBlock
-     * @param string $sZone
+     * @param Controller $oBlock
+     * @param string     $sZone
      *
      * @return void
      */
-    public function addBlock(&$oBlock, string $sZone = '_DEFAULT_'): void
+    public function addBlock(Controller $oBlock, string $sZone = '_DEFAULT_'): void
     {
         $aTemp = [
             'block' => &$oBlock,

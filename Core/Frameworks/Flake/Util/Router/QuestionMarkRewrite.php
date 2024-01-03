@@ -51,7 +51,6 @@ class QuestionMarkRewrite extends Router
         $sRouteTokens = implode('/', self::getRouteTokens());
 
         $aRoutes = self::getRoutes();
-        reset($aRoutes);
         foreach ($aRoutes as $sDefinedRoute => $sDefinedController) {
             if (str_starts_with($sRouteTokens, $sDefinedRoute)) {
                 # found a match
@@ -109,12 +108,10 @@ class QuestionMarkRewrite extends Router
             if ($sUrl !== '/') {
                 $sUrl = '?' . $sUrl;
             }
+        } elseif ($sUrl !== '/') {
+            $sUrl = '/' . self::getUriPath() . '?' . $sUrl;
         } else {
-            if ($sUrl !== '/') {
-                $sUrl = '/' . self::getUriPath() . '?' . $sUrl;
-            } else {
-                $sUrl = '/' . self::getUriPath();
-            }
+            $sUrl = '/' . self::getUriPath();
         }
 
         return $sUrl;
@@ -125,7 +122,6 @@ class QuestionMarkRewrite extends Router
      */
     protected static function getUrlTokens(): array
     {
-        $sQuery = '';
         $sUrl = Tools::stripBeginSlash(Tools::getCurrentUrl());
         $aUrlParts = parse_url($sUrl);
 

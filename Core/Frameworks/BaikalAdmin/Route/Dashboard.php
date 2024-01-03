@@ -44,6 +44,8 @@ class Dashboard extends Route
      */
     public static function layout(Container $oRenderContainer): void
     {
-        $oRenderContainer->zone('Payload')->addBlock(new \BaikalAdmin\Controller\Dashboard());
+        $oRenderContainer
+            ->zone('Payload')
+            ->addBlock(new \BaikalAdmin\Controller\Dashboard());
     }
 }

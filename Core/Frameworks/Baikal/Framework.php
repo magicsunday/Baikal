@@ -31,7 +31,7 @@ namespace Baikal;
 
 use Baikal\Core\Tools;
 use ErrorException;
-use Exception;
+use ReflectionException;
 use Symfony\Component\Yaml\Yaml;
 
 use function define;
@@ -60,7 +60,7 @@ class Framework extends \Flake\Core\Framework
 
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function bootstrap(): void
     {

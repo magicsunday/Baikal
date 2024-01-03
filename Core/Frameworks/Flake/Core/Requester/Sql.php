@@ -40,11 +40,6 @@ class Sql extends Requester
 {
     protected string $sDataTable = '';
     protected array $aClauses = [];
-    protected string $sModelClass = '';
-    protected string $sOrderField = '';
-    protected string $sOrderDirection = 'ASC';
-    protected bool|int $iLimitStart = false;
-    protected bool|int $iLimitNumber = false;
     protected bool $bHasBeenExecuted = false;
 
     /**

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 declare(strict_types=1);
 
@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Formal\Element;
 
-use Exception;
 use Formal\Element;
 
 /**

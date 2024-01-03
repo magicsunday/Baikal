@@ -34,8 +34,6 @@ use Flake\Core\Route;
 use RuntimeException;
 
 use function array_key_exists;
-use function call_user_func_array;
-use function func_get_args;
 
 /**
  *
@@ -59,8 +57,6 @@ abstract class Router
      */
     public static function getRoutes(): array
     {
-        reset($GLOBALS['ROUTES']);
-
         return $GLOBALS['ROUTES'];
     }
 
@@ -93,10 +89,6 @@ abstract class Router
      */
     public static function getRouteForController(string $sController): false|int|string
     {
-        if ($sController[0] !== "\\") {
-            $sController = "\\" . $sController;
-        }
-
         $aRoutes = $GLOBALS['ROUTER']::getRoutes();
 
         foreach ($aRoutes as $sKey => $sRoute) {
@@ -161,19 +153,6 @@ abstract class Router
         #array_unshift($aParams, $sRouteForController);	# Injecting route as first param
         #return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
         return $GLOBALS['ROUTER']::buildRoute($sRouteForController, $aRewrittenParams);
-    }
-
-    /**
-     * @return string
-     */
-    public static function buildCurrentRoute(/*[$sParam, $sParam2, ...]*/): string
-    {
-        $aParams = func_get_args();
-        $sCurrentRoute = $GLOBALS['ROUTER']::getCurrentRoute();
-
-        array_unshift($aParams, $sCurrentRoute);    # Injecting route as first param
-
-        return call_user_func_array($GLOBALS['ROUTER'] . '::buildRoute', $aParams);
     }
 
     /**

@@ -310,7 +310,7 @@ class Framework extends Core\Framework
                 return;
             }
         } catch (Exception $e) {
-            error_log($e);
+            error_log((string) $e);
         }
 
         $sScript = substr($_SERVER['SCRIPT_FILENAME'], strlen($_SERVER['DOCUMENT_ROOT']));
@@ -386,9 +386,10 @@ class Framework extends Core\Framework
             );
         }
 
-        if (file_exists($config['database']['sqlite_file']) && is_readable(
-                $config['database']['sqlite_file']
-            ) && !isset($GLOBALS['DB'])) {
+        if (!isset($GLOBALS['DB'])
+            && file_exists($config['database']['sqlite_file'])
+            && is_readable($config['database']['sqlite_file'])
+        ) {
             $GLOBALS['DB'] = new Sqlite($config['database']['sqlite_file']);
 
             return true;
@@ -430,7 +431,7 @@ class Framework extends Core\Framework
 
             # We now setup t6he connexion to use UTF8
             $GLOBALS['DB']->query('SET NAMES UTF8');
-        } catch (Exception $e) {
+        } catch (Exception) {
             exit('<h3>Baïkal was not able to establish a connexion to the configured MySQL database (as configured in config/baikal.yaml).</h3>');
         }
 

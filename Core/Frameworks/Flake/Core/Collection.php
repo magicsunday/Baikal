@@ -30,6 +30,7 @@ declare(strict_types=1);
 namespace Flake\Core;
 
 use Iterator;
+use ReturnTypeWillChange;
 use RuntimeException;
 
 use function array_key_exists;
@@ -57,7 +58,7 @@ class Collection implements Iterator
     /**
      * @return false|TValue
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return current($this->elements);
@@ -66,7 +67,7 @@ class Collection implements Iterator
     /**
      * @return null|int|string
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key(): int|string|null
     {
         return key($this->elements);
@@ -75,7 +76,7 @@ class Collection implements Iterator
     /**
      * @return false|TValue
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function next()
     {
         return next($this->elements);
@@ -104,13 +105,14 @@ class Collection implements Iterator
     }
 
     /**
-     * @param $sKey
+     * @param int|string $sKey
      *
-     * @return mixed
+     * @return TValue
      */
-    public function getForKey($sKey)
+    public function getForKey(int|string $sKey)
     {
         $aKeys = $this->keys();
+
         if (!in_array($sKey, $aKeys, true)) {
             throw new RuntimeException(
                 "\Flake\Core\Collection->getForKey(): key '" . $sKey . "' not found in Collection"
@@ -129,9 +131,9 @@ class Collection implements Iterator
     }
 
     /**
-     * @return false|mixed
+     * @return false|TValue
      */
-    public function prev(): mixed
+    public function prev()
     {
         return prev($this->elements);
     }
@@ -161,24 +163,6 @@ class Collection implements Iterator
     }
 
     /**
-     * @return bool
-     */
-    public function isAtFirst(): bool
-    {
-        $keys = $this->keys();
-        return $this->key() === array_shift($keys);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAtLast(): bool
-    {
-        $keys = $this->keys();
-        return $this->key() === array_pop($keys);
-    }
-
-    /**
      * @param TValue $value A value
      *
      * @return void
@@ -198,9 +182,9 @@ class Collection implements Iterator
     }
 
     /**
-     * @return mixed|null
+     * @return TValue|null
      */
-    public function first(): mixed
+    public function first()
     {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
@@ -214,9 +198,9 @@ class Collection implements Iterator
     }
 
     /**
-     * @return mixed|null
+     * @return TValue|null
      */
-    public function last(): mixed
+    public function last()
     {
         if (!$this->isEmpty()) {
             $aKeys = $this->keys();
@@ -228,7 +212,7 @@ class Collection implements Iterator
     }
 
     /**
-     * @return array
+     * @return TValue[]
      */
     public function toArray(): array
     {
@@ -332,8 +316,8 @@ class Collection implements Iterator
         ) {
             $sKey = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
             return $this->aMeta[$sKey] ?? null;
-        } else {
-            throw new RuntimeException('Method ' . $sName . '() not found on ' . get_class($this));
         }
+
+        throw new RuntimeException('Method ' . $sName . '() not found on ' . get_class($this));
     }
 }

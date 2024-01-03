@@ -349,6 +349,7 @@ class Calendar extends Db
     /**
      * @return void
      * @throws ReflectionException
+     * @throws Exception
      */
     public function destroy(): void
     {

@@ -90,7 +90,6 @@ abstract class View
      */
     public function render(): string
     {
-        $sTemplatePath = $this->templatesPath();
         return (new Template($this->templatesPath()))->parse($this->getData());
     }
 

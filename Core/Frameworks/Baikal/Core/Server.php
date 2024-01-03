@@ -140,7 +140,7 @@ class Server
      */
     public function start(): void
     {
-        $this->server->exec();
+        $this->server->start();
     }
 
     /**
@@ -182,7 +182,7 @@ class Server
         $this->server = new \Sabre\DAV\Server($nodes);
         $this->server->setBaseUri($this->baseUri);
 
-        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $this->authRealm));
+        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend));
         $this->server->addPlugin(new \Sabre\DAVACL\Plugin());
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
 
@@ -222,11 +222,11 @@ class Server
     /**
      * Log failed accesses, for further processing by tools like Fail2Ban.
      *
-     * @param $e
+     * @param Exception $e
      *
      * @return void
      */
-    public function exception($e): void
+    public function exception(Exception $e): void
     {
         if ($e instanceof NotAuthenticated) {
             // Applications may make their first call without auth so don't log these attempts
@@ -239,7 +239,7 @@ class Server
                 }
             }
         } else {
-            error_log($e);
+            error_log((string) $e);
         }
     }
 }

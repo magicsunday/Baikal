@@ -39,7 +39,6 @@ use ReflectionException;
 use RuntimeException;
 
 use function array_key_exists;
-use function call_user_func;
 use function is_array;
 
 /**
@@ -48,6 +47,10 @@ use function is_array;
 class Form
 {
     protected string $sModelClass = '';
+
+    /**
+     * @var array<string, array|string|bool>
+     */
     protected array $aOptions = [
         'action'          => '',
         'close'           => true,
@@ -77,11 +80,11 @@ class Form
     }
 
     /**
-     * @param $sName
+     * @param string $sName
      *
-     * @return mixed
+     * @return string|bool|array
      */
-    public function option($sName)
+    public function option(string $sName): string|bool|array
     {
         if (array_key_exists($sName, $this->aOptions)) {
             return $this->aOptions[$sName];
@@ -270,7 +273,7 @@ class Form
             $aHook($this, $oMorpho);
         }
 
-        if (!$this->refreshed() && empty($this->aErrors)) {
+        if (empty($this->aErrors) && !$this->refreshed()) {
             # Model object is persisted
             # Last chance to generate a confirm message corresponding to what *was* submitted ("Creating", instead of "Editing")
 
@@ -287,7 +290,7 @@ class Form
                 $this->sDisplayMessage = Message::notice(
                     "Changes on <i class='" . $this->modelInstance()->icon() . "'></i> <strong>" . $this->modelInstance(
                     )->label() . '</strong> have been saved.',
-                    false,    # No title
+                    '',    # No title
                     false    # No close button
                 );
             }
@@ -512,7 +515,6 @@ class Form
         }
 
         $elements = implode("\n", $aHtml);
-        $sModelClass = $this->sModelClass;
 
         ######################################################
         # Displaying messages

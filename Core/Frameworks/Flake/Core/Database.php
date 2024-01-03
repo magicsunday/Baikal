@@ -34,7 +34,6 @@ use PDO;
 use RuntimeException;
 
 use function count;
-use function get_class;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -255,22 +254,22 @@ abstract class Database
         // Build basic query:
         $query = 'SELECT ' . $select_fields . '
 			FROM ' . $from_table .
-            ($where_clause != '' ? '
+            ($where_clause !== '' ? '
 			WHERE
 				' . $where_clause : '');
 
         // Group by:
-        if ($groupBy != '') {
+        if ($groupBy !== '') {
             $query .= '
 			GROUP BY ' . $groupBy;
         }
         // Order by:
-        if ($orderBy != '') {
+        if ($orderBy !== '') {
             $query .= '
 			ORDER BY ' . $orderBy;
         }
         // Group by:
-        if ($limit != '') {
+        if ($limit !== '') {
             $query .= '
 			LIMIT ' . $limit;
         }

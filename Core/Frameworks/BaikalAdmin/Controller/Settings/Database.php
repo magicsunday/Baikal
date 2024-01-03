@@ -37,6 +37,7 @@ use Flake\Core\Database\Sqlite;
 use Formal\Core\Message;
 use Formal\Form;
 use Formal\Form\Morphology;
+use ReflectionException;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
@@ -58,7 +59,7 @@ class Database extends Controller
 
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function execute(): void
     {

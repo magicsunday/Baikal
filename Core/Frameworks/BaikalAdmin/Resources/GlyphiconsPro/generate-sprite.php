@@ -451,7 +451,7 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
 
 CSS;
 
-    foreach ($aSprites as $iKey => $aSprite) {
+    foreach ($aSprites as $aSprite) {
         $iX = (-1 * (int)$aSprite['x']);
         $iY = (-1 * (int)$aSprite['y']);
 

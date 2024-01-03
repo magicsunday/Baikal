@@ -35,9 +35,11 @@ use BaikalAdmin\Controller\Users;
 use Exception;
 use Flake\Core\Collection;
 use Flake\Core\Controller;
+use Flake\Core\Model;
 use Flake\Util\Tools;
 use Formal\Core\Message;
 use Formal\Form;
+use ReflectionException;
 use RuntimeException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -85,7 +87,8 @@ class AddressBooks extends Controller
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws Exception
      */
     public function render(): string
     {
@@ -217,16 +220,16 @@ class AddressBooks extends Controller
     # Action edit
 
     /**
-     * @param AddressBook $oModel
+     * @param Model $oModel
      *
      * @return string
      */
-    public function linkEdit(AddressBook $oModel): string
+    public function linkEdit(Model $oModel): string
     {
         return self::buildRoute([
-                'user' => $this->currentUserId(),
-                'edit' => $oModel->get('id'),
-            ]) . '#form';
+            'user' => $this->currentUserId(),
+            'edit' => $oModel->get('id'),
+        ]) . '#form';
     }
 
     /**
@@ -300,12 +303,13 @@ class AddressBooks extends Controller
      */
     protected function actionDeleteConfirmed(): bool
     {
-        if (($iPrimary = $this->actionDeleteRequested()) === false) {
+        if ($this->actionDeleteRequested() === false) {
             return false;
         }
 
         $aParams = $this->getParams();
-        return array_key_exists('confirm', $aParams) && (int)$aParams['confirm'] > 0;
+
+        return array_key_exists('confirm', $aParams) && (((int) $aParams['confirm']) > 0);
     }
 
     /**
@@ -324,7 +328,7 @@ class AddressBooks extends Controller
             try {
                 $oModel = new AddressBook($iModel);
                 $oModel->destroy();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 # already deleted; silently discarding
             }
 

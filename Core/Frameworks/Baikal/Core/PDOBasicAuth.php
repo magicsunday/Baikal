@@ -42,11 +42,6 @@ class PDOBasicAuth extends AbstractBasic
     protected string $authRealm;
 
     /**
-     * @var string
-     */
-    private string $currentUser;
-
-    /**
      * Creates the backend object.
      *
      * If the filename argument is passed in, it will parse out the specified file fist.
@@ -84,12 +79,7 @@ class PDOBasicAuth extends AbstractBasic
         }
 
         $hash = md5($username . ':' . $this->authRealm . ':' . $password);
-        if ($result[0]['digesta1'] === $hash) {
-            $this->currentUser = $username;
 
-            return true;
-        }
-
-        return false;
+        return $result[0]['digesta1'] === $hash;
     }
 }

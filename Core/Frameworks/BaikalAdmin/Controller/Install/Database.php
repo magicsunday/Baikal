@@ -37,6 +37,7 @@ use Flake\Core\Database\Mysql;
 use Flake\Core\Database\Sqlite;
 use Formal\Form;
 use Formal\Form\Morphology;
+use ReflectionException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -56,7 +57,8 @@ class Database extends Controller
 
     /**
      * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws Exception
      */
     public function execute(): void
     {
@@ -117,15 +119,12 @@ class Database extends Controller
      */
     public function render(): string
     {
-        $sBigIcon = 'glyph2x-magic';
-        $sBaikalVersion = BAIKAL_VERSION;
-
         $oView = new \BaikalAdmin\View\Install\Database();
         $oView->setData('baikalversion', BAIKAL_VERSION);
 
         if ($this->oForm->persisted()) {
             $sMessage = '<p>Baïkal is now installed, and its database properly configured. <strong>For security reasons, this installation wizard is now disabled.</strong></p>';
-            $sMessage . '<p>&nbsp;</p>';
+            $sMessage .= '<p>&nbsp;</p>';
             $sMessage .= "<p><a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Start using Baïkal</a></p>";
             $sForm = '';
         } else {

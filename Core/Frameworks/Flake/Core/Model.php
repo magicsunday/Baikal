@@ -158,7 +158,7 @@ abstract class Model
     /**
      * @return string|null
      */
-    public static function humanName(): ?string
+    public function humanName(): ?string
     {
         $aRes = explode("\\", static::class);
 
@@ -179,7 +179,7 @@ abstract class Model
      * @return Form
      * @throws ReflectionException
      */
-    public function formForThisModelInstance($options = []): Form
+    public function formForThisModelInstance(array $options = []): Form
     {
         $sClass = get_class($this);
         $oForm = new Form($sClass, $options);

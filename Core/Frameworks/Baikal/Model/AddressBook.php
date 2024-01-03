@@ -30,7 +30,6 @@ declare(strict_types=1);
 namespace Baikal\Model;
 
 use Baikal\Model\AddressBook\Contact;
-use Exception;
 use Flake\Core\Model\Db;
 use Flake\Core\Requester\Sql;
 use Formal\Element\Text;
@@ -56,17 +55,9 @@ class AddressBook extends Db
     /**
      * @return string|null
      */
-    public static function humanName(): ?string
+    public function humanName(): ?string
     {
         return 'Address Book';
-    }
-
-    /**
-     * @return string
-     */
-    public static function icon(): string
-    {
-        return 'icon-book';
     }
 
     /**

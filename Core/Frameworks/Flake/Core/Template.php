@@ -39,7 +39,6 @@ use Twig\Error\SyntaxError;
  */
 class Template
 {
-    private string $sAbsPath;
     private string|false $sHtml;
 
     /**
@@ -47,10 +46,7 @@ class Template
      */
     public function __construct(string $sAbsPath)
     {
-        $this->sAbsPath = $sAbsPath;
-        $this->sHtml = $this->getTemplateFile(
-            $this->sAbsPath
-        );
+        $this->sHtml = $this->getTemplateFile($sAbsPath);
     }
 
     /**

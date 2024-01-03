@@ -29,7 +29,6 @@ declare(strict_types=1);
 
 namespace Formal\Element;
 
-use Exception;
 use Formal\Element;
 
 use function array_key_exists;
@@ -55,7 +54,6 @@ class Text extends Element
         $disabled = '';
         $inputclass = '';
         $groupclass = '';
-        $placeholder = '';
 
         $value = $this->value();
         $label = $this->option('label');

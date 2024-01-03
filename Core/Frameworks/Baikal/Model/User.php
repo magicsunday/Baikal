@@ -59,6 +59,7 @@ class User extends Db
      *
      * @return void
      * @throws ReflectionException
+     * @throws Exception
      */
     protected function initByPrimary(string|int $sPrimary): void
     {
@@ -129,7 +130,7 @@ class User extends Db
         try {
             # does the property exist on the model object ?
             $sRes = parent::get($sPropName);
-        } catch (Exception $e) {
+        } catch (Exception) {
             # no, it may belong to the oIdentityPrincipal model object
             if ($this->oIdentityPrincipal) {
                 $sRes = $this->oIdentityPrincipal->get($sPropName);
@@ -164,13 +165,11 @@ class User extends Db
         }
 
         try {
-            # does the property exist on the model object ?
+            // does the property exist on the model object ?
             parent::set($sPropName, $sPropValue);
-        } catch (Exception $e) {
-            # no, it may belong to the oIdentityPrincipal model object
-            if ($this->oIdentityPrincipal) {
-                $this->oIdentityPrincipal->set($sPropName, $sPropValue);
-            }
+        } catch (Exception) {
+            // no, it may belong to the oIdentityPrincipal model object
+            $this->oIdentityPrincipal?->set($sPropName, $sPropValue);
         }
 
         return $this;
@@ -238,12 +237,10 @@ class User extends Db
      */
     public function destroy(): void
     {
-        # TODO: delete all related resources (principals, calendars, calendar events, contact books and contacts)
+        // TODO: delete all related resources (principals, calendars, calendar events, contact books and contacts)
 
-        # Destroying identity principal
-        if ($this->oIdentityPrincipal != null) {
-            $this->oIdentityPrincipal->destroy();
-        }
+        // Destroying identity principal
+        $this->oIdentityPrincipal?->destroy();
 
         /** @var Calendar[] $oCalendars */
         $oCalendars = $this->getCalendarsBaseRequester()->execute();
@@ -362,14 +359,15 @@ class User extends Db
     }
 
     /**
-     * @param $sPassword
+     * @param string $sPassword
      *
      * @return string
      * @throws Exception
      */
-    public function getPasswordHashForPassword($sPassword): string
+    public function getPasswordHashForPassword(string $sPassword): string
     {
         try {
+            /** @var array $config */
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
         } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());

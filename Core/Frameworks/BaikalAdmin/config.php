@@ -27,22 +27,22 @@ declare(strict_types=1);
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
+use BaikalAdmin\Route\Dashboard;
+use BaikalAdmin\Route\Logout;
+use BaikalAdmin\Route\Settings\Database;
+use BaikalAdmin\Route\Settings\Standard;
+use BaikalAdmin\Route\User\AddressBooks;
+use BaikalAdmin\Route\User\Calendars;
+use BaikalAdmin\Route\Users;
+
 define('BAIKALADMIN_PATH_TEMPLATES', BAIKALADMIN_PATH_ROOT . 'Resources/Templates/');
 
 $GLOBALS['ROUTES'] = [
-    'default'            => '\BaikalAdmin\Route\Dashboard',
-    'users'              => '\BaikalAdmin\Route\Users',
-    'users/calendars'    => '\BaikalAdmin\Route\User\Calendars',
-    'users/addressbooks' => '\BaikalAdmin\Route\User\AddressBooks',
-    'settings/standard'  => '\BaikalAdmin\Route\Settings\Standard',
-    'settings/database'  => '\BaikalAdmin\Route\Settings\Database',
-    'logout'             => '\BaikalAdmin\Route\Logout',
-
-    //    'default'            => Dashboard::class,
-    //    'users'              => Users::class,
-    //    'users/calendars'    => Calendars::class,
-    //    'users/addressbooks' => AddressBooks::class,
-    //    'settings/standard'  => Standard::class,
-    //    'settings/database'  => Database::class,
-    //    'logout'             => Logout::class,
+    'default'            => Dashboard::class,
+    'users'              => Users::class,
+    'users/calendars'    => Calendars::class,
+    'users/addressbooks' => AddressBooks::class,
+    'settings/standard'  => Standard::class,
+    'settings/database'  => Database::class,
+    'logout'             => Logout::class,
 ];

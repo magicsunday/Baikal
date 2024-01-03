@@ -32,7 +32,6 @@ namespace BaikalAdmin\Controller\Install;
 use Baikal\Model\Config\Standard;
 use Exception;
 use Flake\Core\Controller;
-use Formal\Form;
 use PDO;
 use RuntimeException;
 use Sabre\DAV\Xml\Property\Href;
@@ -62,6 +61,7 @@ class VersionUpgrade extends Controller
     public function render(): string
     {
         try {
+            /** @var array $config */
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
         } catch (Exception $e) {
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
@@ -335,7 +335,6 @@ HTML;
             $this->aSuccess[] = 'etag and size was recalculated for cards';
             $result = $pdo->query('SELECT id, calendardata FROM calendarobjects');
             $stmt = $pdo->prepare('UPDATE calendarobjects SET uid = ? WHERE id = ?');
-            $counter = 0;
 
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 try {
@@ -344,7 +343,6 @@ HTML;
                     $this->aSuccess[] = 'warning: skipped record ' . $row['id'] . '. Error: ' . $e->getMessage();
                     continue;
                 }
-                $uid = null;
                 $item = $vobj->getBaseComponent();
                 if (!isset($item->UID)) {
                     $vobj->destroy();
@@ -357,7 +355,7 @@ HTML;
                         $row['id'],
                     ]
                 );
-                ++$counter;
+
                 $vobj->destroy();
             }
             $this->aSuccess[] = 'uid was recalculated for calendarobjects';

@@ -29,30 +29,32 @@ declare(strict_types=1);
 
 namespace Flake\Core\Render;
 
+use Flake\Core\Controller;
+
 /**
  *
  */
 class Zone
 {
-    private $oZonableObject;
+    private Container $oZonableObject;
     private string $sZone;
 
     /**
-     * @param        $oZonableObject
-     * @param string $sZone
+     * @param Container $oZonableObject
+     * @param string    $sZone
      */
-    public function __construct($oZonableObject, string $sZone)
+    public function __construct(Container $oZonableObject, string $sZone)
     {
         $this->oZonableObject = $oZonableObject;
         $this->sZone = $sZone;
     }
 
     /**
-     * @param $oBlock
+     * @param Controller $oBlock
      *
      * @return void
      */
-    public function addBlock($oBlock): void
+    public function addBlock(Controller $oBlock): void
     {
         $this->oZonableObject->addBlock(
             $oBlock,
