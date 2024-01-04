@@ -14,7 +14,7 @@ echo generateSprite(getSymbols(), COLUMNS, ROWS, MATRIXWIDTH, MATRIXHEIGHT, 'gly
  */
 function getSymbols(): array
 {
-    # Glyphicons Png names, without extension
+    // Glyphicons Png names, without extension
     return [
         '000_glass',
         '001_leaf',
@@ -410,7 +410,7 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
     }
 
     ##########################################################################
-    # Generate CSS
+    // Generate CSS
 
     $iSpriteWidth = ceil($iSymbolWidth);
     $iSpriteHeight = ceil($iSymbolHeight);

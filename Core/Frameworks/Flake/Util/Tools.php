@@ -98,6 +98,7 @@ class Tools
     {
         if ($sVar !== false) {
             $aData = self::POST();
+
             if (array_key_exists($sVar, $aData)) {
                 return $aData[$sVar];
             }
@@ -117,6 +118,7 @@ class Tools
     {
         if ($sVar !== false) {
             $aData = self::GET();
+
             if (array_key_exists($sVar, $aData)) {
                 return $aData[$sVar];
             }

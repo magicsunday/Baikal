@@ -39,12 +39,18 @@ ini_set('log_errors', 1);
 define('BAIKAL_CONTEXT', true);
 define('PROJECT_CONTEXT_BASEURI', '/');
 
-if (file_exists(getcwd() . '/Core')) {
-    # Flat FTP mode
-    define('PROJECT_PATH_ROOT', getcwd() . '/');    #./
+$currentWorkingDirectory = getcwd();
+
+if ($currentWorkingDirectory === false) {
+    exit('<h1>Incomplete installation</h1><p>The current working directory is not accessible. Check if any one of the parent directories does have the readable or search mode set. See chmod for more information on modes and permissions.</p>');
+}
+
+if (file_exists($currentWorkingDirectory . '/Core')) {
+    // Flat FTP mode
+    define('PROJECT_PATH_ROOT', $currentWorkingDirectory . '/');
 } else {
-    # Dedicated server mode
-    define('PROJECT_PATH_ROOT', dirname(getcwd()) . '/');    #../
+    // Dedicated server mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory) . '/');
 }
 
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
@@ -53,21 +59,21 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
-# Bootstrapping Flake
+// Bootstrapping Flake
 \Flake\Framework::bootstrap();
 
-# Bootstrapping Baïkal
+// Bootstrapping Baïkal
 Framework::bootstrap();
 
-# Create and setup a page object
+// Create and set up a page object
 $oPage = new Page(PROJECT_PATH_ROOT . 'Core/Resources/Web/Baikal/Templates/Page/index.html');
 $oPage->injectHTTPHeaders();
 $oPage->setTitle('Baïkal server');
 $oPage->setBaseUrl(PROJECT_URI);
 
-# Draw page
+// Draw page
 $oPage->zone('navbar')->addBlock(new Anonymous());
 $oPage->zone('Payload')->addBlock(new Main());
 
-# Render the page
+// Render the page
 echo $oPage->render();

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /***************************************************************
 *  Copyright notice
 *
@@ -24,21 +27,29 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+use Baikal\Core\Server;
+use Baikal\Framework;
 use Symfony\Component\Yaml\Yaml;
 
-ini_set("session.cookie_httponly", 1);
-ini_set("display_errors", 0);
-ini_set("log_errors", 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-define("BAIKAL_CONTEXT", true);
-define("PROJECT_CONTEXT_BASEURI", "/");
+define('BAIKAL_CONTEXT', true);
+define('PROJECT_CONTEXT_BASEURI', '/');
 
-if (file_exists(getcwd() . "/Core")) {
-    # Flat FTP mode
-    define("PROJECT_PATH_ROOT", getcwd() . "/");    #./
+$currentWorkingDirectory = getcwd();
+
+if ($currentWorkingDirectory === false) {
+    exit('<h1>Incomplete installation</h1><p>The current working directory is not accessible. Check if any one of the parent directories does have the readable or search mode set. See chmod for more information on modes and permissions.</p>');
+}
+
+if (file_exists($currentWorkingDirectory . '/Core')) {
+    // Flat FTP mode
+    define('PROJECT_PATH_ROOT', $currentWorkingDirectory . '/');    #./
 } else {
-    # Dedicated server mode
-    define("PROJECT_PATH_ROOT", dirname(getcwd()) . "/");    #../
+    // Dedicated server mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory) . '/');    #../
 }
 
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
@@ -47,27 +58,29 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
-# Bootstrapping Flake
+// Bootstrapping Flake
 \Flake\Framework::bootstrap();
 
-# Bootstrapping Baïkal
-\Baikal\Framework::bootstrap();
+// Bootstrapping Baïkal
+Framework::bootstrap();
 
 try {
-    $config = Yaml::parseFile(PROJECT_PATH_CONFIG . "baikal.yaml");
-} catch (\Exception $e) {
+    /** @var array<string, array<string, mixed>> $config */
+    $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
+} catch (Exception $e) {
     exit('<h1>Incomplete installation</h1><p>Ba&iuml;kal is missing its configuration file, or its configuration file is unreadable.');
 }
 
-if (!isset($config['system']["cal_enabled"]) || $config['system']["cal_enabled"] !== true) {
-    throw new ErrorException("Baikal CalDAV is disabled.", 0, 255, __FILE__, __LINE__);
+if (!isset($config['system']['cal_enabled']) || $config['system']['cal_enabled'] !== true) {
+    throw new ErrorException('Baikal CalDAV is disabled.', 0, 255, __FILE__, __LINE__);
 }
 
-$server = new \Baikal\Core\Server(
-    $config['system']["cal_enabled"],
-    $config['system']["card_enabled"],
-    $config['system']["dav_auth_type"],
-    $config['system']["auth_realm"],
+/** @var array{system: array{cal_enabled: bool, card_enabled: bool, dav_auth_type: string, auth_realm: string}} $config */
+$server = new Server(
+    $config['system']['cal_enabled'],
+    $config['system']['card_enabled'],
+    $config['system']['dav_auth_type'],
+    $config['system']['auth_realm'],
     $GLOBALS['DB']->getPDO(),
     PROJECT_BASEURI . 'cal.php/'
 );

@@ -50,12 +50,18 @@ define('BAIKAL_CONTEXT', true);
 define('BAIKAL_CONTEXT_INSTALL', true);
 define('PROJECT_CONTEXT_BASEURI', '/admin/install/');
 
-if (file_exists(dirname(getcwd(), 2) . '/Core')) {
-    # Flat FTP mode
-    define('PROJECT_PATH_ROOT', dirname(getcwd(), 2) . '/');    #../../
+$currentWorkingDirectory = getcwd();
+
+if ($currentWorkingDirectory === false) {
+    exit('<h1>Incomplete installation</h1><p>The current working directory is not accessible. Check if any one of the parent directories does have the readable or search mode set. See chmod for more information on modes and permissions.</p>');
+}
+
+if (file_exists(dirname($currentWorkingDirectory, 2) . '/Core')) {
+    // Flat FTP mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory, 2) . '/');
 } else {
-    # Dedicated server mode
-    define('PROJECT_PATH_ROOT', dirname(getcwd(), 3) . '/');    # ../../../
+    // Dedicated server mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory, 3) . '/');
 }
 
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
@@ -64,13 +70,13 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
-# Bootstrapping Flake
+// Bootstrapping Flake
 \Flake\Framework::bootstrap();
 
-# Bootstrap BaikalAdmin
+// Bootstrap BaikalAdmin
 Framework::bootstrap();
 
-# Create and setup a page object
+// Create and set up a page object
 $oPage = new Page(BAIKALADMIN_PATH_TEMPLATES . 'Page/index.html');
 $oPage->injectHTTPHeaders();
 $oPage->setTitle('Baïkal Maintainance');
@@ -79,18 +85,19 @@ $oPage->setBaseUrl(PROJECT_URI);
 $oPage->zone('navbar')->addBlock(new Install());
 
 try {
+    /** @var array<string, array<string, mixed>> $config */
     $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
 } catch (Exception $e) {
     $config = null;
     error_log('Error reading baikal.yaml file : ' . $e->getMessage());
 }
 
-if (!$config || !isset($config['system']['configured_version'])) {
-    # we have to upgrade Baïkal (existing installation)
+if (($config === null) || !isset($config['system']['configured_version'])) {
+    // we have to upgrade Baïkal (existing installation)
     $oPage->zone('Payload')->addBlock(new Initialize());
 } elseif (isset($config['system']['admin_passwordhash'])) {
     if ($config['system']['configured_version'] !== BAIKAL_VERSION) {
-        # we have to upgrade Baïkal
+        // we have to upgrade Baïkal
         if (Tools::GET('upgradeConfirmed')) {
             $oPage->zone('Payload')->addBlock(new VersionUpgrade());
         } else {
@@ -103,9 +110,9 @@ if (!$config || !isset($config['system']['configured_version'])) {
         $oPage->zone('Payload')->addBlock(new Database());
     }
 } else {
-    # we have to set an admin password
+    // we have to set an admin password
     $oPage->zone('Payload')->addBlock(new Initialize());
 }
 
-# Render the page
+// Render the page
 echo $oPage->render();

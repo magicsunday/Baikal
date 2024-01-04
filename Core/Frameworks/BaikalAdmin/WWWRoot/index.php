@@ -42,12 +42,18 @@ define('BAIKAL_CONTEXT', true);
 define('BAIKAL_CONTEXT_ADMIN', true);
 define('PROJECT_CONTEXT_BASEURI', '/admin/');
 
-if (file_exists(dirname(getcwd()) . '/Core')) {
-    # Flat FTP mode
-    define('PROJECT_PATH_ROOT', dirname(getcwd()) . '/');    #../
+$currentWorkingDirectory = getcwd();
+
+if ($currentWorkingDirectory === false) {
+    exit('<h1>Incomplete installation</h1><p>The current working directory is not accessible. Check if any one of the parent directories does have the readable or search mode set. See chmod for more information on modes and permissions.</p>');
+}
+
+if (file_exists(dirname($currentWorkingDirectory) . '/Core')) {
+    // Flat FTP mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory) . '/');
 } else {
-    # Dedicated server mode
-    define('PROJECT_PATH_ROOT', dirname(getcwd(), 2) . '/');    #../../
+    // Dedicated server mode
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory, 2) . '/');
 }
 
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
@@ -56,13 +62,13 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
-# Bootstrapping Flake
+// Bootstrapping Flake
 \Flake\Framework::bootstrap();
 
-# Bootstrap BaikalAdmin
+// Bootstrap BaikalAdmin
 Framework::bootstrap();
 
-# Create and setup a page object
+// Create and set up a page object
 $oPage = new Page(BAIKALADMIN_PATH_TEMPLATES . 'Page/index.html');
 $oPage->injectHTTPHeaders();
 
@@ -84,7 +90,7 @@ if (Auth::isAuthenticated()) {
 
     $oPage->zone('navbar')->addBlock(new Topbar());
 
-    # Route the request
+    // Route the request
     $GLOBALS['ROUTER']::route($oPage);
 } else {
     if (Auth::authenticate()) {
@@ -98,5 +104,5 @@ if (Auth::isAuthenticated()) {
     $oPage->zone('Payload')->addBlock(new Login());
 }
 
-# Render the page
+// Render the page
 echo $oPage->render();

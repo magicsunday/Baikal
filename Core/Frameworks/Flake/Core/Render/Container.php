@@ -40,6 +40,10 @@ abstract class Container extends Controller
 {
     public array $aSequence = [];
     public array $aBlocks = [];
+
+    /**
+     * @var Zone[]
+     */
     public array $aZones = [];
 
     /**
@@ -59,11 +63,11 @@ abstract class Container extends Controller
     }
 
     /**
-     * @param $sZone
+     * @param string $sZone
      *
-     * @return Zone|mixed
+     * @return Zone
      */
-    public function zone($sZone): mixed
+    public function zone(string $sZone): Zone
     {
         if (!array_key_exists($sZone, $this->aZones)) {
             $this->aZones[$sZone] = new Zone($this, $sZone);
