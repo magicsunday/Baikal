@@ -1,3 +1,8 @@
+[![Latest version](https://img.shields.io/github/v/release/magicsunday/baikal?sort=semver)](https://github.com/magicsunday/baikal/releases/latest)
+[![License](https://img.shields.io/github/license/magicsunday/baikal)](https://github.com/magicsunday/baikal/blob/main/LICENSE)
+[![CI](https://github.com/magicsunday/baikal/actions/workflows/ci.yml/badge.svg)](https://github.com/magicsunday/baikal/actions/workflows/ci.yml)
+
+
 Baïkal
 ======
 
