@@ -27,12 +27,12 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.51.0",
-        "rector/rector": "^0.18",
-        "phpro/grumphp": "^2.4",
+        "friendsofphp/php-cs-fixer": "^3.1",
+        "overtrue/phplint": "^3.4 || ^9.0",
         "phpstan/phpstan": "^1.10",
         "phpstan/phpstan-strict-rules": "^1.5",
-        "phpstan/phpstan-deprecation-rules": "^1.1"
+        "phpstan/phpstan-deprecation-rules": "^1.1",
+        "rector/rector": "^1.0"
     },
     "replace": {
         "jeromeschneider/baikal": "self.version"
@@ -48,20 +48,30 @@
         "source": "https://github.com/sabre-io/Baikal"
     },
     "scripts": {
-        "cs-fixer": [
-            "php-cs-fixer fix"
+        "ci:test:php:lint": [
+            "phplint"
         ],
-        "phpstan": [
-            "phpstan analyse Core html"
+        "ci:test:php:phpstan": [
+            "phpstan analyze"
         ],
-        "test": [
-            "composer cs-fixer",
-            "composer phpstan"
+        "ci:test:php:phpstan:baseline": [
+            "phpstan analyze --generate-baseline phpstan-baseline.neon --allow-empty-baseline"
+        ],
+        "ci:test:php:rector": [
+            "rector process --config rector.php --dry-run"
+        ],
+        "ci:test": [
+            "@ci:test:php:lint",
+            "@ci:test:php:phpstan",
+            "@ci:test:php:rector"
+        ],
+        "ci:cgl": [
+            "php-cs-fixer fix --diff --verbose"
         ]
     },
     "config": {
-        "allow-plugins": {
-            "phpro/grumphp": true
-        }
+        "discard-changes": true,
+        "sort-packages": true,
+        "optimize-autoloader": true
     }
 }

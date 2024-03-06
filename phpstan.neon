@@ -1,23 +1,25 @@
 includes:
-    - vendor/phpstan/phpstan-strict-rules/rules.neon
-    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - %currentWorkingDirectory%/vendor/phpstan/phpstan-strict-rules/rules.neon
+    - %currentWorkingDirectory%/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - %currentWorkingDirectory%/phpstan-baseline.neon
 
 parameters:
-    # You can currently choose from 10 levels (0 is the loosest and "max" is the strictest).
-    level: max
+    # You can currently choose from 10 levels (0 is the loosest and 9 is the strictest).
+    level: 9
 
     paths:
-        - Core
-        - html
+        - %currentWorkingDirectory%/Core/
+        - %currentWorkingDirectory%/html/
 
     fileExtensions:
         - php
 
     excludePaths:
-        - vendor/
-        - Core/Frameworks/BaikalAdmin/Resources/GlyphiconsPro/generate-sprite.php
-        - Core/Resources/Web/BaikalAdmin/GlyphiconsPro/generate-sprite.php
-        - html/res/core/BaikalAdmin/GlyphiconsPro/generate-sprite.php
+        - %currentWorkingDirectory%/vendor/
+        - %currentWorkingDirectory%/Core/Frameworks/BaikalAdmin/Resources/GlyphiconsPro/generate-sprite.php
+        - %currentWorkingDirectory%/Core/Resources/Web/BaikalAdmin/GlyphiconsPro/generate-sprite.php
+        - %currentWorkingDirectory%/html/res/core/BaikalAdmin/GlyphiconsPro/generate-sprite.php
 
     # Ignored errors
     ignoreErrors:
+
