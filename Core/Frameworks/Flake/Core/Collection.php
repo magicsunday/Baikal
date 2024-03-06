@@ -140,7 +140,7 @@ class Collection implements Iterator
     /**
      * @return false|TValue
      */
-    public function prev(): mixed|false
+    public function prev(): mixed
     {
         return prev($this->elements);
     }
