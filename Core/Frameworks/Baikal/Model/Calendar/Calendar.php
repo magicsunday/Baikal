@@ -41,8 +41,10 @@ use RuntimeException;
 
 class Calendar extends Db
 {
-    public const DATATABLE  = 'calendars';
+    public const DATATABLE = 'calendars';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'components';
 
     protected array $aData = [
@@ -57,7 +59,7 @@ class Calendar extends Db
         $rSql = $GLOBALS['DB']->exec_SELECTquery(
             'count(*)',
             'calendarinstances',
-            'calendarid' . "='" . $this->aData['id'] . "'"
+            'calendarid=\'' . $this->aData['id'] . "'"
         );
 
         if (($aRs = $rSql->fetch()) === false) {
@@ -79,6 +81,7 @@ class Calendar extends Db
         if ($this->hasInstances()) {
             throw new RuntimeException('Trying to destroy a calendar with instances');
         }
+
         parent::destroy();
     }
 }

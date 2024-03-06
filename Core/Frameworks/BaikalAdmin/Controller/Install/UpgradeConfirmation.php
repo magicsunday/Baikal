@@ -63,15 +63,15 @@ class UpgradeConfirmation extends Controller
 
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
 
         if (isset($config['system']['configured_version']) && $config['system']['configured_version'] === BAIKAL_VERSION) {
             $sMessage = 'Your system is configured to use version <strong>' . $config['system']['configured_version'] . "</strong>.<br />There's no upgrade to be done.";
         } else {
             $oldVersion = $config['system']['configured_version'] ?? 'Unknown';
-            $sMessage   = "Upgrading Baïkal from version <strong>$oldVersion</strong> to version <strong>" . BAIKAL_VERSION . '</strong>';
+            $sMessage   = sprintf('Upgrading Baïkal from version <strong>%s</strong> to version <strong>', $oldVersion) . BAIKAL_VERSION . '</strong>';
         }
 
         $oView->setData('message', $sMessage);

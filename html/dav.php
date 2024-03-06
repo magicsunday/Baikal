@@ -62,6 +62,7 @@ if (file_exists($currentWorkingDirectory . '/Core')) {
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
     exit('<h1>Incomplete installation</h1><p>Ba&iuml;kal dependencies have not been installed. If you are a regular user, this means that you probably downloaded the wrong zip file.</p><p>To install the dependencies manually, execute "<strong>composer install</strong>" in the Ba&iuml;kal root folder.</p>');
 }
+
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
 // Bootstrapping Flake
@@ -73,7 +74,7 @@ Framework::bootstrap();
 try {
     /** @var array<string, array<string, mixed>> $config */
     $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-} catch (Exception $e) {
+} catch (Exception) {
     exit('<h1>Incomplete installation</h1><p>Ba&iuml;kal is missing its configuration file, or its configuration file is unreadable.');
 }
 

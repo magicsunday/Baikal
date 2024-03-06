@@ -65,8 +65,11 @@ class Topbar extends Controller
     {
         $oView = new \BaikalAdmin\View\Navigation\Topbar();
 
-        $sCurrentRoute = $GLOBALS['ROUTER']::getCurrentRoute();
-        $sActiveHome   = $sActiveUsers = $sActiveSettingsStandard = $sActiveSettingsDatabase = '';
+        $sCurrentRoute           = $GLOBALS['ROUTER']::getCurrentRoute();
+        $sActiveHome             = '';
+        $sActiveUsers            = '';
+        $sActiveSettingsStandard = '';
+        $sActiveSettingsDatabase = '';
 
         $sControllerForDefaultRoute = $GLOBALS['ROUTER']::getControllerForRoute('default');
         $sHomeLink                  = $sControllerForDefaultRoute::link();
@@ -78,6 +81,7 @@ class Topbar extends Controller
         if ($sCurrentRoute === 'default') {
             $sActiveHome = 'active';
         }
+
         if (
             $sCurrentRoute === $GLOBALS['ROUTER']::getRouteForController(Users::class)
             || $sCurrentRoute === $GLOBALS['ROUTER']::getRouteForController(Calendars::class)

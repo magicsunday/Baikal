@@ -36,6 +36,7 @@ declare(strict_types=1);
 
 namespace BaikalAdmin\Controller\Install;
 
+use Baikal\Model\Config\Database;
 use Baikal\Model\Config\Standard;
 use Flake\Core\Controller;
 use Flake\Util\Tools;
@@ -53,7 +54,9 @@ use function in_array;
 class Initialize extends Controller
 {
     protected array $aMessages = [];
+
     protected Standard $oModel;
+
     protected Form $oForm;    // \Formal\Form
 
     /**
@@ -96,6 +99,7 @@ class Initialize extends Controller
             $this->oModel->set('invite_from', defined('BAIKAL_INVITE_FROM') ? BAIKAL_INVITE_FROM : '');
             $this->oModel->set('dav_auth_type', BAIKAL_DAV_AUTH_TYPE);
         }
+
         if (file_exists(PROJECT_PATH_SPECIFIC . 'config.system.php')) {
             require_once PROJECT_PATH_SPECIFIC . 'config.system.php';
             $this->oModel->set('auth_realm', BAIKAL_AUTH_REALM);
@@ -113,12 +117,13 @@ class Initialize extends Controller
                 if (file_exists(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED')) {
                     @unlink(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED');
                 }
+
                 if (file_exists(PROJECT_PATH_SPECIFIC . 'config.php')) {
                     @unlink(PROJECT_PATH_SPECIFIC . 'config.php');
                 }
 
                 // Creating system config, and initializing BAIKAL_ENCRYPTION_KEY
-                $oDatabaseConfig = new \Baikal\Model\Config\Database();
+                $oDatabaseConfig = new Database();
                 $oDatabaseConfig->set('encryption_key', md5(microtime() . mt_rand()));
 
                 // Default: PDO::SQLite or PDO::MySQL ?
@@ -186,7 +191,7 @@ class Initialize extends Controller
      *
      * @return void
      */
-    private function copyResourceFile($template, $destination): void
+    private function copyResourceFile(string $template, string $destination): void
     {
         if (!file_exists($destination)) {
             @copy(PROJECT_PATH_CORERESOURCES . $template, $destination);

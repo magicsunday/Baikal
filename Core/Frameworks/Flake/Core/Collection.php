@@ -42,7 +42,6 @@ use RuntimeException;
 
 use function array_key_exists;
 use function count;
-use function get_class;
 use function in_array;
 use function strlen;
 
@@ -60,7 +59,8 @@ class Collection implements Iterator
      * @var TValue[]
      */
     protected array $elements = [];
-    protected array $aMeta    = [];
+
+    protected array $aMeta = [];
 
     /**
      * @return false|TValue
@@ -140,7 +140,7 @@ class Collection implements Iterator
     /**
      * @return false|TValue
      */
-    public function prev()
+    public function prev(): mixed|false
     {
         return prev($this->elements);
     }
@@ -272,7 +272,7 @@ class Collection implements Iterator
      *
      * @return void
      */
-    public function remove($sKey): void
+    public function remove(string $sKey): void
     {
         $aKeys = $this->keys();
         if (!in_array($sKey, $aKeys, true)) {
@@ -289,7 +289,7 @@ class Collection implements Iterator
      *
      * @return mixed|null
      */
-    public function __call($sName, $aArguments)
+    public function __call(string $sName, $aArguments)
     {
         if (strlen($sName) > 7
             && $sName[0] === 's'
@@ -328,6 +328,6 @@ class Collection implements Iterator
             return $this->aMeta[$sKey] ?? null;
         }
 
-        throw new RuntimeException('Method ' . $sName . '() not found on ' . get_class($this));
+        throw new RuntimeException('Method ' . $sName . '() not found on ' . static::class);
     }
 }

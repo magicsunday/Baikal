@@ -43,7 +43,8 @@ use function array_key_exists;
 abstract class Container extends Controller
 {
     public array $aSequence = [];
-    public array $aBlocks   = [];
+
+    public array $aBlocks = [];
 
     /**
      * @var Zone[]
@@ -106,7 +107,7 @@ abstract class Container extends Controller
      */
     protected function renderBlocks(): array
     {
-        foreach ($this->aSequence as $sKey => $aStep) {
+        foreach (array_keys($this->aSequence) as $sKey) {
             $this->aSequence[$sKey]['rendu'] = $this->aSequence[$sKey]['block']->render();
         }
 

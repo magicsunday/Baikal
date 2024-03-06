@@ -387,7 +387,7 @@ function getSymbols(): array
  *
  * @return string
  */
-function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sClassPrefix): string
+function generateSprite($aSymbols, string $iCols, string $iRows, string $iPngWidth, string $iPngHeight, string $sClassPrefix): string
 {
     $iKey = 0;
 
@@ -396,7 +396,7 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
     $iSymbolHeight = $iPngHeight / $iRows;
 
     foreach ($aSymbols as $sSymbol) {
-        $aParts = explode('_', strtolower($sSymbol));
+        $aParts = explode('_', strtolower((string) $sSymbol));
         array_shift($aParts);
         $sClass = $sClassPrefix . implode('-', $aParts);
 

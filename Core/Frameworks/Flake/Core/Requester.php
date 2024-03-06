@@ -38,11 +38,15 @@ namespace Flake\Core;
 
 abstract class Requester
 {
-    protected string $sModelClass     = '';
-    protected string $sOrderField     = '';
+    protected string $sModelClass = '';
+
+    protected string $sOrderField = '';
+
     protected string $sOrderDirection = 'ASC';
-    protected bool|int $iLimitStart   = false;
-    protected bool|int $iLimitNumber  = false;
+
+    protected bool|int $iLimitStart = false;
+
+    protected bool|int $iLimitNumber = false;
 
     /**
      * @param string $sModelClass

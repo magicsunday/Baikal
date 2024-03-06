@@ -44,14 +44,13 @@ use function array_key_exists;
 
 abstract class View
 {
-    protected array $aData;
+    protected array $aData = [];
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->aData = [];
     }
 
     /**

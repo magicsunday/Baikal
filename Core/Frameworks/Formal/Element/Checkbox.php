@@ -84,8 +84,8 @@ class Checkbox extends Element
 
         if (($aPopover = $this->option('popover')) !== '') {
             $inputclass .= ' popover-hover ';
-            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
-            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
+            $popover = ' title="' . htmlspecialchars((string) $aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars((string) $aPopover['content']) . '" ';
         }
 
         if ($this->option('refreshonchange') === true) {

@@ -123,8 +123,8 @@ class Standard extends Config
 
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
 
         if (!isset($config['system']['admin_passwordhash']) || trim(

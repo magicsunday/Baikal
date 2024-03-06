@@ -40,8 +40,10 @@ use Flake\Core\Model\Db;
 
 class Event extends Db
 {
-    public const DATATABLE  = 'calendarobjects';
+    public const DATATABLE = 'calendarobjects';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'uri';
 
     protected array $aData = [

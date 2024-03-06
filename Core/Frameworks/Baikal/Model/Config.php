@@ -45,7 +45,8 @@ use function array_key_exists;
 abstract class Config extends NoDb
 {
     protected string $sConfigFileSection = '';
-    protected array $aData               = [];
+
+    protected array $aData = [];
 
     /**
      * @param $sConfigFileSection
@@ -72,8 +73,8 @@ abstract class Config extends NoDb
                     $this->aData[$sProp] = $aConfig[$sProp];
                 }
             }
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
             // Keep default values in $aData
         }
     }
@@ -139,11 +140,8 @@ abstract class Config extends NoDb
      */
     public function persist(): void
     {
-        if (file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')) {
-            $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } else {
-            $config = [];
-        }
+        $config = file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml') ? Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml') : [];
+
         $config[$this->sConfigFileSection] = $this->aData;
         $yaml                              = Yaml::dump($config);
         file_put_contents(PROJECT_PATH_CONFIG . 'baikal.yaml', $yaml);

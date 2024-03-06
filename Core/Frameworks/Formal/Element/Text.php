@@ -103,8 +103,8 @@ class Text extends Element
                 $inputclass .= ' popover-focus ';
             }
 
-            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
-            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
+            $popover = ' title="' . htmlspecialchars((string) $aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars((string) $aPopover['content']) . '" ';
             $popover .= ' data-html="true"';
         }
 

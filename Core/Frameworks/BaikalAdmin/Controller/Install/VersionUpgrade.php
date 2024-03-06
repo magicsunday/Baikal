@@ -49,7 +49,8 @@ use function strlen;
 
 class VersionUpgrade extends Controller
 {
-    protected array $aErrors  = [];
+    protected array $aErrors = [];
+
     protected array $aSuccess = [];
 
     /**
@@ -67,8 +68,8 @@ class VersionUpgrade extends Controller
         try {
             /** @var array $config */
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
 
         $sBigIcon                 = 'glyph2x-magic';
@@ -90,20 +91,20 @@ HTML;
 
         try {
             $bSuccess = $this->upgrade($config['database'], $config['system']['configured_version'], BAIKAL_VERSION);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $bSuccess        = false;
-            $this->aErrors[] = 'Uncaught exception during upgrade: ' . $e;
+            $this->aErrors[] = 'Uncaught exception during upgrade: ' . $exception;
         }
 
-        if (!empty($this->aErrors)) {
+        if ($this->aErrors !== []) {
             $sHtml .= '<h3>Errors</h3>' . implode("<br />\n", $this->aErrors);
         }
 
-        if (!empty($this->aSuccess)) {
+        if ($this->aSuccess !== []) {
             $sHtml .= '<h3>Successful operations</h3>' . implode("<br />\n", $this->aSuccess);
         }
 
-        if ($bSuccess !== false) {
+        if ($bSuccess) {
             $sHtml .= "<p>&nbsp;</p><p>Baïkal has been successfully upgraded. You may now <a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Access the Baïkal admin</a></p>";
         } else {
             $sHtml .= "<p>&nbsp;</p><p><span class='label label-important'>Error</span> Baïkal has not been upgraded. See the section 'Errors' for details.</p>";
@@ -146,16 +147,16 @@ HTML;
                     ] as $dataType
                 ) {
                     $tableName = $dataType . 's';
-                    $pdo->exec("ALTER TABLE $tableName ADD synctoken INT(11) UNSIGNED NOT NULL DEFAULT '1'");
+                    $pdo->exec(sprintf('ALTER TABLE %s ADD synctoken INT(11) UNSIGNED NOT NULL DEFAULT \'1\'', $tableName));
                     $this->aSuccess[] = 'synctoken was added to ' . $tableName;
 
-                    $pdo->exec("ALTER TABLE $tableName DROP ctag");
+                    $pdo->exec(sprintf('ALTER TABLE %s DROP ctag', $tableName));
                     $this->aSuccess[] = 'ctag was removed from ' . $tableName;
 
                     $changesTable = $dataType . 'changes';
                     $pdo->exec(
                         "
-                        CREATE TABLE $changesTable (
+                        CREATE TABLE {$changesTable} (
                             id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
                             uri VARCHAR(200) NOT NULL,
                             synctoken INT(11) UNSIGNED NOT NULL,
@@ -246,13 +247,13 @@ HTML;
                 ) {
                     $tableName = $dataType . 's';
                     // Note: we can't remove the ctag field in sqlite :(;
-                    $pdo->exec("ALTER TABLE $tableName ADD synctoken integer");
+                    $pdo->exec(sprintf('ALTER TABLE %s ADD synctoken integer', $tableName));
                     $this->aSuccess[] = 'synctoken was added to ' . $tableName;
 
                     $changesTable = $dataType . 'changes';
                     $pdo->exec(
                         "
-                        CREATE TABLE $changesTable (
+                        CREATE TABLE {$changesTable} (
                             id integer primary key asc,
                             uri text,
                             synctoken integer,
@@ -263,6 +264,7 @@ HTML;
                     );
                     $this->aSuccess[] = $changesTable . ' was created';
                 }
+
                 $pdo->exec(
                     '
                     CREATE TABLE calendarsubscriptions (
@@ -332,11 +334,12 @@ HTML;
             $stmt   = $pdo->prepare('UPDATE cards SET etag = ?, size = ? WHERE id = ?');
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $stmt->execute([
-                    md5($row['carddata']),
-                    strlen($row['carddata']),
+                    md5((string) $row['carddata']),
+                    strlen((string) $row['carddata']),
                     $row['id'],
                 ]);
             }
+
             $this->aSuccess[] = 'etag and size was recalculated for cards';
             $result           = $pdo->query('SELECT id, calendardata FROM calendarobjects');
             $stmt             = $pdo->prepare('UPDATE calendarobjects SET uid = ? WHERE id = ?');
@@ -348,11 +351,13 @@ HTML;
                     $this->aSuccess[] = 'warning: skipped record ' . $row['id'] . '. Error: ' . $e->getMessage();
                     continue;
                 }
+
                 $item = $vobj->getBaseComponent();
                 if (!isset($item->UID)) {
                     $vobj->destroy();
                     continue;
                 }
+
                 $uid = (string) $item->UID;
                 $stmt->execute(
                     [
@@ -363,6 +368,7 @@ HTML;
 
                 $vobj->destroy();
             }
+
             $this->aSuccess[] = 'uid was recalculated for calendarobjects';
 
             $result = $pdo->query('SELECT id, uri, vcardurl FROM principals WHERE vcardurl IS NOT NULL');
@@ -371,25 +377,24 @@ HTML;
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 // Inserting the new record
                 $stmt1->execute([
-                    'addressbooks/' . basename($row['uri']),
+                    'addressbooks/' . basename((string) $row['uri']),
                     '{http://calendarserver.org/ns/}me-card',
                     serialize(new Href($row['vcardurl'])),
                 ]);
             }
+
             $this->aSuccess[] = 'vcardurl was migrated to the propertystorage system';
         }
-        if (version_compare($sVersionFrom, '0.4.0', '<')) {
-            // The sqlite schema had issues with both the calendar and
-            // addressbooks tables. The tables didn't have a DEFAULT '1' for
-            // the synctoken column. So we're adding it now.
-            if ($databaseConfig['mysql'] === false) {
-                $pdo->exec('UPDATE calendars SET synctoken = 1 WHERE synctoken IS NULL');
 
-                $tmpTable = '_' . time();
-                $pdo->exec('ALTER TABLE calendars RENAME TO calendars' . $tmpTable);
-
-                $pdo->exec(
-                    '
+        // The sqlite schema had issues with both the calendar and
+        // addressbooks tables. The tables didn't have a DEFAULT '1' for
+        // the synctoken column. So we're adding it now.
+        if (version_compare($sVersionFrom, '0.4.0', '<') && $databaseConfig['mysql'] === false) {
+            $pdo->exec('UPDATE calendars SET synctoken = 1 WHERE synctoken IS NULL');
+            $tmpTable = '_' . time();
+            $pdo->exec('ALTER TABLE calendars RENAME TO calendars' . $tmpTable);
+            $pdo->exec(
+                '
 CREATE TABLE calendars (
     id integer primary key asc NOT NULL,
     principaluri text NOT NULL,
@@ -403,27 +408,22 @@ CREATE TABLE calendars (
     components text NOT NULL,
     transparent bool
 );'
-                );
-
-                $pdo->exec(
-                    'INSERT INTO calendars SELECT id, principaluri, displayname, uri, synctoken, description, calendarorder, calendarcolor, timezone, components, transparent FROM calendars' . $tmpTable
-                );
-
-                $this->aSuccess[] = 'Updated calendars table';
-            }
+            );
+            $pdo->exec(
+                'INSERT INTO calendars SELECT id, principaluri, displayname, uri, synctoken, description, calendarorder, calendarcolor, timezone, components, transparent FROM calendars' . $tmpTable
+            );
+            $this->aSuccess[] = 'Updated calendars table';
         }
-        if (version_compare($sVersionFrom, '0.4.5', '<=')) {
-            // Similar to upgrading from older than 0.4.5, there were still
-            // issues with a missing DEFAULT 1 for sthe synctoken field in the
-            // addressbook.
-            if ($databaseConfig['mysql'] === false) {
-                $pdo->exec('UPDATE addressbooks SET synctoken = 1 WHERE synctoken IS NULL');
 
-                $tmpTable = '_' . time();
-                $pdo->exec('ALTER TABLE addressbooks RENAME TO addressbooks' . $tmpTable);
-
-                $pdo->exec(
-                    '
+        // Similar to upgrading from older than 0.4.5, there were still
+        // issues with a missing DEFAULT 1 for sthe synctoken field in the
+        // addressbook.
+        if (version_compare($sVersionFrom, '0.4.5', '<=') && $databaseConfig['mysql'] === false) {
+            $pdo->exec('UPDATE addressbooks SET synctoken = 1 WHERE synctoken IS NULL');
+            $tmpTable = '_' . time();
+            $pdo->exec('ALTER TABLE addressbooks RENAME TO addressbooks' . $tmpTable);
+            $pdo->exec(
+                '
 CREATE TABLE addressbooks (
     id integer primary key asc NOT NULL,
     principaluri text NOT NULL,
@@ -433,14 +433,13 @@ CREATE TABLE addressbooks (
     synctoken integer DEFAULT 1 NOT NULL
 );
                 '
-                );
-
-                $pdo->exec(
-                    'INSERT INTO addressbooks SELECT id, principaluri, displayname, uri, description, synctoken FROM addressbooks' . $tmpTable
-                );
-                $this->aSuccess[] = 'Updated addressbooks table';
-            }
+            );
+            $pdo->exec(
+                'INSERT INTO addressbooks SELECT id, principaluri, displayname, uri, description, synctoken FROM addressbooks' . $tmpTable
+            );
+            $this->aSuccess[] = 'Updated addressbooks table';
         }
+
         if (version_compare($sVersionFrom, '0.5.1', '<')) {
             if ($databaseConfig['mysql'] !== false) { // mysql
                 $pdo->exec(
@@ -580,11 +579,12 @@ SQL
 
             $pdo->exec(
                 <<<SQL
-INSERT INTO calendars (id, synctoken, components) SELECT id, COALESCE(synctoken,1) as synctoken, COALESCE(components,"VEVENT,VTODO,VJOURNAL") as components FROM $calendarBackup
+INSERT INTO calendars (id, synctoken, components) SELECT id, COALESCE(synctoken,1) as synctoken, COALESCE(components,"VEVENT,VTODO,VJOURNAL") as components FROM {$calendarBackup}
 SQL
             );
             $this->aSuccess[] = 'Migrated calendars table';
         }
+
         if (version_compare($sVersionFrom, '0.9.4', '<')) {
             $pdo->exec('UPDATE calendarinstances SET access = 1 WHERE access IS NULL');
             $pdo->exec('UPDATE calendarinstances SET share_invitestatus = 2 WHERE share_invitestatus IS NULL');

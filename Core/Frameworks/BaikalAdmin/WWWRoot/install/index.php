@@ -50,6 +50,7 @@ $maxtime = (int) ini_get('max_execution_time');
 if ($maxtime !== 0 && ($maxtime < 3600)) {
     ini_set('max_execution_time', 3600); // 1 hour
 }
+
 ini_set('ignore_user_abort', true);
 error_reporting(E_ALL);
 
@@ -94,9 +95,9 @@ $oPage->zone('navbar')->addBlock(new Install());
 try {
     /** @var array<string, array<string, mixed>> $config */
     $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-} catch (Exception $e) {
+} catch (Exception $exception) {
     $config = null;
-    error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+    error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
 }
 
 if (($config === null) || !isset($config['system']['configured_version'])) {

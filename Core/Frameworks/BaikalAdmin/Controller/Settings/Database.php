@@ -76,14 +76,10 @@ class Database extends Controller
 
         $this->oForm = $oModel->formForThisModelInstance([
             'close'           => false,
-            'hook.morphology' => [
-                $this,
-                'morphologyHook',
-            ],
-            'hook.validation' => [
-                $this,
-                'validationHook',
-            ],
+            'hook.morphology' => function (Form $oForm, Morphology $oMorpho): void {
+                $this->morphologyHook($oForm, $oMorpho);
+            },
+            'hook.validation' => fn (Form $oForm, Morphology $oMorpho) => $this->validationHook($oForm, $oMorpho),
         ]);
 
         if ($this->oForm->submitted()) {
@@ -131,6 +127,7 @@ class Database extends Controller
             } catch (Exception $e) {
                 error_log('Error reading baikal.yaml file : ' . $e->getMessage());
             }
+
             $bMySQL = $config['database']['mysql'] ?? true;
         }
 
@@ -155,6 +152,7 @@ class Database extends Controller
         if ($oForm->refreshed()) {
             return true;
         }
+
         if ((int) $oForm->modelInstance()->get('mysql') === 1) {
             // We have to check the MySQL connection
             $sHost     = $oForm->modelInstance()->get('mysql_host');
@@ -201,6 +199,7 @@ class Database extends Controller
 
                     return;
                 }
+
                 // Asserting DB directory is writable
                 if (!is_writable(dirname($sFile))) {
                     $sMessage = "The <em>FOLDER</em> containing the DB file is not writable, and it has to.<br />Please give write permissions on folder <span style='font-family: monospace'>" . dirname(

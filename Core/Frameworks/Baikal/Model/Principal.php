@@ -40,9 +40,11 @@ use Flake\Core\Model\Db;
 
 class Principal extends Db
 {
-    public const DATATABLE  = 'principals';
+    public const DATATABLE = 'principals';
+
     public const PRIMARYKEY = 'id';
-    protected array $aData  = [
+
+    protected array $aData = [
         'uri'         => '',
         'displayname' => '',
         'email'       => '',

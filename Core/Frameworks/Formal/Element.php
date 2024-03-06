@@ -38,12 +38,12 @@ namespace Formal;
 
 use Flake\Util\Tools;
 use RuntimeException;
+use Stringable;
 
 use function array_key_exists;
-use function get_class;
 use function is_array;
 
-abstract class Element
+abstract class Element implements Stringable
 {
     /**
      * @var array<string, array|string|bool>
@@ -93,12 +93,10 @@ abstract class Element
     {
         $sOption = trim($this->option($sOptionName));
         if ($sOption !== '') {
-            $aOptions = explode(',', $sOption);
-        } else {
-            $aOptions = [];
+            return explode(',', $sOption);
         }
 
-        return $aOptions;
+        return [];
     }
 
     /**
@@ -133,9 +131,9 @@ abstract class Element
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return get_class($this) . '<' . $this->option('label') . '>';
+        return static::class . '<' . $this->option('label') . '>';
     }
 
     /**

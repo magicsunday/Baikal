@@ -56,8 +56,11 @@ use function array_key_exists;
 class Calendars extends Controller
 {
     protected array $aMessages = [];
-    protected Calendar $oModel;    // \Baikal\Model\Calendar
-    protected User $oUser;    // \Baikal\Model\User
+
+    protected Calendar $oModel;
+    // \Baikal\Model\Calendar
+    protected User $oUser;
+    // \Baikal\Model\User
     protected Form $oForm;    // \Formal\Form
 
     /**
@@ -69,7 +72,7 @@ class Calendars extends Controller
     {
         if (($iUser = $this->currentUserId()) === false) {
             throw new RuntimeException(
-                "BaikalAdmin\Controller\User\Calendars::render(): User get-parameter not found."
+                Calendars::class . '::render(): User get-parameter not found.'
             );
         }
 
@@ -123,11 +126,7 @@ class Calendars extends Controller
         $sMessages = implode("\n", $this->aMessages);
         $oView->setData('messages', $sMessages);
 
-        if ($this->actionNewRequested() || $this->actionEditRequested()) {
-            $sForm = $this->oForm->render();
-        } else {
-            $sForm = '';
-        }
+        $sForm = $this->actionNewRequested() || $this->actionEditRequested() ? $this->oForm->render() : '';
 
         $oView->setData('form', $sForm);
         $oView->setData('titleicon', (new Calendar())->bigicon());
@@ -342,7 +341,7 @@ class Calendars extends Controller
         $aParams   = $this->getParams();
         $iCalendar = $aParams['delete'];
 
-        if ($this->actionDeleteConfirmed() !== false) {
+        if ($this->actionDeleteConfirmed()) {
             // catching Exception thrown when model already destroyed
             // happens when user refreshes page on delete-URL, for instance
 

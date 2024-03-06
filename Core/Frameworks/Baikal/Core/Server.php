@@ -162,8 +162,8 @@ class Server
     {
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
 
         if ($this->authType === 'Basic') {
@@ -174,6 +174,7 @@ class Server
             $authBackend = new \Sabre\DAV\Auth\Backend\PDO($this->pdo);
             $authBackend->setRealm($this->authRealm);
         }
+
         $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($this->pdo);
 
         $nodes = [
@@ -183,6 +184,7 @@ class Server
             $calendarBackend = new \Sabre\CalDAV\Backend\PDO($this->pdo);
             $nodes[]         = new CalendarRoot($principalBackend, $calendarBackend);
         }
+
         if ($this->enableCardDAV) {
             $carddavBackend = new \Sabre\CardDAV\Backend\PDO($this->pdo);
             $nodes[]        = new AddressBookRoot($principalBackend, $carddavBackend);
@@ -214,6 +216,7 @@ class Server
                 $this->server->addPlugin(new IMipPlugin($config['system']['invite_from']));
             }
         }
+
         if ($this->enableCardDAV) {
             $this->server->addPlugin(new Plugin());
             $this->server->addPlugin(new VCFExportPlugin());
@@ -221,10 +224,9 @@ class Server
 
         $this->server->on(
             'exception',
-            [
-                $this,
-                'exception',
-            ]
+            function (Exception $e): void {
+                $this->exception($e);
+            }
         );
     }
 
@@ -243,7 +245,7 @@ class Server
             if (!preg_match("/No 'Authorization: (Basic|Digest)' header found./", $e->getMessage())) {
                 $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
                 if (isset($config['system']['failed_access_message']) && $config['system']['failed_access_message'] !== '') {
-                    $log_msg = str_replace('%u', '(name stripped-out)', $config['system']['failed_access_message']);
+                    $log_msg = str_replace('%u', '(name stripped-out)', (string) $config['system']['failed_access_message']);
                     error_log($log_msg, 4);
                 }
             }

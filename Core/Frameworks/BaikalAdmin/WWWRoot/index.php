@@ -88,6 +88,7 @@ if (Auth::isAuthenticated()) {
         if (!isset($_POST['CSRF_TOKEN'])) {
             throw new RuntimeException('CSRF token was not submitted. Try removing your cookies and log in again');
         }
+
         if ($_POST['CSRF_TOKEN'] !== $_SESSION['CSRF_TOKEN']) {
             throw new RuntimeException(
                 'CSRF token did not match the session CSRF token. Please try to do this action again.'

@@ -56,7 +56,9 @@ use function dirname;
 class Database extends Controller
 {
     protected array $aMessages = [];
+
     protected \Baikal\Model\Config\Database $oModel;
+
     protected Form $oForm;    // \Formal\Form
 
     /**
@@ -82,14 +84,10 @@ class Database extends Controller
 
         $this->oForm = $this->oModel->formForThisModelInstance([
             'close'           => false,
-            'hook.validation' => [
-                $this,
-                'validateConnection',
-            ],
-            'hook.morphology' => [
-                $this,
-                'hideMySQLFieldWhenNeeded',
-            ],
+            'hook.validation' => fn ($oForm, $oMorpho) => $this->validateConnection($oForm, $oMorpho),
+            'hook.morphology' => function (Form $oForm, Morphology $oMorpho): void {
+                $this->hideMySQLFieldWhenNeeded($oForm, $oMorpho);
+            },
         ]);
 
         if ($this->oForm->submitted()) {
@@ -99,6 +97,7 @@ class Database extends Controller
                 if (file_exists(PROJECT_PATH_SPECIFIC . 'config.system.php')) {
                     @unlink(PROJECT_PATH_SPECIFIC . 'config.system.php');
                 }
+
                 touch(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED');
 
                 if (defined('BAIKAL_CONFIGURED_VERSION')) {
@@ -155,6 +154,7 @@ class Database extends Controller
         if ($oForm->refreshed()) {
             return true;
         }
+
         $bMySQLEnabled = $oMorpho->element('mysql')->value();
 
         if ($bMySQLEnabled) {
@@ -218,10 +218,11 @@ class Database extends Controller
 
                     return false;
                 }
+
                 // Asserting DB directory is writable
-                if (!is_writable(dirname($sFile))) {
+                if (!is_writable(dirname((string) $sFile))) {
                     $sMessage = "The <em>FOLDER</em> containing the DB file is not writable, and it has to.<br />Please give write permissions on folder <span style='font-family: monospace'>" . dirname(
-                        $sFile
+                        (string) $sFile
                     ) . '</span>';
                     $oForm->declareError($oMorpho->element('sqlite_file'), $sMessage);
 
@@ -253,9 +254,13 @@ class Database extends Controller
                         // We add these tables ourselves to the database, to initialize Baïkal
                         $sSqlDefinition = file_get_contents(PROJECT_PATH_CORERESOURCES . 'Db/SQLite/db.sql');
                         foreach (explode(';', $sSqlDefinition) as $query) {
-                            if (!trim($query)) {
+                            if (trim($query) === '') {
                                 continue;
                             }
+                            if (trim($query) === '0') {
+                                continue;
+                            }
+
                             $oDb->query($query);
                         }
                     }
@@ -269,6 +274,7 @@ class Database extends Controller
                     ) . $e
                 );
             }
+
             // SQLite
         }
     }
@@ -281,12 +287,7 @@ class Database extends Controller
      */
     public function hideMySQLFieldWhenNeeded(Form $oForm, Morphology $oMorpho): void
     {
-        if ($oForm->submitted()) {
-            $bMySQL = ((int) $oForm->postValue('mysql') === 1);
-        } else {
-            // oMorpho won't have the values from the model set on it yet
-            $bMySQL = $this->oModel->get('mysql');
-        }
+        $bMySQL = $oForm->submitted() ? (int) $oForm->postValue('mysql') === 1 : $this->oModel->get('mysql');
 
         if ($bMySQL === true) {
             $oMorpho->remove('sqlite_file');

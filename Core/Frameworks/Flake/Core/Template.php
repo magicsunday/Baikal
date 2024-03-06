@@ -43,7 +43,7 @@ use Twig\Error\SyntaxError;
 
 class Template
 {
-    private string|false $sHtml;
+    private readonly string|false $sHtml;
 
     /**
      * @param string $sAbsPath
@@ -58,7 +58,7 @@ class Template
      *
      * @return false|string
      */
-    private function getTemplateFile($sAbsPath): false|string
+    private function getTemplateFile(string $sAbsPath): false|string
     {
         return file_get_contents($sAbsPath);
     }

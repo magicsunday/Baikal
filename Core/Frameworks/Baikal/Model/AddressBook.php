@@ -45,8 +45,10 @@ use ReflectionException;
 
 class AddressBook extends Db
 {
-    public const DATATABLE  = 'addressbooks';
+    public const DATATABLE = 'addressbooks';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'displayname';
 
     protected array $aData = [

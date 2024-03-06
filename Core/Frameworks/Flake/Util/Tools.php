@@ -47,7 +47,6 @@ use Twig\Loader\ArrayLoader;
 
 use function array_key_exists;
 use function count;
-use function get_class;
 use function is_array;
 use function is_object;
 use function is_string;
@@ -66,12 +65,10 @@ class Tools
     public static function getCurrentUrl(): mixed
     {
         $sUrl = $GLOBALS['_SERVER']['REQUEST_URI'];
-        if (MONGOOSE_SERVER) {
-            if (array_key_exists('QUERY_STRING', $GLOBALS['_SERVER']) && trim(
-                $GLOBALS['_SERVER']['QUERY_STRING']
-            ) !== '') {
-                $sUrl .= '?' . $GLOBALS['_SERVER']['QUERY_STRING'];
-            }
+        if (MONGOOSE_SERVER && (array_key_exists('QUERY_STRING', $GLOBALS['_SERVER']) && trim(
+            (string) $GLOBALS['_SERVER']['QUERY_STRING']
+        ) !== '')) {
+            $sUrl .= '?' . $GLOBALS['_SERVER']['QUERY_STRING'];
         }
 
         return $sUrl;
@@ -189,9 +186,10 @@ class Tools
         if (is_object($object)) {
             return $object instanceof $class;
         }
+
         if (is_string($object)) {
             if (is_object($class)) {
-                $class = get_class($class);
+                $class = $class::class;
             }
 
             if (class_exists($class)) {    // TRUE to autoload class
@@ -216,7 +214,7 @@ class Tools
         // Taken from TYPO3 extension realurl
 
         $space   = '-';
-        $sString = strtr($sString, ' -+_\'', $space . $space . $space . $space . $space); // convert spaces
+        $sString = strtr($sString, " -+_'", $space . $space . $space . $space . $space); // convert spaces
 
         // De-activated; @see https://github.com/netgusto/Baikal/issues/244
         // if(function_exists("iconv")) {
@@ -229,10 +227,10 @@ class Tools
         $sString = preg_replace(
             '/\\' . $space . '{2,}/',
             $space,
-            $sString
+            (string) $sString
         ); // Convert multiple 'spaces' to a single one
 
-        return trim($sString, $space);
+        return trim((string) $sString, $space);
     }
 
     /**
@@ -281,8 +279,8 @@ class Tools
      */
     public static function stripBeginString($sString, $sAppend): mixed
     {
-        if (str_starts_with($sString, $sAppend)) {
-            $sString = substr($sString, strlen($sAppend));
+        if (str_starts_with((string) $sString, (string) $sAppend)) {
+            return substr((string) $sString, strlen((string) $sAppend));
         }
 
         return $sString;
@@ -297,7 +295,7 @@ class Tools
     public static function stripEndString(string $sString, string $sAppend): string
     {
         if (str_ends_with($sString, $sAppend)) {
-            $sString = substr($sString, 0, -1 * strlen($sAppend));
+            return substr($sString, 0, -1 * strlen($sAppend));
         }
 
         return $sString;

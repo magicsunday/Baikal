@@ -58,7 +58,7 @@ class PDOBasicAuth extends AbstractBasic
      * @param        $authRealm
      * @param string $tableName The PDO table name to use
      */
-    public function __construct(PDO $pdo, $authRealm, string $tableName = 'users')
+    public function __construct(PDO $pdo, string $authRealm, string $tableName = 'users')
     {
         $this->pdo       = $pdo;
         $this->tableName = $tableName;
@@ -76,10 +76,11 @@ class PDOBasicAuth extends AbstractBasic
      *
      * @return bool
      */
-    public function validateUserPass($username, $password): bool
+    protected function validateUserPass($username, $password): bool
     {
         $stmt = $this->pdo->prepare('SELECT username, digesta1 FROM ' . $this->tableName . ' WHERE username = ?');
         $stmt->execute([$username]);
+
         $result = $stmt->fetchAll();
 
         if (!count($result)) {

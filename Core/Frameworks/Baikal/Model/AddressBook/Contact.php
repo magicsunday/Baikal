@@ -40,8 +40,10 @@ use Flake\Core\Model\Db;
 
 class Contact extends Db
 {
-    public const DATATABLE  = 'cards';
+    public const DATATABLE = 'cards';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'uri';
 
     protected array $aData = [

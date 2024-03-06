@@ -36,6 +36,7 @@ declare(strict_types=1);
 
 namespace BaikalAdmin\Controller;
 
+use Baikal\Model\Calendar;
 use Baikal\Model\User;
 use BaikalAdmin\Controller\User\AddressBooks;
 use BaikalAdmin\Controller\User\Calendars;
@@ -117,7 +118,7 @@ class Users extends Controller
         }
 
         $oView->setData('users', $aUsers);
-        $oView->setData('calendaricon', (new \Baikal\Model\Calendar())->icon());
+        $oView->setData('calendaricon', (new Calendar())->icon());
         $oView->setData('usericon', (new User())->icon());
         $oView->setData('davUri', PROJECT_URI . 'dav.php');
 
@@ -126,11 +127,7 @@ class Users extends Controller
         $oView->setData('messages', $sMessages);
 
         // Form
-        if ($this->actionNewRequested() || $this->actionEditRequested()) {
-            $sForm = $this->oForm->render();
-        } else {
-            $sForm = '';
-        }
+        $sForm = $this->actionNewRequested() || $this->actionEditRequested() ? $this->oForm->render() : '';
 
         $oView->setData('form', $sForm);
         $oView->setData('usericon', (new User())->icon());
@@ -219,7 +216,7 @@ class Users extends Controller
         $aParams = $this->getParams();
         $iUser   = (int) $aParams['delete'];
 
-        if ($this->actionDeleteConfirmed() !== false) {
+        if ($this->actionDeleteConfirmed()) {
             // catching Exception thrown when model already destroyed
             // happens when user refreshes delete-page, for instance
 
@@ -238,7 +235,7 @@ class Users extends Controller
             $this->aMessages[] = Message::warningConfirmMessage(
                 "Check twice, you're about to delete " . $oUser->label() . '</strong> from the database !',
                 "<p>You are about to delete a user and all it's calendars / contacts. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
-                $this->linkDeleteConfirm($oUser),
+                static::linkDeleteConfirm($oUser),
                 "Delete <strong><i class='" . $oUser->icon() . " icon-white'></i> " . $oUser->label() . '</strong>',
                 $this->link()
             );
@@ -273,9 +270,7 @@ class Users extends Controller
             if ($this->oForm->persisted()) {
                 $this->oForm->setOption(
                     'action',
-                    $this->linkEdit(
-                        $this->oForm->modelInstance()
-                    )
+                    static::linkEdit($this->oForm->modelInstance())
                 );
             }
         }

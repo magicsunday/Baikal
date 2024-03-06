@@ -57,8 +57,11 @@ use function array_key_exists;
 class AddressBooks extends Controller
 {
     protected array $aMessages = [];
-    protected AddressBook $oModel;    // \Baikal\Model\Contact
-    protected User $oUser;    // \Baikal\Model\User
+
+    protected AddressBook $oModel;
+    // \Baikal\Model\Contact
+    protected User $oUser;
+    // \Baikal\Model\User
     protected Form $oForm;    // \Formal\Form
 
     /**
@@ -127,11 +130,7 @@ class AddressBooks extends Controller
         $sMessages = implode("\n", $this->aMessages);
         $oView->setData('messages', $sMessages);
 
-        if ($this->actionNewRequested() || $this->actionEditRequested()) {
-            $sForm = $this->oForm->render();
-        } else {
-            $sForm = '';
-        }
+        $sForm = $this->actionNewRequested() || $this->actionEditRequested() ? $this->oForm->render() : '';
 
         $oView->setData('form', $sForm);
         $oView->setData('titleicon', AddressBook::bigicon());
@@ -334,7 +333,7 @@ class AddressBooks extends Controller
         $aParams = $this->getParams();
         $iModel  = (int) $aParams['delete'];
 
-        if ($this->actionDeleteConfirmed() !== false) {
+        if ($this->actionDeleteConfirmed()) {
             // catching Exception thrown when model already destroyed
             // happens when user refreshes page on delete-URL, for instance
 

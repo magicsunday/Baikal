@@ -65,13 +65,13 @@ class Tools
     public static function assertEnvironmentIsOk(): void
     {
         // Asserting Baikal Context
-        if (!defined('BAIKAL_CONTEXT') || BAIKAL_CONTEXT !== true) {
+        if (!defined('BAIKAL_CONTEXT') || !BAIKAL_CONTEXT) {
             exit('Bootstrap.php may not be included outside the Baikal context');
         }
 
         // Asserting PDO
         if (!defined('PDO::ATTR_DRIVER_NAME')) {
-            exit('Baikal Fatal Error: PDO is unavailable. It\'s required by Baikal.');
+            exit("Baikal Fatal Error: PDO is unavailable. It's required by Baikal.");
         }
 
         // Asserting PDO::SQLite or PDO::MySQL
@@ -91,7 +91,7 @@ class Tools
      */
     public static function configureEnvironment(): void
     {
-        set_exception_handler('\Baikal\Core\Tools::handleException');
+        set_exception_handler(Tools::class . '::handleException');
         ini_set('error_reporting', E_ALL);
     }
 
@@ -100,7 +100,7 @@ class Tools
      *
      * @return void
      */
-    public static function handleException($exception): void
+    public static function handleException(string $exception): void
     {
         echo '<pre>' . $exception . '<pre>';
     }

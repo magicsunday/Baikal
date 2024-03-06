@@ -80,8 +80,8 @@ class Listbox extends Element
 
         if (($aPopover = $this->option('popover')) !== '') {
             $inputclass .= ' popover-focus ';
-            $popover = ' title="' . htmlspecialchars($aPopover['title']) . '" ';
-            $popover .= ' data-content="' . htmlspecialchars($aPopover['content']) . '" ';
+            $popover = ' title="' . htmlspecialchars((string) $aPopover['title']) . '" ';
+            $popover .= ' data-content="' . htmlspecialchars((string) $aPopover['content']) . '" ';
         }
 
         if ($this->option('refreshonchange') === true) {
@@ -95,7 +95,7 @@ class Listbox extends Element
             reset($aOptions);
             foreach ($aOptions as $sOptionValue) {
                 $selected           = ($sOptionValue === $value) ? ' selected="selected"' : '';
-                $aRenderedOptions[] = '<option' . $selected . '>' . htmlspecialchars($sOptionValue) . '</option>';
+                $aRenderedOptions[] = '<option' . $selected . '>' . htmlspecialchars((string) $sOptionValue) . '</option>';
             }
         } else {
             // Array is associative
@@ -104,7 +104,7 @@ class Listbox extends Element
                 $selected           = ($sOptionValue === $value) ? ' selected="selected"' : '';
                 $aRenderedOptions[] = '<option value="' . htmlspecialchars(
                     $sOptionValue
-                ) . '"' . $selected . '>' . htmlspecialchars($sOptionCaption) . '</option>';
+                ) . '"' . $selected . '>' . htmlspecialchars((string) $sOptionCaption) . '</option>';
             }
         }
 

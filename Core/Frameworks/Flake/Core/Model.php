@@ -43,7 +43,6 @@ use ReflectionException;
 use RuntimeException;
 
 use function array_key_exists;
-use function get_class;
 
 abstract class Model
 {
@@ -81,11 +80,7 @@ abstract class Model
      */
     public function __isset(string $name): bool
     {
-        if (array_key_exists($name, $this->aData)) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists($name, $this->aData);
     }
 
     /**
@@ -100,9 +95,7 @@ abstract class Model
         }
 
         throw new RuntimeException(
-            "\Flake\Core\Model->get(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . get_class(
-                $this
-            )
+            "\Flake\Core\Model->get(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . static::class
         );
     }
 
@@ -121,9 +114,7 @@ abstract class Model
         }
 
         throw new RuntimeException(
-            "\Flake\Core\Model->set(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . get_class(
-                $this
-            )
+            "\Flake\Core\Model->set(): property " . htmlspecialchars($sPropName) . ' does not exist on ' . static::class
         );
     }
 
@@ -186,7 +177,7 @@ abstract class Model
      */
     public function formForThisModelInstance(array $options = []): Form
     {
-        $sClass = get_class($this);
+        $sClass = static::class;
         $oForm  = new Form($sClass, $options);
         $oForm->setModelInstance($this);
 
@@ -198,7 +189,7 @@ abstract class Model
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
-        throw new RuntimeException(get_class($this) . ': No form morphology provided for Model.');
+        throw new RuntimeException(static::class . ': No form morphology provided for Model.');
     }
 
     /**

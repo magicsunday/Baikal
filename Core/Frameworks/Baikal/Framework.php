@@ -51,7 +51,7 @@ class Framework extends \Flake\Core\Framework
      */
     public static function installTool(): void
     {
-        if (defined('BAIKAL_CONTEXT_INSTALL') && BAIKAL_CONTEXT_INSTALL === true) {
+        if (defined('BAIKAL_CONTEXT_INSTALL') && BAIKAL_CONTEXT_INSTALL) {
             // Install tool has been launched and we're already on the install page
             return;
         }
@@ -93,7 +93,7 @@ class Framework extends \Flake\Core\Framework
 
                     Tools::assertBaikalIsOk();
 
-                    set_error_handler("\Baikal\Framework::exception_error_handler");
+                    set_error_handler(Framework::class . '::exception_error_handler');
                 }
             } else {
                 self::installTool();

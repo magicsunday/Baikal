@@ -42,8 +42,6 @@ use Flake\Core\Model;
 use Flake\Core\Requester\Sql;
 use RuntimeException;
 
-use function get_class;
-
 abstract class Db extends Model
 {
     /**
@@ -127,7 +125,7 @@ abstract class Db extends Model
 
         if (($aRs = $rSql->fetch()) === false) {
             throw new RuntimeException(
-                "\Flake\Core\Model '" . htmlspecialchars($sPrimary) . "' not found for model " . get_class($this)
+                "\Flake\Core\Model '" . htmlspecialchars($sPrimary) . "' not found for model " . static::class
             );
         }
 

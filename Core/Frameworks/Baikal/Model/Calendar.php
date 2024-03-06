@@ -51,8 +51,10 @@ use function in_array;
 
 class Calendar extends Db
 {
-    public const DATATABLE  = 'calendarinstances';
+    public const DATATABLE = 'calendarinstances';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'displayname';
 
     protected array $aData = [
@@ -82,8 +84,8 @@ class Calendar extends Db
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
             $this->set('timezone', $config['system']['timezone']);
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
     }
 
@@ -176,22 +178,14 @@ class Calendar extends Db
 
         if ($sPropName === 'todos') {
             // TRUE if components contains VTODO, FALSE otherwise
-            if (($sComponents = $this->get('components')) !== '') {
-                $aComponents = explode(',', $sComponents);
-            } else {
-                $aComponents = [];
-            }
+            $aComponents = ($sComponents = $this->get('components')) !== '' ? explode(',', $sComponents) : [];
 
             return in_array('VTODO', $aComponents, true);
         }
 
         if ($sPropName === 'notes') {
             // TRUE if components contains VJOURNAL, FALSE otherwise
-            if (($sComponents = $this->get('components')) !== '') {
-                $aComponents = explode(',', $sComponents);
-            } else {
-                $aComponents = [];
-            }
+            $aComponents = ($sComponents = $this->get('components')) !== '' ? explode(',', $sComponents) : [];
 
             return in_array('VJOURNAL', $aComponents, true);
         }
@@ -214,40 +208,28 @@ class Calendar extends Db
         }
 
         if ($sPropName === 'todos') {
-            if (($sComponents = $this->get('components')) !== '') {
-                $aComponents = explode(',', $sComponents);
-            } else {
-                $aComponents = [];
-            }
+            $aComponents = ($sComponents = $this->get('components')) !== '' ? explode(',', $sComponents) : [];
 
             if ($sPropValue === true) {
                 if (!in_array('VTODO', $aComponents, true)) {
                     $aComponents[] = 'VTODO';
                 }
-            } else {
-                if (in_array('VTODO', $aComponents, true)) {
-                    unset($aComponents[array_search('VTODO', $aComponents, true)]);
-                }
+            } elseif (in_array('VTODO', $aComponents, true)) {
+                unset($aComponents[array_search('VTODO', $aComponents, true)]);
             }
 
             return $this->set('components', implode(',', $aComponents));
         }
 
         if ($sPropName === 'notes') {
-            if (($sComponents = $this->get('components')) !== '') {
-                $aComponents = explode(',', $sComponents);
-            } else {
-                $aComponents = [];
-            }
+            $aComponents = ($sComponents = $this->get('components')) !== '' ? explode(',', $sComponents) : [];
 
             if ($sPropValue === true) {
                 if (!in_array('VJOURNAL', $aComponents, true)) {
                     $aComponents[] = 'VJOURNAL';
                 }
-            } else {
-                if (in_array('VJOURNAL', $aComponents, true)) {
-                    unset($aComponents[array_search('VJOURNAL', $aComponents, true)]);
-                }
+            } elseif (in_array('VJOURNAL', $aComponents, true)) {
+                unset($aComponents[array_search('VJOURNAL', $aComponents, true)]);
             }
 
             return $this->set('components', implode(',', $aComponents));
@@ -342,7 +324,7 @@ class Calendar extends Db
         $rSql = $GLOBALS['DB']->exec_SELECTquery(
             'count(*)',
             'calendarinstances',
-            'calendarid' . "='" . $this->aData['calendarid'] . "'"
+            'calendarid=\'' . $this->aData['calendarid'] . "'"
         );
 
         if (($aRs = $rSql->fetch()) === false) {

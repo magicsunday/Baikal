@@ -45,10 +45,13 @@ use Twig\Error\SyntaxError;
 
 class Page extends Container
 {
-    protected string $sTitle           = '';
-    protected string $sMetaKeywords    = '';
+    protected string $sTitle = '';
+
+    protected string $sMetaKeywords = '';
+
     protected string $sMetaDescription = '';
-    protected string $sTemplatePath    = '';
+
+    protected string $sTemplatePath = '';
 
     /**
      * @var string
@@ -113,7 +116,7 @@ class Page extends Container
      *
      * @return void
      */
-    public function setBaseUrl($sBaseUrl): void
+    public function setBaseUrl(string $sBaseUrl): void
     {
         $this->sBaseUrl = $sBaseUrl;
     }

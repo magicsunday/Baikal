@@ -50,7 +50,7 @@ class Auth
         $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
 
         return isset($_SESSION['baikaladminauth']) && $_SESSION['baikaladminauth'] === md5(
-            $config['system']['admin_passwordhash']
+            (string) $config['system']['admin_passwordhash']
         );
     }
 
@@ -68,11 +68,12 @@ class Auth
 
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
 
             return false;
         }
+
         $sPassHash = self::hashAdminPassword($sPass, $config['system']['auth_realm']);
         if ($sUser === 'admin' && $sPassHash === $config['system']['admin_passwordhash']) {
             $_SESSION['baikaladminauth'] = md5($config['system']['admin_passwordhash']);
@@ -97,7 +98,7 @@ class Auth
      *
      * @return string
      */
-    public static function hashAdminPassword($sPassword, $sAuthRealm): string
+    public static function hashAdminPassword(string $sPassword, string $sAuthRealm): string
     {
         return hash('sha256', 'admin:' . $sAuthRealm . ':' . $sPassword);
     }

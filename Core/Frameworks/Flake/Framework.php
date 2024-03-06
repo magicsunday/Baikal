@@ -62,8 +62,8 @@ class Framework extends Core\Framework
      */
     public static function rmBeginSlash($sString): mixed
     {
-        if (str_starts_with($sString, '/')) {
-            $sString = substr($sString, 1);
+        if (str_starts_with((string) $sString, '/')) {
+            return substr((string) $sString, 1);
         }
 
         return $sString;
@@ -74,7 +74,7 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function appendSlash($sString): mixed
+    public static function appendSlash(string $sString): mixed
     {
         if (!str_ends_with($sString, '/')) {
             $sString .= '/';
@@ -88,10 +88,10 @@ class Framework extends Core\Framework
      *
      * @return mixed|string
      */
-    public static function prependSlash($sString): mixed
+    public static function prependSlash(string $sString): mixed
     {
         if (!str_starts_with($sString, '/')) {
-            $sString = '/' . $sString;
+            return '/' . $sString;
         }
 
         return $sString;
@@ -104,9 +104,9 @@ class Framework extends Core\Framework
      */
     public static function rmQuery($sString): string
     {
-        $iStart = strpos($sString, '?');
+        $iStart = strpos((string) $sString, '?');
 
-        return ($iStart === false) ? $sString : substr($sString, 0, $iStart);
+        return ($iStart === false) ? $sString : substr((string) $sString, 0, $iStart);
     }
 
     /**
@@ -117,9 +117,9 @@ class Framework extends Core\Framework
      */
     public static function rmScriptName($sString, $sScriptName): string
     {
-        $sScriptBaseName = basename($sScriptName);
+        $sScriptBaseName = basename((string) $sScriptName);
         if (self::endswith($sString, $sScriptBaseName)) {
-            return substr($sString, 0, -strlen($sScriptBaseName));
+            return substr((string) $sString, 0, -strlen($sScriptBaseName));
         }
 
         return $sString;
@@ -133,7 +133,7 @@ class Framework extends Core\Framework
     public static function rmProjectContext($sString): mixed
     {
         return self::appendSlash(
-            substr($sString, 0, -1 * strlen(PROJECT_CONTEXT_BASEURI))
+            substr((string) $sString, 0, -1 * strlen(PROJECT_CONTEXT_BASEURI))
         );
     }
 
@@ -145,12 +145,12 @@ class Framework extends Core\Framework
      */
     public static function endsWith($sString, $sTest): bool
     {
-        $iTestLen = strlen($sTest);
-        if ($iTestLen > strlen($sString)) {
+        $iTestLen = strlen((string) $sTest);
+        if ($iTestLen > strlen((string) $sString)) {
             return false;
         }
 
-        return substr_compare($sString, $sTest, -$iTestLen) === 0;
+        return substr_compare((string) $sString, (string) $sTest, -$iTestLen) === 0;
     }
 
     /**
@@ -199,12 +199,15 @@ class Framework extends Core\Framework
             if (isset($_GET) && is_array($_GET)) {
                 $process[] = &$_GET;
             }
+
             if (isset($_POST) && is_array($_POST)) {
                 $process[] = &$_POST;
             }
+
             if (isset($_COOKIE) && is_array($_COOKIE)) {
                 $process[] = &$_COOKIE;
             }
+
             if (isset($_REQUEST) && is_array($_REQUEST)) {
                 $process[] = &$_REQUEST;
             }
@@ -216,7 +219,7 @@ class Framework extends Core\Framework
                         $process[$key][stripslashes($k)] = $v;
                         $process[]                       = &$process[$key][stripslashes($k)];
                     } else {
-                        $process[$key][stripslashes($k)] = stripslashes($v);
+                        $process[$key][stripslashes($k)] = stripslashes((string) $v);
                     }
                 }
             }
@@ -274,6 +277,7 @@ class Framework extends Core\Framework
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
             }
+
             if (!isset($_SESSION['CSRF_TOKEN'])) {
                 $_SESSION['CSRF_TOKEN'] = bin2hex(openssl_random_pseudo_bytes(20));
             }
@@ -284,7 +288,7 @@ class Framework extends Core\Framework
 
         $GLOBALS['TEMPLATESTACK'] = [];
 
-        $aUrlInfo = parse_url(PROJECT_URI);
+        $aUrlInfo = parse_url((string) PROJECT_URI);
         define('FLAKE_DOMAIN', $_SERVER['HTTP_HOST']);
         define('FLAKE_URIPATH', Tools::stripBeginSlash($aUrlInfo['path']));
         unset($aUrlInfo);
@@ -313,18 +317,14 @@ class Framework extends Core\Framework
 
                 return;
             }
-        } catch (Exception $e) {
-            error_log((string) $e);
+        } catch (Exception $exception) {
+            error_log((string) $exception);
         }
 
-        $sScript  = substr($_SERVER['SCRIPT_FILENAME'], strlen($_SERVER['DOCUMENT_ROOT']));
+        $sScript  = substr((string) $_SERVER['SCRIPT_FILENAME'], strlen((string) $_SERVER['DOCUMENT_ROOT']));
         $sDirName = str_replace('\\', '/', dirname($sScript));    // fix windows backslashes
 
-        if ($sDirName !== '.') {
-            $sDirName = self::appendSlash($sDirName);
-        } else {
-            $sDirName = '/';
-        }
+        $sDirName = $sDirName !== '.' ? self::appendSlash($sDirName) : '/';
 
         $sBaseUrl = self::rmBeginSlash(self::rmProjectContext($sDirName));
         define('PROJECT_BASEURI', self::prependSlash($sBaseUrl));    // SabreDAV needs a "/" at the beginning of BASEURL
@@ -346,17 +346,19 @@ class Framework extends Core\Framework
     {
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
 
             return true;
         }
+
         // Dont init db on install, but in normal mode and when upgrading
         if (defined(
             'BAIKAL_CONTEXT_INSTALL'
         ) && (!isset($config['system']['configured_version']) || $config['system']['configured_version'] === BAIKAL_VERSION)) {
             return true;
         }
+
         if ($config['database']['mysql'] === true) {
             self::initDbMysql($config);
         } else {
@@ -369,7 +371,7 @@ class Framework extends Core\Framework
      *
      * @return bool|void
      */
-    protected static function initDbSqlite(array $config)
+    protected static function initDbSqlite(array $config): bool
     {
         // Asserting DB filepath is set
         if (!$config['database']['sqlite_file']) {
@@ -382,10 +384,10 @@ class Framework extends Core\Framework
         }
 
         // Asserting DB directory is writable
-        if (!is_writable(dirname($config['database']['sqlite_file']))) {
+        if (!is_writable(dirname((string) $config['database']['sqlite_file']))) {
             exit(
                 "<h3>The <em>FOLDER</em> containing the DB file is not writable, and it has to.<br />Please give write permissions on folder '<span style='font-family: monospace; background: yellow;'>" . dirname(
-                    $config['database']['sqlite_file']
+                    (string) $config['database']['sqlite_file']
                 ) . "</span>'</h3>"
             );
         }
@@ -407,7 +409,7 @@ class Framework extends Core\Framework
      *
      * @return true|void
      */
-    protected static function initDbMysql(array $config)
+    protected static function initDbMysql(array $config): bool
     {
         if (!$config['database']['mysql_host']) {
             exit('<h3>The constant PROJECT_DB_MYSQL_HOST, containing the MySQL host name, is not set.<br />You should set it in config/baikal.yaml</h3>');

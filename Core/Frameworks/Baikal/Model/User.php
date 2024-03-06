@@ -47,8 +47,10 @@ use Symfony\Component\Yaml\Yaml;
 
 class User extends Db
 {
-    public const DATATABLE  = 'users';
+    public const DATATABLE = 'users';
+
     public const PRIMARYKEY = 'id';
+
     public const LABELFIELD = 'username';
 
     protected array $aData = [
@@ -112,7 +114,7 @@ class User extends Db
     /**
      * @return void
      */
-    public function initFloating(): void
+    protected function initFloating(): void
     {
         parent::initFloating();
 
@@ -139,11 +141,7 @@ class User extends Db
             $sRes = parent::get($sPropName);
         } catch (Exception) {
             // no, it may belong to the oIdentityPrincipal model object
-            if ($this->oIdentityPrincipal) {
-                $sRes = $this->oIdentityPrincipal->get($sPropName);
-            } else {
-                $sRes = '';
-            }
+            $sRes = $this->oIdentityPrincipal instanceof Principal ? $this->oIdentityPrincipal->get($sPropName) : '';
         }
 
         return $sRes;
@@ -381,8 +379,8 @@ class User extends Db
         try {
             /** @var array $config */
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-        } catch (Exception $e) {
-            error_log('Error reading baikal.yaml file : ' . $e->getMessage());
+        } catch (Exception $exception) {
+            error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
         }
 
         return md5($this->get('username') . ':' . $config['system']['auth_realm'] . ':' . $sPassword);

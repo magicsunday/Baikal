@@ -96,7 +96,7 @@ abstract class Router
         $aRoutes = $GLOBALS['ROUTER']::getRoutes();
 
         foreach ($aRoutes as $sKey => $sRoute) {
-            if (str_replace('\\Route', '\\Controller', $sRoute) === $sController) {
+            if (str_replace('\\Route', '\\Controller', (string) $sRoute) === $sController) {
                 return $sKey;
             }
         }

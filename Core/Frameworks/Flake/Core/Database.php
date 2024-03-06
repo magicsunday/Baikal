@@ -40,7 +40,6 @@ use Flake\Core\Database\Statement;
 use PDO;
 use RuntimeException;
 
-use function count;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -92,7 +91,7 @@ abstract class Database
     public function INSERTquery(string $table, array $fields_values, array|bool|string $no_quote_fields = false)
     {
         // Table and fieldnames should be "SQL-injection-safe" when supplied to this function (contrary to values in the arrays which may be insecure).
-        if (count($fields_values)) {
+        if ($fields_values !== []) {
             // quote and escape values
             $fields_values = $this->fullQuoteArray($fields_values, $table, $no_quote_fields);
 
@@ -153,7 +152,7 @@ abstract class Database
         array|bool|string $no_quote_fields = false
     ) {
         // Table and fieldnames should be "SQL-injection-safe" when supplied to this function (contrary to values in the arrays which may be insecure).
-        if (count($fields_values)) {
+        if ($fields_values !== []) {
             // quote and escape values
             $nArr = $this->fullQuoteArray($fields_values, $table, $no_quote_fields);
 
@@ -267,11 +266,13 @@ abstract class Database
             $query .= '
 			GROUP BY ' . $groupBy;
         }
+
         // Order by:
         if ($orderBy !== '') {
             $query .= '
 			ORDER BY ' . $orderBy;
         }
+
         // Group by:
         if ($limit !== '') {
             $query .= '
@@ -293,7 +294,7 @@ abstract class Database
      */
     public function fullQuote(string $str): string
     {
-        return '\'' . $this->quote($str) . '\'';
+        return "'" . $this->quote($str) . "'";
     }
 
     /**
@@ -313,11 +314,7 @@ abstract class Database
 
         foreach ($arr as $k => $v) {
             if ($noQuote === false || !in_array($k, $noQuote, true)) {
-                if ($v === null) {
-                    $arr[$k] = 'NULL';
-                } else {
-                    $arr[$k] = $this->fullQuote((string) $v);
-                }
+                $arr[$k] = $v === null ? 'NULL' : $this->fullQuote((string) $v);
             }
         }
 

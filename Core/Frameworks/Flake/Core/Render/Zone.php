@@ -40,8 +40,9 @@ use Flake\Core\Controller;
 
 class Zone
 {
-    private Container $oZonableObject;
-    private string $sZone;
+    private readonly Container $oZonableObject;
+
+    private readonly string $sZone;
 
     /**
      * @param Container $oZonableObject

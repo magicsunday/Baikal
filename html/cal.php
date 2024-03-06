@@ -74,7 +74,7 @@ Framework::bootstrap();
 try {
     /** @var array<string, array<string, mixed>> $config */
     $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
-} catch (Exception $e) {
+} catch (Exception) {
     exit('<h1>Incomplete installation</h1><p>Ba&iuml;kal is missing its configuration file, or its configuration file is unreadable.');
 }
 

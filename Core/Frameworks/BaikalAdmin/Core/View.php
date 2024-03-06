@@ -36,7 +36,6 @@ declare(strict_types=1);
 
 namespace BaikalAdmin\Core;
 
-use function get_class;
 use function strlen;
 
 class View extends \Flake\Core\View
@@ -46,7 +45,7 @@ class View extends \Flake\Core\View
      */
     public function templatesPath(): string
     {
-        $sViewName = get_class($this);
+        $sViewName = static::class;
         $sTemplate = str_replace('\\', '/', substr($sViewName, strlen('BaikalAdmin\\View\\'))) . '.html';
 
         return BAIKALADMIN_PATH_TEMPLATES . $sTemplate;

@@ -65,15 +65,16 @@ class Login extends Controller
         $sSubmittedFlagName = 'auth';
         $sMessage           = '';
 
-        $sLogin = htmlspecialchars(Tools::POST('login'));
+        $sLogin = htmlspecialchars((string) Tools::POST('login'));
 
         if (self::isSubmitted() && !Auth::isAuthenticated()) {
             // Log failed accesses, for further processing by tools like Fail2Ban
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
             if (isset($config['system']['failed_access_message']) && $config['system']['failed_access_message'] !== '') {
-                $log_msg = str_replace('%u', $sLogin, $config['system']['failed_access_message']);
+                $log_msg = str_replace('%u', $sLogin, (string) $config['system']['failed_access_message']);
                 error_log($log_msg, 4);
             }
+
             $sMessage = Message::error(
                 'The login/password you provided is invalid. Please retry.',
                 'Authentication error'
@@ -86,7 +87,7 @@ class Login extends Controller
             );
         }
 
-        $sPassword = htmlspecialchars(Tools::POST('password'));
+        $sPassword = htmlspecialchars((string) Tools::POST('password'));
 
         if (trim($sLogin) === '') {
             $sLogin = 'admin';

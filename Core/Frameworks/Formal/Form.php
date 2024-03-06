@@ -62,12 +62,17 @@ class Form
         'hook.validation' => false,
         'hook.morphology' => false,
     ];
+
     protected ?Model $oModelInstance = null;
+
     protected ElementCollection $oElements;
-    protected array $aErrors    = [];
+
+    protected array $aErrors = [];
+
     protected ?bool $bPersisted = null;        // TRUE when form has persisted; available only after execute
 
-    protected string $sDisplayTitle   = '';        // Displayed form title; generated in setModelInstance()
+    protected string $sDisplayTitle = '';
+    // Displayed form title; generated in setModelInstance()
     protected string $sDisplayMessage = '';    // Displayed confirm message; generated in execute()
 
     protected ?Morphology $oMorpho = null;
@@ -76,7 +81,7 @@ class Form
      * @param       $sModelClass
      * @param array $aOptions
      */
-    public function __construct($sModelClass, array $aOptions = [])
+    public function __construct(string $sModelClass, array $aOptions = [])
     {
         $this->sModelClass = $sModelClass;
         $this->aOptions    = array_merge($this->aOptions, $aOptions);
@@ -123,7 +128,7 @@ class Form
      */
     public function getMorpho(): Morphology
     {
-        if ($this->oMorpho !== null) {
+        if ($this->oMorpho instanceof Morphology) {
             return $this->oMorpho;
         }
 
@@ -235,7 +240,7 @@ class Form
         $oMorpho->elements()->reset();
         foreach ($oMorpho->elements() as $oElement) {
             $aValidation = $oElement->optionArray('validation');
-            if (empty($aValidation)) {
+            if ($aValidation === []) {
                 continue;
             }
 
@@ -248,15 +253,15 @@ class Form
                 }
 
                 $sParam = false;
-                if (str_contains($sValidation, ':')) {
+                if (str_contains((string) $sValidation, ':')) {
                     $sValidation = strtok($sValidation, ':');
                     $sParam      = strtok(':');
                 }
 
-                $sMethod = 'validate' . ucfirst(strtolower($sValidation));
+                $sMethod = 'validate' . ucfirst(strtolower((string) $sValidation));
                 if (!method_exists($this, $sMethod)) {
                     throw new RuntimeException(
-                        "\Formal\Form::execute(): no validation method for '" . htmlspecialchars($sValidation) . "'"
+                        Form::class . '::execute(): no validation method for \'' . htmlspecialchars((string) $sValidation) . "'"
                     );
                 }
 
@@ -278,7 +283,7 @@ class Form
             $aHook($this, $oMorpho);
         }
 
-        if (empty($this->aErrors) && !$this->refreshed()) {
+        if ($this->aErrors === [] && !$this->refreshed()) {
             // Model object is persisted
             // Last chance to generate a confirm message corresponding to what *was* submitted ("Creating", instead of "Editing")
 
@@ -307,6 +312,7 @@ class Form
                 ) . '<i class=' . $this->modelInstance()->mediumicon() . '></i><strong>' . $this->modelInstance(
                 )->label() . '</strong>';
             }
+
             $this->bPersisted = true;
         } else {
             $this->bPersisted = false;
@@ -358,7 +364,7 @@ class Form
      */
     public function validateRequired($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
-        if (trim($sValue) !== '') {
+        if (trim((string) $sValue) !== '') {
             return true;
         }
 
@@ -389,7 +395,7 @@ class Form
      *
      * @return true|string
      */
-    public function validateSameas($sValue, Morphology $oMorpho, Element $oElement, $sReferencePropName): true|string
+    public function validateSameas($sValue, Morphology $oMorpho, Element $oElement, string $sReferencePropName): true|string
     {
         $sReferenceValue = $oMorpho->element($sReferencePropName)->value();
         if ($sValue === $sReferenceValue) {
@@ -453,7 +459,7 @@ class Form
      */
     public function validateTokenid($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
-        if (!preg_match("/^[a-z0-9\-_]+$/", $sValue)) {
+        if (!preg_match("/^[a-z0-9\-_]+$/", (string) $sValue)) {
             return '<strong>' . $oElement->option(
                 'label'
             ) . '</strong> is not valid. Allowed characters are digits, lowercase letters, the dash and underscore symbol.';
@@ -471,13 +477,16 @@ class Form
      */
     public function validateColor($sValue, Morphology $oMorpho, Element $oElement): true|string
     {
-        if (!empty($sValue) && !preg_match('/^#[a-fA-F0-9]{6}([a-fA-F0-9]{2})?$/', $sValue)) {
-            return '<strong>' . $oElement->option(
-                'label'
-            ) . "</strong> is not a valid color with format '#RRGGBB' or '#RRGGBBAA' in hexadecimal values.";
+        if (empty($sValue)) {
+            return true;
+        }
+        if (preg_match('/^#[a-fA-F0-9]{6}([a-fA-F0-9]{2})?$/', (string) $sValue)) {
+            return true;
         }
 
-        return true;
+        return '<strong>' . $oElement->option(
+            'label'
+        ) . "</strong> is not a valid color with format '#RRGGBB' or '#RRGGBBAA' in hexadecimal values.";
     }
 
     /**
@@ -488,12 +497,14 @@ class Form
     public function postValue($sPropName): mixed
     {
         $aData = Tools::POST('data');
-
-        if (is_array($aData) && array_key_exists($sPropName, $aData)) {
-            return $aData[$sPropName];
+        if (!is_array($aData)) {
+            return '';
+        }
+        if (!array_key_exists($sPropName, $aData)) {
+            return '';
         }
 
-        return '';
+        return $aData[$sPropName];
     }
 
     /**
@@ -525,28 +536,23 @@ class Form
         // #####################################################
         // Displaying messages
         // #####################################################
-
-        if ($this->submitted()) {
-            // There were errors detected during execute()
-            // Error messages are displayed
-
-            if (!empty($this->aErrors)) {
-                $this->sDisplayMessage = '';
-                $aMessages             = [];
-                reset($this->aErrors);
-                foreach ($this->aErrors as $aError) {
-                    if (trim($aError['message']) === '') {
-                        continue;
-                    }
-
-                    $aMessages[] = $aError['message'];
+        // There were errors detected during execute()
+        // Error messages are displayed
+        if ($this->submitted() && $this->aErrors !== []) {
+            $this->sDisplayMessage = '';
+            $aMessages             = [];
+            reset($this->aErrors);
+            foreach ($this->aErrors as $aError) {
+                if (trim((string) $aError['message']) === '') {
+                    continue;
                 }
 
-                $this->sDisplayMessage = Message::error(
-                    implode('<br />', $aMessages),
-                    'Validation error'
-                );
+                $aMessages[] = $aError['message'];
             }
+            $this->sDisplayMessage = Message::error(
+                implode('<br />', $aMessages),
+                'Validation error'
+            );
         }
 
         $sSubmittedFlagName = $this->submitSignatureName();
@@ -562,7 +568,8 @@ class Form
                 'A CSRF token must be set in the session. Try clearing your cookies and logging in again'
             );
         }
-        $csrfToken = htmlspecialchars($_SESSION['CSRF_TOKEN']);
+
+        $csrfToken = htmlspecialchars((string) $_SESSION['CSRF_TOKEN']);
 
         $sActionUrl = $this->option('action');
 

@@ -64,10 +64,7 @@ class Sqlite extends Database
 
         // Find all user level table names
         $oStmt = $this->query(
-            'SELECT name '
-            . 'FROM sqlite_master '
-            . 'WHERE type=\'table\' AND name NOT LIKE \'sqlite_%\' '
-            . 'ORDER BY name'
+            'SELECT name FROM sqlite_master WHERE type=\'table\' AND name NOT LIKE \'sqlite_%\' ORDER BY name'
         );
 
         while (($aRs = $oStmt->fetch()) !== false) {

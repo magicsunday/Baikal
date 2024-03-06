@@ -42,8 +42,10 @@ use ReflectionException;
 
 class Sql extends Requester
 {
-    protected string $sDataTable     = '';
-    protected array $aClauses        = [];
+    protected string $sDataTable = '';
+
+    protected array $aClauses = [];
+
     protected bool $bHasBeenExecuted = false;
 
     /**
@@ -51,7 +53,7 @@ class Sql extends Requester
      *
      * @return Sql
      */
-    public function setDataTable($sDataTable): Sql
+    public function setDataTable(string $sDataTable): Sql
     {
         $this->sDataTable = $sDataTable;
 
@@ -149,7 +151,7 @@ class Sql extends Requester
         $sOrderBy = '';
         $sLimit   = '';
 
-        if (!empty($this->aClauses)) {
+        if ($this->aClauses !== []) {
             $sWhere = implode(' AND ', $this->aClauses);
         }
 
@@ -158,11 +160,7 @@ class Sql extends Requester
         }
 
         if ($this->iLimitStart !== false) {
-            if ($this->iLimitNumber !== false) {
-                $sLimit = $this->iLimitStart . ', ' . $this->iLimitNumber;
-            } else {
-                $sLimit = $this->iLimitStart;
-            }
+            $sLimit = $this->iLimitNumber !== false ? $this->iLimitStart . ', ' . $this->iLimitNumber : $this->iLimitStart;
         } elseif ($this->iLimitNumber !== false) {
             $sLimit = '0, ' . $this->iLimitNumber;
         }

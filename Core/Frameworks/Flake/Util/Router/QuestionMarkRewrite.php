@@ -55,7 +55,7 @@ class QuestionMarkRewrite extends Router
         $sRouteTokens = implode('/', self::getRouteTokens());
 
         $aRoutes = self::getRoutes();
-        foreach ($aRoutes as $sDefinedRoute => $sDefinedController) {
+        foreach (array_keys($aRoutes) as $sDefinedRoute) {
             if (str_starts_with($sRouteTokens, $sDefinedRoute)) {
                 // found a match
                 $iSlashCount = substr_count($sDefinedRoute, '/');
@@ -67,7 +67,7 @@ class QuestionMarkRewrite extends Router
             }
         }
 
-        if (empty($aMatches)) {
+        if ($aMatches === []) {
             return 'default';
         }
 
@@ -101,11 +101,7 @@ class QuestionMarkRewrite extends Router
             $sParams .= '/';
         }
 
-        if ($sRoute === 'default' && empty($aParams)) {
-            $sUrl = '/';
-        } else {
-            $sUrl = '/' . $sRoute . '/' . $sParams;
-        }
+        $sUrl = $sRoute === 'default' && $aParams === [] ? '/' : '/' . $sRoute . '/' . $sParams;
 
         $sUriPath = self::getUriPath();
         if ($sUriPath === '' || $sUriPath === '/') {
@@ -128,13 +124,11 @@ class QuestionMarkRewrite extends Router
     {
         $sUrl      = Tools::stripBeginSlash(Tools::getCurrentUrl());
         $aUrlParts = parse_url($sUrl);
-
-        $aParams = [];
         if (array_key_exists('query', $aUrlParts)) {
-            $aParams = explode('/', '?' . $aUrlParts['query']);
+            return explode('/', '?' . $aUrlParts['query']);
         }
 
-        return $aParams;
+        return [];
     }
 
     /**
@@ -144,7 +138,7 @@ class QuestionMarkRewrite extends Router
     {
         $aUrlTokens = self::getUrlTokens();
 
-        if (!empty($aUrlTokens)) {
+        if ($aUrlTokens !== []) {
             return array_slice($aUrlTokens, 1);
         }
 
@@ -159,17 +153,17 @@ class QuestionMarkRewrite extends Router
         $aTokens = self::getRouteTokens();
 
         // stripping route
-        if (!empty($aTokens)) {
+        if ($aTokens !== []) {
             $sRouteUrl     = implode('/', $aTokens);
             $sCurrentRoute = $GLOBALS['ROUTER']::getCurrentRoute();
 
-            if (!str_contains($sRouteUrl, $sCurrentRoute)) {
+            if (!str_contains($sRouteUrl, (string) $sCurrentRoute)) {
                 throw new RuntimeException(
-                    "Flake\Util\Router\QuestionMarkRewrite::getURLParams(): unrecognized route."
+                    QuestionMarkRewrite::class . '::getURLParams(): unrecognized route.'
                 );
             }
 
-            $sParams = Tools::trimSlashes(substr($sRouteUrl, strlen($sCurrentRoute)));
+            $sParams = Tools::trimSlashes(substr($sRouteUrl, strlen((string) $sCurrentRoute)));
 
             $aParams = [];
             if ($sParams !== '') {

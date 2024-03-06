@@ -41,9 +41,12 @@ use PDO;
 
 class Mysql extends Database
 {
-    protected string $sHost     = '';
-    protected string $sDbName   = '';
+    protected string $sHost = '';
+
+    protected string $sDbName = '';
+
     protected string $sUsername = '';
+
     protected string $sPassword = '';
 
     /**

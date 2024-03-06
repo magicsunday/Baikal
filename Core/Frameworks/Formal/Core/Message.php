@@ -77,7 +77,7 @@ HTML;
             $sTitle = '<h3 class="alert-heading">' . $sTitle . '</h3>';
         }
 
-        if ($bClose === true) {
+        if ($bClose) {
             $sClose = '<a class="close" data-dismiss="alert" href="#">&times;</a>';
         }
 
