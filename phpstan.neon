@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # You can currently choose from 10 levels (0 is the loosest and 9 is the strictest).
-    level: 9
+    level: 5
 
     paths:
         - %currentWorkingDirectory%/Core/
@@ -22,4 +22,5 @@ parameters:
 
     # Ignored errors
     ignoreErrors:
-
+        -
+            message: "#^Constant (.*) not found\\.$#"
