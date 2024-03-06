@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace BaikalAdmin\Controller\Install;
 
@@ -46,17 +53,15 @@ use function count;
 use function defined;
 use function dirname;
 
-/**
- *
- */
 class Database extends Controller
 {
     protected array $aMessages = [];
     protected \Baikal\Model\Config\Database $oModel;
-    protected Form $oForm;    # \Formal\Form
+    protected Form $oForm;    // \Formal\Form
 
     /**
      * @return void
+     *
      * @throws ReflectionException
      * @throws Exception
      */
@@ -101,8 +106,8 @@ class Database extends Controller
                     $oStandardConfig->set('configured_version', BAIKAL_CONFIGURED_VERSION);
                     $oStandardConfig->persist();
 
-                    # We've just rolled back the configured version, so reload so that we get to the
-                    # version upgrade page rather than the database is configured message in render below
+                    // We've just rolled back the configured version, so reload so that we get to the
+                    // version upgrade page rather than the database is configured message in render below
                     $sLink = PROJECT_URI . 'admin/install/?/database';
                     \Flake\Util\Tools::redirect($sLink);
                     exit(0);
@@ -113,6 +118,7 @@ class Database extends Controller
 
     /**
      * @return string
+     *
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -129,7 +135,7 @@ class Database extends Controller
             $sForm = '';
         } else {
             $sMessage = '';
-            $sForm = $this->oForm->render();
+            $sForm    = $this->oForm->render();
         }
 
         $oView->setData('message', $sMessage);
@@ -152,8 +158,8 @@ class Database extends Controller
         $bMySQLEnabled = $oMorpho->element('mysql')->value();
 
         if ($bMySQLEnabled) {
-            $sHost = $oMorpho->element('mysql_host')->value();
-            $sDbname = $oMorpho->element('mysql_dbname')->value();
+            $sHost     = $oMorpho->element('mysql_host')->value();
+            $sDbname   = $oMorpho->element('mysql_dbname')->value();
             $sUsername = $oMorpho->element('mysql_username')->value();
             $sPassword = $oMorpho->element('mysql_password')->value();
 
@@ -166,14 +172,14 @@ class Database extends Controller
                 );
 
                 if (($aMissingTables = Tools::isDBStructurallyComplete($oDb)) !== true) {
-                    # Checking if all tables are missing
+                    // Checking if all tables are missing
                     $aRequiredTables = Tools::getRequiredTablesList();
                     if (count($aRequiredTables) !== count($aMissingTables)) {
                         $sMessage = '<br /><p><strong>Database is not structurally complete.</strong></p>';
                         $sMessage .= '<p>Missing tables are: <strong>' . implode(
-                                '</strong>, <strong>',
-                                $aMissingTables
-                            ) . '</strong></p>';
+                            '</strong>, <strong>',
+                            $aMissingTables
+                        ) . '</strong></p>';
                         $sMessage .= '<p>You will find the SQL definition of Baïkal tables in this file: <strong>Core/Resources/Db/MySQL/db.sql</strong></p>';
                         $sMessage .= '<br /><p>Nothing has been saved. <strong>Please, add these tables to the database before pursuing Baïkal initialization.</strong></p>';
 
@@ -182,8 +188,8 @@ class Database extends Controller
                             $sMessage
                         );
                     } else {
-                        # All tables are missing
-                        # We add these tables ourselves to the database, to initialize Baïkal
+                        // All tables are missing
+                        // We add these tables ourselves to the database, to initialize Baïkal
                         $sSqlDefinition = file_get_contents(PROJECT_PATH_CORERESOURCES . 'Db/MySQL/db.sql');
                         $oDb->query($sSqlDefinition);
                     }
@@ -205,18 +211,18 @@ class Database extends Controller
             $sFile = $oMorpho->element('sqlite_file')->value();
 
             try {
-                # Asserting DB file is writable
+                // Asserting DB file is writable
                 if (file_exists($sFile) && !is_writable($sFile)) {
                     $sMessage = "DB file is not writable. Please give write permissions on file <span style='font-family: monospace'>" . $sFile . '</span>';
                     $oForm->declareError($oMorpho->element('sqlite_file'), $sMessage);
 
                     return false;
                 }
-                # Asserting DB directory is writable
+                // Asserting DB directory is writable
                 if (!is_writable(dirname($sFile))) {
                     $sMessage = "The <em>FOLDER</em> containing the DB file is not writable, and it has to.<br />Please give write permissions on folder <span style='font-family: monospace'>" . dirname(
-                            $sFile
-                        ) . '</span>';
+                        $sFile
+                    ) . '</span>';
                     $oForm->declareError($oMorpho->element('sqlite_file'), $sMessage);
 
                     return false;
@@ -227,14 +233,14 @@ class Database extends Controller
                 );
 
                 if (($aMissingTables = Tools::isDBStructurallyComplete($oDb)) !== true) {
-                    # Checking if all tables are missing
+                    // Checking if all tables are missing
                     $aRequiredTables = Tools::getRequiredTablesList();
                     if (count($aRequiredTables) !== count($aMissingTables)) {
                         $sMessage = '<br /><p><strong>Database is not structurally complete.</strong></p>';
                         $sMessage .= '<p>Missing tables are: <strong>' . implode(
-                                '</strong>, <strong>',
-                                $aMissingTables
-                            ) . '</strong></p>';
+                            '</strong>, <strong>',
+                            $aMissingTables
+                        ) . '</strong></p>';
                         $sMessage .= '<p>You will find the SQL definition of Baïkal tables in this file: <strong>Core/Resources/Db/SQLite/db.sql</strong></p>';
                         $sMessage .= '<br /><p>Nothing has been saved. <strong>Please, add these tables to the database before pursuing Baïkal initialization.</strong></p>';
 
@@ -243,8 +249,8 @@ class Database extends Controller
                             $sMessage
                         );
                     } else {
-                        # All tables are missing
-                        # We add these tables ourselves to the database, to initialize Baïkal
+                        // All tables are missing
+                        // We add these tables ourselves to the database, to initialize Baïkal
                         $sSqlDefinition = file_get_contents(PROJECT_PATH_CORERESOURCES . 'Db/SQLite/db.sql');
                         foreach (explode(';', $sSqlDefinition) as $query) {
                             if (!trim($query)) {
@@ -276,7 +282,7 @@ class Database extends Controller
     public function hideMySQLFieldWhenNeeded(Form $oForm, Morphology $oMorpho): void
     {
         if ($oForm->submitted()) {
-            $bMySQL = ((int)$oForm->postValue('mysql') === 1);
+            $bMySQL = ((int) $oForm->postValue('mysql') === 1);
         } else {
             // oMorpho won't have the values from the model set on it yet
             $bMySQL = $this->oModel->get('mysql');

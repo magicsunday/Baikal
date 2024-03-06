@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace BaikalAdmin\Controller\Install;
 
@@ -40,12 +47,9 @@ use Symfony\Component\Yaml\Yaml;
 
 use function strlen;
 
-/**
- *
- */
 class VersionUpgrade extends Controller
 {
-    protected array $aErrors = [];
+    protected array $aErrors  = [];
     protected array $aSuccess = [];
 
     /**
@@ -67,8 +71,8 @@ class VersionUpgrade extends Controller
             error_log('Error reading baikal.yaml file : ' . $e->getMessage());
         }
 
-        $sBigIcon = 'glyph2x-magic';
-        $sBaikalVersion = BAIKAL_VERSION;
+        $sBigIcon                 = 'glyph2x-magic';
+        $sBaikalVersion           = BAIKAL_VERSION;
         $sBaikalConfiguredVersion = $config['system']['configured_version'];
 
         if ($config['system']['configured_version'] === BAIKAL_VERSION) {
@@ -87,7 +91,7 @@ HTML;
         try {
             $bSuccess = $this->upgrade($config['database'], $config['system']['configured_version'], BAIKAL_VERSION);
         } catch (Exception $e) {
-            $bSuccess = false;
+            $bSuccess        = false;
             $this->aErrors[] = 'Uncaught exception during upgrade: ' . $e;
         }
 
@@ -114,6 +118,7 @@ HTML;
      * @param string $sVersionTo
      *
      * @return bool
+     *
      * @throws Exception
      */
     protected function upgrade(string $databaseConfig, string $sVersionFrom, string $sVersionTo): bool
@@ -324,7 +329,7 @@ HTML;
 
             // Statements for both SQLite and MySQL
             $result = $pdo->query('SELECT id, carddata FROM cards');
-            $stmt = $pdo->prepare('UPDATE cards SET etag = ?, size = ? WHERE id = ?');
+            $stmt   = $pdo->prepare('UPDATE cards SET etag = ?, size = ? WHERE id = ?');
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $stmt->execute([
                     md5($row['carddata']),
@@ -333,8 +338,8 @@ HTML;
                 ]);
             }
             $this->aSuccess[] = 'etag and size was recalculated for cards';
-            $result = $pdo->query('SELECT id, calendardata FROM calendarobjects');
-            $stmt = $pdo->prepare('UPDATE calendarobjects SET uid = ? WHERE id = ?');
+            $result           = $pdo->query('SELECT id, calendardata FROM calendarobjects');
+            $stmt             = $pdo->prepare('UPDATE calendarobjects SET uid = ? WHERE id = ?');
 
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 try {
@@ -348,7 +353,7 @@ HTML;
                     $vobj->destroy();
                     continue;
                 }
-                $uid = (string)$item->UID;
+                $uid = (string) $item->UID;
                 $stmt->execute(
                     [
                         $uid,
@@ -361,7 +366,7 @@ HTML;
             $this->aSuccess[] = 'uid was recalculated for calendarobjects';
 
             $result = $pdo->query('SELECT id, uri, vcardurl FROM principals WHERE vcardurl IS NOT NULL');
-            $stmt1 = $pdo->prepare('INSERT INTO propertystorage (path, name, valuetype, value) VALUES (?, ?, 3, ?)');
+            $stmt1  = $pdo->prepare('INSERT INTO propertystorage (path, name, valuetype, value) VALUES (?, ?, 3, ?)');
 
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 // Inserting the new record
@@ -490,7 +495,7 @@ FROM calendars
 '
                 );
                 $this->aSuccess[] = 'Migrated calendarinstances table';
-                $calendarBackup = 'calendars_3_1';
+                $calendarBackup   = 'calendars_3_1';
                 $pdo->exec('RENAME TABLE calendars TO ' . $calendarBackup);
                 $this->aSuccess[] = 'Did calendars backup';
 
@@ -557,7 +562,7 @@ FROM calendars
 '
                 );
                 $this->aSuccess[] = 'Migrated calendarinstances table';
-                $calendarBackup = 'calendars_3_1';
+                $calendarBackup   = 'calendars_3_1';
                 $pdo->exec('ALTER TABLE calendars RENAME TO ' . $calendarBackup);
                 $this->aSuccess[] = 'Did calendars backup';
 
@@ -595,11 +600,12 @@ SQL
      * @param string $sVersionTo
      *
      * @return void
+     *
      * @throws Exception
      */
     protected function updateConfiguredVersion(string $sVersionTo): void
     {
-        # Update BAIKAL_CONFIGURED_VERSION
+        // Update BAIKAL_CONFIGURED_VERSION
         $oConfig = new Standard();
         $oConfig->set('configured_version', $sVersionTo);
         $oConfig->persist();
@@ -610,7 +616,7 @@ SQL
      */
     protected function assertConfigWritable(): void
     {
-        # Parsing the config also makes sure that it is not malformed
+        // Parsing the config also makes sure that it is not malformed
         $oConfig = new Standard();
         if ($oConfig->writable() === false) {
             throw new RuntimeException(PROJECT_PATH_CONFIG . 'baikal.yaml is not writable');

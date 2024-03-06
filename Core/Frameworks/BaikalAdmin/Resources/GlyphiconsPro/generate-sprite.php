@@ -1,5 +1,13 @@
 #!/usr/bin/env php
 <?php
+
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 define('COLUMNS', 10);
@@ -383,8 +391,8 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
 {
     $iKey = 0;
 
-    $aSprites = [];
-    $iSymbolWidth = $iPngWidth / $iCols;
+    $aSprites      = [];
+    $iSymbolWidth  = $iPngWidth / $iCols;
     $iSymbolHeight = $iPngHeight / $iRows;
 
     foreach ($aSymbols as $sSymbol) {
@@ -392,7 +400,7 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
         array_shift($aParts);
         $sClass = $sClassPrefix . implode('-', $aParts);
 
-        $iRowNum = (int)($iKey / $iCols);
+        $iRowNum = (int) ($iKey / $iCols);
         $iColNum = $iKey % $iCols;
 
         $iX = $iColNum * $iSymbolWidth;
@@ -409,10 +417,10 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
         ++$iKey;
     }
 
-    ##########################################################################
+    // #########################################################################
     // Generate CSS
 
-    $iSpriteWidth = ceil($iSymbolWidth);
+    $iSpriteWidth  = ceil($iSymbolWidth);
     $iSpriteHeight = ceil($iSymbolHeight);
 
     $sCss = <<<CSS
@@ -452,8 +460,8 @@ function generateSprite($aSymbols, $iCols, $iRows, $iPngWidth, $iPngHeight, $sCl
 CSS;
 
     foreach ($aSprites as $aSprite) {
-        $iX = (-1 * (int)$aSprite['x']);
-        $iY = (-1 * (int)$aSprite['y']);
+        $iX = (-1 * (int) $aSprite['x']);
+        $iY = (-1 * (int) $aSprite['y']);
 
         if ($iX < 0) {
             $iX .= 'px';
@@ -472,6 +480,6 @@ CSS;
     }
 
     return "\n" . '/* ' . count($aSprites) . ' glyphs, generated on ' . strftime(
-            '%Y-%m-%d %H:%M:%S'
-        ) . '; C=' . $iCols . '; R=' . $iRows . '; W=' . $iPngWidth . '; H=' . $iPngHeight . '; PREFIX=' . $sClassPrefix . " */\n" . $sCss;
+        '%Y-%m-%d %H:%M:%S'
+    ) . '; C=' . $iCols . '; R=' . $iRows . '; W=' . $iPngWidth . '; H=' . $iPngHeight . '; PREFIX=' . $sClassPrefix . " */\n" . $sCss;
 }

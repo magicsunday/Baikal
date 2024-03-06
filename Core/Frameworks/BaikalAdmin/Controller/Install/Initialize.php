@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace BaikalAdmin\Controller\Install;
 
@@ -43,17 +50,15 @@ use Twig\Error\SyntaxError;
 use function defined;
 use function in_array;
 
-/**
- *
- */
 class Initialize extends Controller
 {
     protected array $aMessages = [];
     protected Standard $oModel;
-    protected Form $oForm;    # \Formal\Form
+    protected Form $oForm;    // \Formal\Form
 
     /**
      * @return void
+     *
      * @throws ReflectionException
      * @throws Exception
      * @throws \Exception
@@ -65,13 +70,13 @@ class Initialize extends Controller
      */
     public function execute(): void
     {
-        # Assert that /Specific is writable
+        // Assert that /Specific is writable
 
         if (!file_exists(PROJECT_PATH_SPECIFIC) || !is_dir(PROJECT_PATH_SPECIFIC) || !is_writable(
-                PROJECT_PATH_SPECIFIC
-            ) || !file_exists(PROJECT_PATH_CONFIG) || !is_dir(PROJECT_PATH_CONFIG) || !is_writable(
-                PROJECT_PATH_CONFIG
-            )) {
+            PROJECT_PATH_SPECIFIC
+        ) || !file_exists(PROJECT_PATH_CONFIG) || !is_dir(PROJECT_PATH_CONFIG) || !is_writable(
+            PROJECT_PATH_CONFIG
+        )) {
             $message = '<h1>Error - Insufficient  permissions on the configuration folders</h1><p>';
             $message .= '<p>In order to work properly, Baïkal needs to have write permissions in the <strong>Specific/</strong> and <strong>config/</strong> folder.</p>';
 
@@ -112,17 +117,17 @@ class Initialize extends Controller
                     @unlink(PROJECT_PATH_SPECIFIC . 'config.php');
                 }
 
-                # Creating system config, and initializing BAIKAL_ENCRYPTION_KEY
+                // Creating system config, and initializing BAIKAL_ENCRYPTION_KEY
                 $oDatabaseConfig = new \Baikal\Model\Config\Database();
                 $oDatabaseConfig->set('encryption_key', md5(microtime() . mt_rand()));
 
-                # Default: PDO::SQLite or PDO::MySQL ?
+                // Default: PDO::SQLite or PDO::MySQL ?
                 $aPDODrivers = PDO::getAvailableDrivers();
                 if (!in_array(
                     'sqlite',
                     $aPDODrivers,
                     true
-                )) {    # PDO::MySQL is already asserted in \Baikal\Core\Tools::assertEnvironmentIsOk()
+                )) {    // PDO::MySQL is already asserted in \Baikal\Core\Tools::assertEnvironmentIsOk()
                     $oDatabaseConfig->set('mysql', true);
                 }
 
@@ -133,6 +138,7 @@ class Initialize extends Controller
 
     /**
      * @return string
+     *
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -151,12 +157,12 @@ class Initialize extends Controller
             Tools::redirect($sLink);
             exit(0);
 
-            #$sMessage = "<p>Baïkal is now configured. You may <a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Access the Baïkal admin</a></p>";
-            #$sForm = "";
+            // $sMessage = "<p>Baïkal is now configured. You may <a class='btn btn-success' href='" . PROJECT_URI . "admin/'>Access the Baïkal admin</a></p>";
+            // $sForm = "";
         }
 
         $sMessage = '';
-        $sForm = $this->oForm->render();
+        $sForm    = $this->oForm->render();
 
         $oView->setData('message', $sMessage);
         $oView->setData('form', $sForm);

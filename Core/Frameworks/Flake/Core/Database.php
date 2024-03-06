@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake\Core;
 
@@ -38,9 +45,6 @@ use function in_array;
 use function is_array;
 use function is_string;
 
-/**
- *
- */
 abstract class Database
 {
     /**
@@ -74,7 +78,7 @@ abstract class Database
         string $table,
         array $fields_values,
         array|bool|string $no_quote_fields = false
-    ): Database\Statement {
+    ): Statement {
         return $this->query($this->INSERTquery($table, $fields_values, $no_quote_fields));
     }
 
@@ -96,16 +100,16 @@ abstract class Database
             $query = 'INSERT INTO ' . $table . '
 				(
 					' . implode(
-                    ',
+                ',
 					',
-                    array_keys($fields_values)
-                ) . '
+                array_keys($fields_values)
+            ) . '
 				) VALUES (
 					' . implode(
-                    ',
+                ',
 					',
-                    $fields_values
-                ) . '
+                $fields_values
+            ) . '
 				)';
 
             // Return query:
@@ -130,7 +134,7 @@ abstract class Database
         string $where,
         array $fields_values,
         array|bool|string $no_quote_fields = false
-    ): Database\Statement {
+    ): Statement {
         return $this->query($this->UPDATEquery($table, $where, $fields_values, $no_quote_fields));
     }
 
@@ -162,10 +166,10 @@ abstract class Database
             $query = 'UPDATE ' . $table . '
                 SET
                     ' . implode(
+                ',
                     ',
-                    ',
-                    $fields
-                ) .
+                $fields
+            ) .
                 ($where !== '' ? '
                 WHERE
                     ' . $where : '');
@@ -185,7 +189,7 @@ abstract class Database
      *
      * @return Statement
      */
-    public function exec_DELETEquery(string $table, string $where): Database\Statement
+    public function exec_DELETEquery(string $table, string $where): Statement
     {
         return $this->query($this->DELETEquery($table, $where));
     }
@@ -228,7 +232,7 @@ abstract class Database
         string $groupBy = '',
         string $orderBy = '',
         string $limit = ''
-    ): Database\Statement {
+    ): Statement {
         return $this->query($this->SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit));
     }
 
@@ -312,7 +316,7 @@ abstract class Database
                 if ($v === null) {
                     $arr[$k] = 'NULL';
                 } else {
-                    $arr[$k] = $this->fullQuote((string)$v);
+                    $arr[$k] = $this->fullQuote((string) $v);
                 }
             }
         }
@@ -327,7 +331,7 @@ abstract class Database
      *
      * @return Statement
      */
-    public function query(string $sSql): Database\Statement
+    public function query(string $sSql): Statement
     {
         if (($stmt = $this->oDb->query($sSql)) === false) {
             $sMessage = print_r($this->oDb->errorInfo(), true);
@@ -352,7 +356,7 @@ abstract class Database
      */
     public function quote(string $str): string
     {
-        return substr($this->oDb->quote($str), 1, -1);    # stripping first and last quote
+        return substr($this->oDb->quote($str), 1, -1);    // stripping first and last quote
     }
 
     /**
@@ -371,9 +375,6 @@ abstract class Database
         $this->oDb = null;
     }
 
-    /**
-     *
-     */
     public function __destruct()
     {
         $this->close();

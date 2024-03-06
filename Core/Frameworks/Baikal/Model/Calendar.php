@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Baikal\Model;
 
@@ -42,12 +49,9 @@ use Symfony\Component\Yaml\Yaml;
 
 use function in_array;
 
-/**
- *
- */
 class Calendar extends Db
 {
-    public const DATATABLE = 'calendarinstances';
+    public const DATATABLE  = 'calendarinstances';
     public const PRIMARYKEY = 'id';
     public const LABELFIELD = 'displayname';
 
@@ -64,7 +68,7 @@ class Calendar extends Db
         'share_invitestatus' => 2,
     ];
 
-    protected Calendar\Calendar $oCalendar; # Baikal\Model\Calendar\Calendar
+    protected Calendar\Calendar $oCalendar; // Baikal\Model\Calendar\Calendar
 
     /**
      * @param false|int|string $sPrimary
@@ -96,6 +100,7 @@ class Calendar extends Db
      * @param int|string $sPrimary
      *
      * @return void
+     *
      * @throws Exception
      */
     protected function initByPrimary(int|string $sPrimary): void
@@ -106,6 +111,7 @@ class Calendar extends Db
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function persist(): void
@@ -141,6 +147,7 @@ class Calendar extends Db
 
     /**
      * @return Sql
+     *
      * @throws Exception
      */
     public function getEventsBaseRequester(): Sql
@@ -148,7 +155,7 @@ class Calendar extends Db
         $oBaseRequester = Event::getBaseRequester();
         $oBaseRequester->addClauseEquals(
             'calendarid',
-            (string)$this->get('calendarid')
+            (string) $this->get('calendarid')
         );
 
         return $oBaseRequester;
@@ -168,7 +175,7 @@ class Calendar extends Db
         }
 
         if ($sPropName === 'todos') {
-            # TRUE if components contains VTODO, FALSE otherwise
+            // TRUE if components contains VTODO, FALSE otherwise
             if (($sComponents = $this->get('components')) !== '') {
                 $aComponents = explode(',', $sComponents);
             } else {
@@ -179,7 +186,7 @@ class Calendar extends Db
         }
 
         if ($sPropName === 'notes') {
-            # TRUE if components contains VJOURNAL, FALSE otherwise
+            // TRUE if components contains VJOURNAL, FALSE otherwise
             if (($sComponents = $this->get('components')) !== '') {
                 $aComponents = explode(',', $sComponents);
             } else {
@@ -197,6 +204,7 @@ class Calendar extends Db
      * @param bool|int|string|null $sPropValue
      *
      * @return Model
+     *
      * @throws Exception
      */
     public function set(string $sPropName, bool|int|string|null $sPropValue): Model
@@ -250,7 +258,6 @@ class Calendar extends Db
 
     /**
      * @return Morphology
-     *
      */
     public function formMorphologyForThisModelInstance(): Morphology
     {
@@ -319,6 +326,7 @@ class Calendar extends Db
 
     /**
      * @return bool
+     *
      * @throws Exception
      */
     public function isDefault(): bool
@@ -348,6 +356,7 @@ class Calendar extends Db
 
     /**
      * @return void
+     *
      * @throws ReflectionException
      * @throws Exception
      */

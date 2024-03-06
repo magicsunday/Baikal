@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Baikal\Core;
 
@@ -49,6 +56,7 @@ use Symfony\Component\Yaml\Yaml;
  * This class sets up the underlying Sabre\DAV\Server object.
  *
  * @copyright Copyright (C) Jérôme Schneider <mail@jeromeschneider.fr>
+ *
  * @author    Evert Pot (http://evertpot.com/)
  * @license   http://sabre.io/license/ GPLv2
  */
@@ -85,7 +93,7 @@ class Server
     /**
      * Reference to Database object.
      *
-     * @var \PDO
+     * @var PDO
      */
     protected PDO $pdo;
 
@@ -106,11 +114,11 @@ class Server
     /**
      * Creates the server object.
      *
-     * @param bool $enableCalDAV
-     * @param bool $enableCardDAV
+     * @param bool   $enableCalDAV
+     * @param bool   $enableCardDAV
      * @param string $authType
      * @param string $authRealm
-     * @param \PDO $pdo
+     * @param PDO    $pdo
      * @param string $baseUri
      *
      * @throws \Sabre\DAV\Exception
@@ -123,12 +131,12 @@ class Server
         PDO $pdo,
         string $baseUri
     ) {
-        $this->enableCalDAV = $enableCalDAV;
+        $this->enableCalDAV  = $enableCalDAV;
         $this->enableCardDAV = $enableCardDAV;
-        $this->authType = $authType;
-        $this->authRealm = $authRealm;
-        $this->pdo = $pdo;
-        $this->baseUri = $baseUri;
+        $this->authType      = $authType;
+        $this->authRealm     = $authRealm;
+        $this->pdo           = $pdo;
+        $this->baseUri       = $baseUri;
 
         $this->initServer();
     }
@@ -147,6 +155,7 @@ class Server
      * Initializes the server object.
      *
      * @return void
+     *
      * @throws \Sabre\DAV\Exception
      */
     protected function initServer(): void
@@ -172,11 +181,11 @@ class Server
         ];
         if ($this->enableCalDAV) {
             $calendarBackend = new \Sabre\CalDAV\Backend\PDO($this->pdo);
-            $nodes[] = new CalendarRoot($principalBackend, $calendarBackend);
+            $nodes[]         = new CalendarRoot($principalBackend, $calendarBackend);
         }
         if ($this->enableCardDAV) {
             $carddavBackend = new \Sabre\CardDAV\Backend\PDO($this->pdo);
-            $nodes[] = new AddressBookRoot($principalBackend, $carddavBackend);
+            $nodes[]        = new AddressBookRoot($principalBackend, $carddavBackend);
         }
 
         $this->server = new \Sabre\DAV\Server($nodes);

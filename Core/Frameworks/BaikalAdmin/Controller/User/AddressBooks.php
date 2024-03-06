@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace BaikalAdmin\Controller\User;
 
@@ -47,18 +54,16 @@ use Twig\Error\SyntaxError;
 
 use function array_key_exists;
 
-/**
- *
- */
 class AddressBooks extends Controller
 {
     protected array $aMessages = [];
-    protected AddressBook $oModel;    # \Baikal\Model\Contact
-    protected User $oUser;    # \Baikal\Model\User
-    protected Form $oForm;    # \Formal\Form
+    protected AddressBook $oModel;    // \Baikal\Model\Contact
+    protected User $oUser;    // \Baikal\Model\User
+    protected Form $oForm;    // \Formal\Form
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function execute(): void
@@ -84,6 +89,7 @@ class AddressBooks extends Controller
 
     /**
      * @return string
+     *
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -94,10 +100,10 @@ class AddressBooks extends Controller
     {
         $oView = new \BaikalAdmin\View\User\AddressBooks();
 
-        # User
+        // User
         $oView->setData('user', $this->oUser);
 
-        # Render list of address books
+        // Render list of address books
         $aAddressBooks = [];
 
         /** @var Collection<AddressBook> $oAddressBooks */
@@ -117,7 +123,7 @@ class AddressBooks extends Controller
 
         $oView->setData('addressbooks', $aAddressBooks);
 
-        # Messages
+        // Messages
         $sMessages = implode("\n", $this->aMessages);
         $oView->setData('messages', $sMessages);
 
@@ -140,6 +146,7 @@ class AddressBooks extends Controller
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function initForm(): void
@@ -159,14 +166,14 @@ class AddressBooks extends Controller
     protected function currentUserId(): false|int
     {
         $aParams = $this->getParams();
-        if (($iUser = (int)$aParams['user']) === 0) {
+        if (($iUser = (int) $aParams['user']) === 0) {
             return false;
         }
 
         return $iUser;
     }
 
-    # Action new
+    // Action new
 
     /**
      * @return string
@@ -185,16 +192,18 @@ class AddressBooks extends Controller
     protected function actionNewRequested(): bool
     {
         $aParams = $this->getParams();
-        return array_key_exists('new', $aParams) && (int)$aParams['new'] === 1;
+
+        return array_key_exists('new', $aParams) && (int) $aParams['new'] === 1;
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionNew(): void
     {
-        # Building floating model object
+        // Building floating model object
         $this->oModel = new AddressBook();
         $this->oModel->set(
             'principaluri',
@@ -217,7 +226,7 @@ class AddressBooks extends Controller
         }
     }
 
-    # Action edit
+    // Action edit
 
     /**
      * @param Model $oModel
@@ -238,29 +247,31 @@ class AddressBooks extends Controller
     protected function actionEditRequested(): bool
     {
         $aParams = $this->getParams();
-        return array_key_exists('edit', $aParams) && (int)$aParams['edit'] > 0;
+
+        return array_key_exists('edit', $aParams) && (int) $aParams['edit'] > 0;
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionEdit(): void
     {
-        # Building anchored model object
-        $aParams = $this->getParams();
-        $this->oModel = new AddressBook((int)$aParams['edit']);
+        // Building anchored model object
+        $aParams      = $this->getParams();
+        $this->oModel = new AddressBook((int) $aParams['edit']);
 
-        # Initialize corresponding form
+        // Initialize corresponding form
         $this->initForm();
 
-        # Process form
+        // Process form
         if ($this->oForm->submitted()) {
             $this->oForm->execute();
         }
     }
 
-    # Action delete + confirm
+    // Action delete + confirm
 
     /**
      * @param AddressBook $oModel
@@ -295,7 +306,8 @@ class AddressBooks extends Controller
     protected function actionDeleteRequested(): bool
     {
         $aParams = $this->getParams();
-        return array_key_exists('delete', $aParams) && (int)$aParams['delete'] > 0;
+
+        return array_key_exists('delete', $aParams) && (int) $aParams['delete'] > 0;
     }
 
     /**
@@ -314,28 +326,29 @@ class AddressBooks extends Controller
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionDelete(): void
     {
         $aParams = $this->getParams();
-        $iModel = (int)$aParams['delete'];
+        $iModel  = (int) $aParams['delete'];
 
         if ($this->actionDeleteConfirmed() !== false) {
-            # catching Exception thrown when model already destroyed
-            # happens when user refreshes page on delete-URL, for instance
+            // catching Exception thrown when model already destroyed
+            // happens when user refreshes page on delete-URL, for instance
 
             try {
                 $oModel = new AddressBook($iModel);
                 $oModel->destroy();
             } catch (Exception) {
-                # already deleted; silently discarding
+                // already deleted; silently discarding
             }
 
-            # Redirecting to admin home
+            // Redirecting to admin home
             Tools::redirectUsingMeta($this->linkHome());
         } else {
-            $oModel = new AddressBook($iModel);
+            $oModel            = new AddressBook($iModel);
             $this->aMessages[] = Message::warningConfirmMessage(
                 "Check twice, you're about to delete " . $oModel->label() . '</strong> from the database !',
                 "<p>You are about to delete a contact book and all it's visiting cards. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
@@ -346,7 +359,7 @@ class AddressBooks extends Controller
         }
     }
 
-    # Link to home
+    // Link to home
 
     /**
      * @return string
@@ -364,12 +377,13 @@ class AddressBooks extends Controller
      * @param AddressBook $addressbook
      *
      * @return string AddressBook DAV URI
+     *
      * @throws Exception
      */
     protected function getDavUri(AddressBook $addressbook): string
     {
         return PROJECT_URI . 'dav.php/addressbooks/' . $this->oUser->get('username') . '/' . $addressbook->get(
-                'uri'
-            ) . '/';
+            'uri'
+        ) . '/';
     }
 }

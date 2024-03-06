@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 /***************************************************************
@@ -71,7 +78,7 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
 // Bootstrapping Flake
-\Flake\Framework::bootstrap();
+Flake\Framework::bootstrap();
 
 // Bootstrap BaikalAdmin
 Framework::bootstrap();
@@ -105,7 +112,7 @@ if (($config === null) || !isset($config['system']['configured_version'])) {
         }
     } elseif (file_exists(PROJECT_PATH_SPECIFIC . '/INSTALL_DISABLED')) {
         echo "Installation was already completed. Please head to the admin interface to modify any settings.\n";
-        exit();
+        exit;
     } else {
         $oPage->zone('Payload')->addBlock(new Database());
     }

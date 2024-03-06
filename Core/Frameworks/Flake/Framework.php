@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake;
 
@@ -46,9 +53,6 @@ use function in_array;
 use function is_array;
 use function strlen;
 
-/**
- *
- */
 class Framework extends Core\Framework
 {
     /**
@@ -154,16 +158,16 @@ class Framework extends Core\Framework
      */
     public static function bootstrap(): void
     {
-        # Asserting PHP 5.5.0+
+        // Asserting PHP 5.5.0+
         if (PHP_VERSION_ID < 50500) {
             exit('Flake Fatal Error: Flake requires PHP 5.5.0+ to run properly. Your version is: ' . PHP_VERSION . '.');
         }
 
-        # Define safehash salt
+        // Define safehash salt
         define('PROJECT_SAFEHASH_SALT', 'strong-secret-salt');
 
-        # Define absolute server path to Flake Framework
-        define('FLAKE_PATH_ROOT', PROJECT_PATH_ROOT . 'Core/Frameworks/Flake/');    # ./
+        // Define absolute server path to Flake Framework
+        define('FLAKE_PATH_ROOT', PROJECT_PATH_ROOT . 'Core/Frameworks/Flake/');    // ./
 
         if (!defined('LF')) {
             define('LF', chr(10));
@@ -181,16 +185,16 @@ class Framework extends Core\Framework
 
         $magicQuotes = ini_get('magic_quotes_gpc');
 
-        # Undo magic_quotes as this cannot be disabled by .htaccess on PHP ran as CGI
-        # Source: http://stackoverflow.com/questions/517008/how-to-turn-off-magic-quotes-on-shared-hosting
-        # Also: https://github.com/netgusto/Baikal/issues/155
+        // Undo magic_quotes as this cannot be disabled by .htaccess on PHP ran as CGI
+        // Source: http://stackoverflow.com/questions/517008/how-to-turn-off-magic-quotes-on-shared-hosting
+        // Also: https://github.com/netgusto/Baikal/issues/155
         if ($magicQuotes !== false && in_array(
-                strtolower($magicQuotes),
-                [
-                    '1',
-                    'on',
-                ]
-            )) {
+            strtolower($magicQuotes),
+            [
+                '1',
+                'on',
+            ]
+        )) {
             $process = [];
             if (isset($_GET) && is_array($_GET)) {
                 $process[] = &$_GET;
@@ -210,7 +214,7 @@ class Framework extends Core\Framework
                     unset($process[$key][$k]);
                     if (is_array($v)) {
                         $process[$key][stripslashes($k)] = $v;
-                        $process[] = &$process[$key][stripslashes($k)];
+                        $process[]                       = &$process[$key][stripslashes($k)];
                     } else {
                         $process[$key][stripslashes($k)] = stripslashes($v);
                     }
@@ -220,15 +224,15 @@ class Framework extends Core\Framework
             unset($process);
         }
 
-        # Fixing some CGI environments, that prefix HTTP_AUTHORIZATION (forwarded in .htaccess) with "REDIRECT_"
+        // Fixing some CGI environments, that prefix HTTP_AUTHORIZATION (forwarded in .htaccess) with "REDIRECT_"
         if (array_key_exists('REDIRECT_HTTP_AUTHORIZATION', $_SERVER)) {
             $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
         }
 
-        #################################################################################################
+        // ################################################################################################
 
-        # determine Flake install root path
-        # not using realpath here to avoid symlinks resolution
+        // determine Flake install root path
+        // not using realpath here to avoid symlinks resolution
 
         define('PROJECT_PATH_CORE', PROJECT_PATH_ROOT . 'Core/');
         define('PROJECT_PATH_CORERESOURCES', PROJECT_PATH_CORE . 'Resources/');
@@ -257,12 +261,12 @@ class Framework extends Core\Framework
 
         self::defineBaseUri();
 
-        #################################################################################################
+        // ################################################################################################
 
-        # Include Flake Framework config
+        // Include Flake Framework config
         require_once FLAKE_PATH_ROOT . 'config.php';
 
-        # Determine Router class
+        // Determine Router class
         $GLOBALS['ROUTER'] = Tools::router();
 
         if (!Tools::isCliPhp()) {
@@ -313,8 +317,8 @@ class Framework extends Core\Framework
             error_log((string) $e);
         }
 
-        $sScript = substr($_SERVER['SCRIPT_FILENAME'], strlen($_SERVER['DOCUMENT_ROOT']));
-        $sDirName = str_replace("\\", '/', dirname($sScript));    // fix windows backslashes
+        $sScript  = substr($_SERVER['SCRIPT_FILENAME'], strlen($_SERVER['DOCUMENT_ROOT']));
+        $sDirName = str_replace('\\', '/', dirname($sScript));    // fix windows backslashes
 
         if ($sDirName !== '.') {
             $sDirName = self::appendSlash($sDirName);
@@ -325,8 +329,8 @@ class Framework extends Core\Framework
         $sBaseUrl = self::rmBeginSlash(self::rmProjectContext($sDirName));
         define('PROJECT_BASEURI', self::prependSlash($sBaseUrl));    // SabreDAV needs a "/" at the beginning of BASEURL
 
-        # Determine PROJECT_URI
-        $sProtocol = Tools::getCurrentProtocol();
+        // Determine PROJECT_URI
+        $sProtocol    = Tools::getCurrentProtocol();
         $sHttpBaseUrl = $_SERVER['REQUEST_URI'];
         $sHttpBaseUrl = self::rmQuery($sHttpBaseUrl);
         $sHttpBaseUrl = self::rmScriptName($sHttpBaseUrl, $sScript);
@@ -347,10 +351,10 @@ class Framework extends Core\Framework
 
             return true;
         }
-        # Dont init db on install, but in normal mode and when upgrading
+        // Dont init db on install, but in normal mode and when upgrading
         if (defined(
-                'BAIKAL_CONTEXT_INSTALL'
-            ) && (!isset($config['system']['configured_version']) || $config['system']['configured_version'] === BAIKAL_VERSION)) {
+            'BAIKAL_CONTEXT_INSTALL'
+        ) && (!isset($config['system']['configured_version']) || $config['system']['configured_version'] === BAIKAL_VERSION)) {
             return true;
         }
         if ($config['database']['mysql'] === true) {
@@ -367,17 +371,17 @@ class Framework extends Core\Framework
      */
     protected static function initDbSqlite(array $config)
     {
-        # Asserting DB filepath is set
+        // Asserting DB filepath is set
         if (!$config['database']['sqlite_file']) {
             return false;
         }
 
-        # Asserting DB file is writable
+        // Asserting DB file is writable
         if (file_exists($config['database']['sqlite_file']) && !is_writable($config['database']['sqlite_file'])) {
             exit("<h3>DB file is not writable. Please give write permissions on file '<span style='font-family: monospace; background: yellow;'>" . $config['database']['sqlite_file'] . "</span>'</h3>");
         }
 
-        # Asserting DB directory is writable
+        // Asserting DB directory is writable
         if (!is_writable(dirname($config['database']['sqlite_file']))) {
             exit(
                 "<h3>The <em>FOLDER</em> containing the DB file is not writable, and it has to.<br />Please give write permissions on folder '<span style='font-family: monospace; background: yellow;'>" . dirname(
@@ -429,7 +433,7 @@ class Framework extends Core\Framework
                 $config['database']['mysql_password']
             );
 
-            # We now setup t6he connexion to use UTF8
+            // We now setup t6he connexion to use UTF8
             $GLOBALS['DB']->query('SET NAMES UTF8');
         } catch (Exception) {
             exit('<h3>Baïkal was not able to establish a connexion to the configured MySQL database (as configured in config/baikal.yaml).</h3>');

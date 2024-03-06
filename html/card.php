@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 /***************************************************************
@@ -46,10 +53,10 @@ if ($currentWorkingDirectory === false) {
 
 if (file_exists($currentWorkingDirectory . '/Core')) {
     // Flat FTP mode
-    define('PROJECT_PATH_ROOT', $currentWorkingDirectory . '/');    #./
+    define('PROJECT_PATH_ROOT', $currentWorkingDirectory . '/');    // ./
 } else {
     // Dedicated server mode
-    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory) . '/');    #../
+    define('PROJECT_PATH_ROOT', dirname($currentWorkingDirectory) . '/');    // ../
 }
 
 if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
@@ -59,7 +66,7 @@ if (!file_exists(PROJECT_PATH_ROOT . 'vendor/')) {
 require PROJECT_PATH_ROOT . 'vendor/autoload.php';
 
 // Bootstrapping Flake
-\Flake\Framework::bootstrap();
+Flake\Framework::bootstrap();
 
 // Bootstrapping Baïkal
 Framework::bootstrap();

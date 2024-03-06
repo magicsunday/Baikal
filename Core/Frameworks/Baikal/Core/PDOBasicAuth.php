@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Baikal\Core;
@@ -15,6 +22,7 @@ use function count;
  * Format of the database tables must match to the one of \Sabre\DAV\Auth\Backend\PDO
  *
  * @copyright Copyright (C) 2013 Lukasz Janyst. All rights reserved.
+ *
  * @author    Lukasz Janyst <ljanyst@buggybrain.net>
  * @license   http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
@@ -52,7 +60,7 @@ class PDOBasicAuth extends AbstractBasic
      */
     public function __construct(PDO $pdo, $authRealm, string $tableName = 'users')
     {
-        $this->pdo = $pdo;
+        $this->pdo       = $pdo;
         $this->tableName = $tableName;
         $this->authRealm = $authRealm;
     }

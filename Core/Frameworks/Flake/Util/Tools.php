@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake\Util;
 
@@ -46,9 +53,6 @@ use function is_object;
 use function is_string;
 use function strlen;
 
-/**
- *
- */
 class Tools
 {
     private function __construct()
@@ -64,8 +68,8 @@ class Tools
         $sUrl = $GLOBALS['_SERVER']['REQUEST_URI'];
         if (MONGOOSE_SERVER) {
             if (array_key_exists('QUERY_STRING', $GLOBALS['_SERVER']) && trim(
-                    $GLOBALS['_SERVER']['QUERY_STRING']
-                ) !== '') {
+                $GLOBALS['_SERVER']['QUERY_STRING']
+            ) !== '') {
                 $sUrl .= '?' . $GLOBALS['_SERVER']['QUERY_STRING'];
             }
         }
@@ -82,7 +86,7 @@ class Tools
             return $GLOBALS['_SERVER']['HTTP_X_FORWARDED_PROTO'];
         }
 
-        if ((!empty($GLOBALS['_SERVER']['HTTPS']) && $GLOBALS['_SERVER']['HTTPS'] !== 'off') || (int)$_SERVER['SERVER_PORT'] === 443) {
+        if ((!empty($GLOBALS['_SERVER']['HTTPS']) && $GLOBALS['_SERVER']['HTTPS'] !== 'off') || (int) $_SERVER['SERVER_PORT'] === 443) {
             return 'https';
         }
 
@@ -159,7 +163,7 @@ class Tools
      */
     public static function validEmail(string $sEmail): bool
     {
-        return (filter_var($sEmail, FILTER_VALIDATE_EMAIL) !== false);
+        return filter_var($sEmail, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
@@ -170,8 +174,8 @@ class Tools
     public static function parseTemplateCode(string $sCode, array $aMarkers): string
     {
         $tplName = md5($sCode);
-        $loader = new ArrayLoader([$tplName => $sCode]);
-        $env = new Environment($loader);
+        $loader  = new ArrayLoader([$tplName => $sCode]);
+        $env     = new Environment($loader);
         $env->setCache(false);
 
         return $env->render($tplName, $aMarkers);
@@ -190,7 +194,7 @@ class Tools
                 $class = get_class($class);
             }
 
-            if (class_exists($class)) {    # TRUE to autoload class
+            if (class_exists($class)) {    // TRUE to autoload class
                 return @is_subclass_of($object, $class) || $object == $class;
             }
 
@@ -209,15 +213,15 @@ class Tools
      */
     public static function stringToUrlToken(string $sString): string
     {
-        # Taken from TYPO3 extension realurl
+        // Taken from TYPO3 extension realurl
 
-        $space = '-';
+        $space   = '-';
         $sString = strtr($sString, ' -+_\'', $space . $space . $space . $space . $space); // convert spaces
 
-        # De-activated; @see https://github.com/netgusto/Baikal/issues/244
-        #if(function_exists("iconv")) {
-        #	$sString = iconv('UTF-8', 'ASCII//TRANSLIT', $sString);
-        #}
+        // De-activated; @see https://github.com/netgusto/Baikal/issues/244
+        // if(function_exists("iconv")) {
+        //	$sString = iconv('UTF-8', 'ASCII//TRANSLIT', $sString);
+        // }
 
         $sString = strtolower($sString);
 
@@ -227,6 +231,7 @@ class Tools
             $space,
             $sString
         ); // Convert multiple 'spaces' to a single one
+
         return trim($sString, $space);
     }
 
@@ -313,8 +318,8 @@ class Tools
      */
     public static function arrayIsAssoc(array $aArray): bool
     {
-        # Taken from http://stackoverflow.com/questions/173400/php-arrays-a-good-way-to-check-if-an-array-is-associative-or-sequential#answer-4254008
-        # count() will return 0 if numeric, and > 0 if assoc, even partially
+        // Taken from http://stackoverflow.com/questions/173400/php-arrays-a-good-way-to-check-if-an-array-is-associative-or-sequential#answer-4254008
+        // count() will return 0 if numeric, and > 0 if assoc, even partially
         return (bool) count(array_filter(array_keys($aArray), '\is_string'));
     }
 

@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake\Core\Requester;
 
@@ -33,13 +40,10 @@ use Flake\Core\Collection;
 use Flake\Core\Requester;
 use ReflectionException;
 
-/**
- *
- */
 class Sql extends Requester
 {
-    protected string $sDataTable = '';
-    protected array $aClauses = [];
+    protected string $sDataTable     = '';
+    protected array $aClauses        = [];
     protected bool $bHasBeenExecuted = false;
 
     /**
@@ -77,7 +81,7 @@ class Sql extends Requester
      */
     protected function addClauseWrapped(string $sField, string $sValue, string $sWrap): Sql
     {
-        $sValue = $this->escapeSqlValue($sValue);
+        $sValue  = $this->escapeSqlValue($sValue);
         $sClause = str_replace(
             [
                 '{field}',
@@ -131,7 +135,7 @@ class Sql extends Requester
 
         return new $sTemp(
             $aData[$sTemp::getPrimaryKey()]
-        );    # To address 'Notice: Only variable references should be returned by reference'
+        );    // To address 'Notice: Only variable references should be returned by reference'
     }
 
     /**
@@ -141,9 +145,9 @@ class Sql extends Requester
      */
     public function getQuery(string $sFields = '*'): string
     {
-        $sWhere = '1=1';
+        $sWhere   = '1=1';
         $sOrderBy = '';
-        $sLimit = '';
+        $sLimit   = '';
 
         if (!empty($this->aClauses)) {
             $sWhere = implode(' AND ', $this->aClauses);
@@ -187,7 +191,7 @@ class Sql extends Requester
     public function execute(): Collection
     {
         $oCollection = new Collection();
-        $sSql = $this->getQuery();
+        $sSql        = $this->getQuery();
 
         $rSql = $GLOBALS['DB']->query($sSql);
         while (($aRs = $rSql->fetch()) !== false) {
@@ -210,7 +214,7 @@ class Sql extends Requester
 
         $rSql = $GLOBALS['DB']->query($sSql);
         if (($aRs = $rSql->fetch()) !== false) {
-            return (int)$aRs['nbitems'];
+            return (int) $aRs['nbitems'];
         }
 
         return 0;

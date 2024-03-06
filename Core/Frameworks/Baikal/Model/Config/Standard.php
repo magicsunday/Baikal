@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Baikal\Model\Config;
 
@@ -40,12 +47,9 @@ use Formal\Element\Text;
 use Formal\Form\Morphology;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- *
- */
 class Standard extends Config
 {
-    # Default values
+    // Default values
     protected array $aData = [
         'configured_version'    => BAIKAL_VERSION,
         'timezone'              => 'Europe/Paris',
@@ -56,8 +60,8 @@ class Standard extends Config
         'failed_access_message' => 'user %u authentication failure for Baikal',
         // While not editable as will change admin & any existing user passwords,
         // could be set to different value when migrating from legacy config
-        'auth_realm'            => 'BaikalDAV',
-        'base_uri'              => '',
+        'auth_realm' => 'BaikalDAV',
+        'base_uri'   => '',
     ];
 
     public function __construct()
@@ -124,9 +128,9 @@ class Standard extends Config
         }
 
         if (!isset($config['system']['admin_passwordhash']) || trim(
-                (string)$config['system']['admin_passwordhash']
-            ) === '') {
-            # No password set (Form is used in install tool), so password is required as it has to be defined
+            (string) $config['system']['admin_passwordhash']
+        ) === '') {
+            // No password set (Form is used in install tool), so password is required as it has to be defined
             $oMorpho->element('admin_passwordhash')->setOption('validation', 'required');
         } else {
             $sNotice = '-- Leave empty to keep current password --';
@@ -150,12 +154,13 @@ class Standard extends Config
      * @param $sPropValue
      *
      * @return $this
+     *
      * @throws Exception
      */
     public function set($sPropName, $sPropValue): static
     {
         if ($sPropName === 'admin_passwordhash' || $sPropName === 'admin_passwordhash_confirm') {
-            # Special handling for password and passwordconfirm
+            // Special handling for password and passwordconfirm
 
             if ($sPropName === 'admin_passwordhash' && $sPropValue !== '') {
                 parent::set(

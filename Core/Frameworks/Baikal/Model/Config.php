@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Baikal\Model;
 
@@ -35,20 +42,17 @@ use Symfony\Component\Yaml\Yaml;
 
 use function array_key_exists;
 
-/**
- *
- */
 abstract class Config extends NoDb
 {
     protected string $sConfigFileSection = '';
-    protected array $aData = [];
+    protected array $aData               = [];
 
     /**
      * @param $sConfigFileSection
      */
     public function __construct($sConfigFileSection)
     {
-        # Note: no call to parent::__construct() to avoid erasing $this->aData
+        // Note: no call to parent::__construct() to avoid erasing $this->aData
         $this->sConfigFileSection = $sConfigFileSection;
 
         try {
@@ -91,11 +95,11 @@ abstract class Config extends NoDb
      */
     public function writable(): bool
     {
-        return (
-            @file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml') &&
-            @is_file(PROJECT_PATH_CONFIG . 'baikal.yaml') &&
-            @is_writable(PROJECT_PATH_CONFIG . 'baikal.yaml')
-        );
+        return
+            @file_exists(PROJECT_PATH_CONFIG . 'baikal.yaml')
+            && @is_file(PROJECT_PATH_CONFIG . 'baikal.yaml')
+            && @is_writable(PROJECT_PATH_CONFIG . 'baikal.yaml')
+        ;
     }
 
     /**
@@ -141,7 +145,7 @@ abstract class Config extends NoDb
             $config = [];
         }
         $config[$this->sConfigFileSection] = $this->aData;
-        $yaml = Yaml::dump($config);
+        $yaml                              = Yaml::dump($config);
         file_put_contents(PROJECT_PATH_CONFIG . 'baikal.yaml', $yaml);
     }
 

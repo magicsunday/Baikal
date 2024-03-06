@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake\Core;
 
@@ -48,12 +55,12 @@ use function strlen;
 class Collection implements Iterator
 {
     /**
-     * An array containing the elements of this collection
+     * An array containing the elements of this collection.
      *
      * @var TValue[]
      */
     protected array $elements = [];
-    protected array $aMeta = [];
+    protected array $aMeta    = [];
 
     /**
      * @return false|TValue
@@ -65,7 +72,7 @@ class Collection implements Iterator
     }
 
     /**
-     * @return null|int|string
+     * @return int|string|null
      */
     #[ReturnTypeWillChange]
     public function key(): int|string|null
@@ -192,9 +199,9 @@ class Collection implements Iterator
             return $this->elements[array_shift($aKeys)];
         }
 
-        # two lines instead of one
+        // two lines instead of one
 
-        return null;    # as PHP needs a variable to return by ref
+        return null;    // as PHP needs a variable to return by ref
     }
 
     /**
@@ -243,6 +250,7 @@ class Collection implements Iterator
     public function map($sFunc): Collection
     {
         $aData = $this->toArray();
+
         return self::fromArray(array_map($sFunc, $aData));
     }
 
@@ -255,6 +263,7 @@ class Collection implements Iterator
     public function walk($sFunc, array $aParams = []): Collection
     {
         $aData = $this->toArray();
+
         return self::fromArray(array_walk($aData, $sFunc, $aParams));
     }
 
@@ -282,15 +291,15 @@ class Collection implements Iterator
      */
     public function __call($sName, $aArguments)
     {
-        if (strlen($sName) > 7 &&
-            $sName[0] === 's' &&
-            $sName[1] === 'e' &&
-            $sName[2] === 't' &&
-            $sName[3] === 'M' &&
-            $sName[4] === 'e' &&
-            $sName[5] === 't' &&
-            $sName[6] === 'a') {
-            $sKey = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
+        if (strlen($sName) > 7
+            && $sName[0] === 's'
+            && $sName[1] === 'e'
+            && $sName[2] === 't'
+            && $sName[3] === 'M'
+            && $sName[4] === 'e'
+            && $sName[5] === 't'
+            && $sName[6] === 'a') {
+            $sKey   = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
             $mValue = &$aArguments[0];
 
             if ($mValue === null) {
@@ -301,20 +310,21 @@ class Collection implements Iterator
                 $this->aMeta[$sKey] = &$mValue;
             }
 
-            return null;    # To avoid 'Notice: Only variable references should be returned by reference'
+            return null;    // To avoid 'Notice: Only variable references should be returned by reference'
         }
 
         if (
-            strlen($sName) > 7 &&
-            $sName[0] === 'g' &&
-            $sName[1] === 'e' &&
-            $sName[2] === 't' &&
-            $sName[3] === 'M' &&
-            $sName[4] === 'e' &&
-            $sName[5] === 't' &&
-            $sName[6] === 'a'
+            strlen($sName) > 7
+            && $sName[0] === 'g'
+            && $sName[1] === 'e'
+            && $sName[2] === 't'
+            && $sName[3] === 'M'
+            && $sName[4] === 'e'
+            && $sName[5] === 't'
+            && $sName[6] === 'a'
         ) {
             $sKey = strtolower(substr($sName, 7, 1)) . substr($sName, 8);
+
             return $this->aMeta[$sKey] ?? null;
         }
 

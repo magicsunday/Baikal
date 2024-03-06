@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace BaikalAdmin\Controller\User;
 
@@ -46,18 +53,16 @@ use Twig\Error\SyntaxError;
 
 use function array_key_exists;
 
-/**
- *
- */
 class Calendars extends Controller
 {
     protected array $aMessages = [];
-    protected Calendar $oModel;    # \Baikal\Model\Calendar
-    protected User $oUser;    # \Baikal\Model\User
-    protected Form $oForm;    # \Formal\Form
+    protected Calendar $oModel;    // \Baikal\Model\Calendar
+    protected User $oUser;    // \Baikal\Model\User
+    protected Form $oForm;    // \Formal\Form
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function execute(): void
@@ -81,6 +86,7 @@ class Calendars extends Controller
 
     /**
      * @return string
+     *
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -91,10 +97,10 @@ class Calendars extends Controller
     {
         $oView = new \BaikalAdmin\View\User\Calendars();
 
-        # User
+        // User
         $oView->setData('user', $this->oUser);
 
-        # List of calendars
+        // List of calendars
         $oCalendars = $this->oUser->getCalendarsBaseRequester()->execute();
         $aCalendars = [];
 
@@ -124,18 +130,19 @@ class Calendars extends Controller
         }
 
         $oView->setData('form', $sForm);
-        $oView->setData('titleicon', (new \Baikal\Model\Calendar)->bigicon());
+        $oView->setData('titleicon', (new Calendar())->bigicon());
         $oView->setData('modelicon', $this->oUser->mediumicon());
         $oView->setData('modellabel', $this->oUser->label());
         $oView->setData('linkback', Users::link());
         $oView->setData('linknew', $this->linkNew());
-        $oView->setData('calendaricon', (new \Baikal\Model\Calendar)->icon());
+        $oView->setData('calendaricon', (new Calendar())->icon());
 
         return $oView->render();
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function initForm(): void
@@ -156,7 +163,7 @@ class Calendars extends Controller
     {
         $aParams = $this->getParams();
 
-        if (($iUser = ((int)$aParams['user'])) === 0) {
+        if (($iUser = ((int) $aParams['user'])) === 0) {
             return false;
         }
 
@@ -180,16 +187,18 @@ class Calendars extends Controller
     protected function actionNewRequested(): bool
     {
         $aParams = $this->getParams();
-        return array_key_exists('new', $aParams) && (int)$aParams['new'] === 1;
+
+        return array_key_exists('new', $aParams) && (int) $aParams['new'] === 1;
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionNew(): void
     {
-        # Building floating model object
+        // Building floating model object
         $this->oModel = new Calendar();
         $this->oModel->set(
             'principaluri',
@@ -201,10 +210,10 @@ class Calendars extends Controller
             'VEVENT'
         );
 
-        # Initialize corresponding form
+        // Initialize corresponding form
         $this->initForm();
 
-        # Process form
+        // Process form
         if ($this->oForm->submitted()) {
             $this->oForm->execute();
 
@@ -219,12 +228,13 @@ class Calendars extends Controller
         }
     }
 
-    # Action edit
+    // Action edit
 
     /**
      * @param Model $oModel
      *
      * @return string
+     *
      * @throws Exception
      */
     public function linkEdit(Model $oModel): string
@@ -242,17 +252,18 @@ class Calendars extends Controller
     {
         $aParams = $this->getParams();
 
-        return array_key_exists('edit', $aParams) && (((int)$aParams['edit']) > 0);
+        return array_key_exists('edit', $aParams) && (((int) $aParams['edit']) > 0);
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionEdit(): void
     {
         // Building anchored model object
-        $aParams = $this->getParams();
+        $aParams      = $this->getParams();
         $this->oModel = new Calendar($aParams['edit']);
 
         // Initialize corresponding form
@@ -264,12 +275,13 @@ class Calendars extends Controller
         }
     }
 
-    # Action delete + confirm
+    // Action delete + confirm
 
     /**
      * @param Calendar $oModel
      *
      * @return string
+     *
      * @throws Exception
      */
     public function linkDelete(Calendar $oModel): string
@@ -284,6 +296,7 @@ class Calendars extends Controller
      * @param Calendar $oModel
      *
      * @return string
+     *
      * @throws Exception
      */
     public function linkDeleteConfirm(Calendar $oModel): string
@@ -301,7 +314,8 @@ class Calendars extends Controller
     protected function actionDeleteRequested(): bool
     {
         $aParams = $this->getParams();
-        return array_key_exists('delete', $aParams) && (((int)$aParams['delete']) > 0);
+
+        return array_key_exists('delete', $aParams) && (((int) $aParams['delete']) > 0);
     }
 
     /**
@@ -314,16 +328,18 @@ class Calendars extends Controller
         }
 
         $aParams = $this->getParams();
-        return array_key_exists('confirm', $aParams) && (((int)$aParams['confirm']) === 1);
+
+        return array_key_exists('confirm', $aParams) && (((int) $aParams['confirm']) === 1);
     }
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     protected function actionDelete(): void
     {
-        $aParams = $this->getParams();
+        $aParams   = $this->getParams();
         $iCalendar = $aParams['delete'];
 
         if ($this->actionDeleteConfirmed() !== false) {
@@ -340,7 +356,7 @@ class Calendars extends Controller
             // Redirecting to admin home
             Tools::redirectUsingMeta($this->linkHome());
         } else {
-            $oModel = new Calendar($iCalendar);
+            $oModel            = new Calendar($iCalendar);
             $this->aMessages[] = Message::warningConfirmMessage(
                 "Check twice, you're about to delete " . $oModel->label() . '</strong> from the database !',
                 "<p>You are about to delete a calendar and all it's scheduled events. This operation cannot be undone.</p><p>So, now that you know all that, what shall we do ?</p>",
@@ -367,6 +383,7 @@ class Calendars extends Controller
      * @param Calendar $calendar
      *
      * @return string Calender DAV URI
+     *
      * @throws Exception
      */
     protected function getDavUri(Calendar $calendar): string

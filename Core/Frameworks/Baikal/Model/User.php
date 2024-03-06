@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://sabre.io/baikal
-#
-#  This script is part of the Baïkal Server project. The Baïkal
-#  Server project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://sabre.io/baikal
+//
+//  This script is part of the Baïkal Server project. The Baïkal
+//  Server project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Baikal\Model;
 
@@ -38,12 +45,9 @@ use Formal\Form\Morphology;
 use ReflectionException;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- *
- */
 class User extends Db
 {
-    public const DATATABLE = 'users';
+    public const DATATABLE  = 'users';
     public const PRIMARYKEY = 'id';
     public const LABELFIELD = 'username';
 
@@ -58,6 +62,7 @@ class User extends Db
      * @param string|int $sPrimary
      *
      * @return void
+     *
      * @throws ReflectionException
      * @throws Exception
      */
@@ -65,7 +70,7 @@ class User extends Db
     {
         parent::initByPrimary($sPrimary);
 
-        # Initializing principals
+        // Initializing principals
         $this->oIdentityPrincipal = Principal::getBaseRequester()
             ->addClauseEquals('uri', 'principals/' . $this->get('username'))
             ->execute()
@@ -74,6 +79,7 @@ class User extends Db
 
     /**
      * @return Sql
+     *
      * @throws Exception
      */
     public function getAddressBooksBaseRequester(): Sql
@@ -89,6 +95,7 @@ class User extends Db
 
     /**
      * @return Sql
+     *
      * @throws Exception
      */
     public function getCalendarsBaseRequester(): Sql
@@ -109,7 +116,7 @@ class User extends Db
     {
         parent::initFloating();
 
-        # Initializing principals
+        // Initializing principals
         $this->oIdentityPrincipal = new Principal();
     }
 
@@ -123,15 +130,15 @@ class User extends Db
     public function get(string $sPropName): bool|int|string|null
     {
         if ($sPropName === 'password' || $sPropName === 'passwordconfirm') {
-            # Special handling for password and passwordconfirm
+            // Special handling for password and passwordconfirm
             return '';
         }
 
         try {
-            # does the property exist on the model object ?
+            // does the property exist on the model object ?
             $sRes = parent::get($sPropName);
         } catch (Exception) {
-            # no, it may belong to the oIdentityPrincipal model object
+            // no, it may belong to the oIdentityPrincipal model object
             if ($this->oIdentityPrincipal) {
                 $sRes = $this->oIdentityPrincipal->get($sPropName);
             } else {
@@ -147,12 +154,13 @@ class User extends Db
      * @param bool|int|string|null $sPropValue
      *
      * @return $this
+     *
      * @throws Exception
      */
     public function set(string $sPropName, bool|int|string|null $sPropValue): static
     {
         if ($sPropName === 'password' || $sPropName === 'passwordconfirm') {
-            # Special handling for password and passwordconfirm
+            // Special handling for password and passwordconfirm
 
             if ($sPropName === 'password' && $sPropValue !== '') {
                 parent::set(
@@ -177,20 +185,21 @@ class User extends Db
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function persist(): void
     {
         $bFloating = $this->floating();
 
-        # Persisted first, as Model users loads this data
+        // Persisted first, as Model users loads this data
         $this->oIdentityPrincipal->set('uri', 'principals/' . $this->get('username'));
         $this->oIdentityPrincipal->persist();
 
         parent::persist();
 
         if ($bFloating) {
-            # Creating default calendar for user
+            // Creating default calendar for user
             $oDefaultCalendar = new Calendar();
             $oDefaultCalendar->set(
                 'principaluri',
@@ -211,7 +220,7 @@ class User extends Db
 
             $oDefaultCalendar->persist();
 
-            # Creating default address book for user
+            // Creating default address book for user
             $oDefaultAddressBook = new AddressBook();
             $oDefaultAddressBook->set(
                 'principaluri',
@@ -233,6 +242,7 @@ class User extends Db
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function destroy(): void
@@ -259,6 +269,7 @@ class User extends Db
 
     /**
      * @return string
+     *
      * @throws Exception
      */
     public function getMailtoURI(): string
@@ -362,6 +373,7 @@ class User extends Db
      * @param string $sPassword
      *
      * @return string
+     *
      * @throws Exception
      */
     public function getPasswordHashForPassword(string $sPassword): string

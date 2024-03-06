@@ -1,31 +1,38 @@
 <?php
 
+/**
+ * This file is part of the package sabre/baikal.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-#################################################################
-#  Copyright notice
-#
-#  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
-#  All rights reserved
-#
-#  http://flake.codr.fr
-#
-#  This script is part of the Flake project. The Flake
-#  project is free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-#
-#  The GNU General Public License can be found at
-#  http://www.gnu.org/copyleft/gpl.html.
-#
-#  This script is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  This copyright notice MUST APPEAR in all copies of the script!
-#################################################################
+// ################################################################
+//  Copyright notice
+//
+//  (c) 2013 Jérôme Schneider <mail@jeromeschneider.fr>
+//  All rights reserved
+//
+//  http://flake.codr.fr
+//
+//  This script is part of the Flake project. The Flake
+//  project is free software; you can redistribute it
+//  and/or modify it under the terms of the GNU General Public
+//  License as published by the Free Software Foundation; either
+//  version 2 of the License, or (at your option) any later version.
+//
+//  The GNU General Public License can be found at
+//  http://www.gnu.org/copyleft/gpl.html.
+//
+//  This script is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  This copyright notice MUST APPEAR in all copies of the script!
+// ################################################################
 
 namespace Flake\Util;
 
@@ -35,9 +42,6 @@ use RuntimeException;
 
 use function array_key_exists;
 
-/**
- *
- */
 abstract class Router
 {
     /**
@@ -67,7 +71,7 @@ abstract class Router
      */
     public static function getControllerForRoute(string $sRoute): string
     {
-        return str_replace("\\Route", "\\Controller", self::getRouteClassForRoute($sRoute));
+        return str_replace('\\Route', '\\Controller', self::getRouteClassForRoute($sRoute));
     }
 
     /**
@@ -92,7 +96,7 @@ abstract class Router
         $aRoutes = $GLOBALS['ROUTER']::getRoutes();
 
         foreach ($aRoutes as $sKey => $sRoute) {
-            if (str_replace("\\Route", "\\Controller", $sRoute) === $sController) {
+            if (str_replace('\\Route', '\\Controller', $sRoute) === $sController) {
                 return $sKey;
             }
         }
@@ -122,8 +126,8 @@ abstract class Router
      */
     public static function buildRouteForController(string $sController, array $aParams = []): string
     {
-        #$aParams = func_get_args();
-        #array_shift($aParams);	# stripping $sController
+        // $aParams = func_get_args();
+        // array_shift($aParams);	# stripping $sController
         if (($sRouteForController = $GLOBALS['ROUTER']::getRouteForController($sController)) === false) {
             throw new RuntimeException(
                 "buildRouteForController '" . htmlspecialchars($sController) . "': no route available."
@@ -133,12 +137,12 @@ abstract class Router
         $aRewrittenParams = [];
 
         /** @var Route $sRouteClass */
-        $sRouteClass = self::getRouteClassForRoute($sRouteForController);
+        $sRouteClass    = self::getRouteClassForRoute($sRouteForController);
         $aParametersMap = $sRouteClass::parametersMap();
 
         foreach ($aParametersMap as $sParam => $aMap) {
             if (!array_key_exists($sParam, $aParams)) {
-                # if parameter not in parameters map, skip !
+                // if parameter not in parameters map, skip !
                 continue;
             }
 
@@ -150,8 +154,8 @@ abstract class Router
             $aRewrittenParams[$sUrlToken] = $aParams[$sParam];
         }
 
-        #array_unshift($aParams, $sRouteForController);	# Injecting route as first param
-        #return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
+        // array_unshift($aParams, $sRouteForController);	# Injecting route as first param
+        // return call_user_func_array($GLOBALS["ROUTER"] . "::buildRoute", $aParams);
         return $GLOBALS['ROUTER']::buildRoute($sRouteForController, $aRewrittenParams);
     }
 
@@ -173,10 +177,10 @@ abstract class Router
         return FLAKE_URIPATH . static::$sURIPath;
     }
 
-    /* ----------------------- CHANGING METHODS ----------------------------*/
+    /* ----------------------- CHANGING METHODS ---------------------------- */
 
-    # this method is likely to change with every Router implementation
-    # should be abstract, but is not, because of PHP's strict standards
+    // this method is likely to change with every Router implementation
+    // should be abstract, but is not, because of PHP's strict standards
     /**
      * @param string $sRoute
      * @param array  $aParams
@@ -188,7 +192,7 @@ abstract class Router
         return '';
     }
 
-    # should be abstract, but is not, because of PHP's strict standards
+    // should be abstract, but is not, because of PHP's strict standards
 
     /**
      * @return string
@@ -198,7 +202,7 @@ abstract class Router
         return '';
     }
 
-    # should be abstract, but is not, because of PHP's strict standards
+    // should be abstract, but is not, because of PHP's strict standards
 
     /**
      * @return array
