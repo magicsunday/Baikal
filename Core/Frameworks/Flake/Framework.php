@@ -340,23 +340,23 @@ class Framework extends Core\Framework
     }
 
     /**
-     * @return true|void
+     * @return void
      */
-    protected static function initDb()
+    protected static function initDb(): void
     {
         try {
             $config = Yaml::parseFile(PROJECT_PATH_CONFIG . 'baikal.yaml');
         } catch (Exception $exception) {
             error_log('Error reading baikal.yaml file : ' . $exception->getMessage());
 
-            return true;
+            return;
         }
 
         // Dont init db on install, but in normal mode and when upgrading
         if (defined(
             'BAIKAL_CONTEXT_INSTALL'
         ) && (!isset($config['system']['configured_version']) || $config['system']['configured_version'] === BAIKAL_VERSION)) {
-            return true;
+            return;
         }
 
         if ($config['database']['mysql'] === true) {
