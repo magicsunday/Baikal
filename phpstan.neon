@@ -19,8 +19,3 @@ parameters:
         - %currentWorkingDirectory%/Core/Frameworks/BaikalAdmin/Resources/GlyphiconsPro/generate-sprite.php
         - %currentWorkingDirectory%/Core/Resources/Web/BaikalAdmin/GlyphiconsPro/generate-sprite.php
         - %currentWorkingDirectory%/html/res/core/BaikalAdmin/GlyphiconsPro/generate-sprite.php
-
-    # Ignored errors
-    ignoreErrors:
-        -
-            message: "#^Constant (.*) not found\\.$#"

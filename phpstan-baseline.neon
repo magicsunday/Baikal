@@ -1,2 +1,5 @@
 parameters:
-	ignoreErrors: []
+    # Ignored errors
+    ignoreErrors:
+        -
+            message: "#^Constant (.*) not found\\.$#"
