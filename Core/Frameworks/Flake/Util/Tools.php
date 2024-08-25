@@ -193,7 +193,7 @@ class Tools
             }
 
             if (class_exists($class)) {    // TRUE to autoload class
-                return @is_subclass_of($object, $class) || $object == $class;
+                return @is_subclass_of($object, $class) || $object === $class;
             }
 
             if (interface_exists($class)) {
