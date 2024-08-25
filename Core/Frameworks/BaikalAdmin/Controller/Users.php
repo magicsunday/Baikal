@@ -282,8 +282,8 @@ class Users extends Controller
     public function linkNew(): string
     {
         return self::buildRoute([
-                'new' => 1,
-            ]) . '#form';
+            'new' => 1,
+        ]) . '#form';
     }
 
     /**
@@ -310,8 +310,8 @@ class Users extends Controller
     public static function linkDelete(User $user): string
     {
         return self::buildRoute([
-                'delete' => $user->get('id'),
-            ]) . '#message';
+            'delete' => $user->get('id'),
+        ]) . '#message';
     }
 
     /**
@@ -324,9 +324,9 @@ class Users extends Controller
     public static function linkDeleteConfirm(User $user): string
     {
         return self::buildRoute([
-                'delete'  => $user->get('id'),
-                'confirm' => 1,
-            ]) . '#message';
+            'delete'  => $user->get('id'),
+            'confirm' => 1,
+        ]) . '#message';
     }
 
     /**

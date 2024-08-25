@@ -175,9 +175,9 @@ class Calendars extends Controller
     public function linkNew(): string
     {
         return self::buildRoute([
-                'user' => $this->currentUserId(),
-                'new'  => 1,
-            ]) . '#form';
+            'user' => $this->currentUserId(),
+            'new'  => 1,
+        ]) . '#form';
     }
 
     /**
@@ -286,9 +286,9 @@ class Calendars extends Controller
     public function linkDelete(Calendar $oModel): string
     {
         return self::buildRoute([
-                'user'   => $this->currentUserId(),
-                'delete' => $oModel->get('id'),
-            ]) . '#message';
+            'user'   => $this->currentUserId(),
+            'delete' => $oModel->get('id'),
+        ]) . '#message';
     }
 
     /**
@@ -301,10 +301,10 @@ class Calendars extends Controller
     public function linkDeleteConfirm(Calendar $oModel): string
     {
         return self::buildRoute([
-                'user'    => $this->currentUserId(),
-                'delete'  => $oModel->get('id'),
-                'confirm' => 1,
-            ]) . '#message';
+            'user'    => $this->currentUserId(),
+            'delete'  => $oModel->get('id'),
+            'confirm' => 1,
+        ]) . '#message';
     }
 
     /**
